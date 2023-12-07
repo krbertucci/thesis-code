@@ -56,7 +56,7 @@ def butter_bandpass(signal: np.ndarray):
         signal: This is the non-biased signal after remove_bias
     """
     # Butterworth bandpass filter specifications
-    fs = 2000 #Sampling frequency
+    fs = 2000 # Sampling frequency
     a = 30 # Highpass cut off @ 30 Hz to remove HR (Drake and Callaghan 2006)
     b = 500 # Lowbass cutoff @ 500 Hz 
     Wn = np.array([a, b]) 
@@ -76,12 +76,9 @@ def full_wave_rectify(signal: np.ndarray):
 
 def process_muscle(signal: np.ndarray):
     unbiased_signal = remove_bias(signal)
-    # plot_signal(unbiased_signal, "Unbiased Signal")
     bandpass_signal = butter_bandpass(unbiased_signal)
-    # plot_signal(bandpass_signal, "Bandpass Signal")
     rectified_signal = full_wave_rectify(bandpass_signal)
-    # plot_signal(rectified_signal, "Rectified Signal")
-    _, (ax1, ax2, ax3, ax4) = plt.subplots(4, sharex=True)
+    # _, (ax1, ax2, ax3, ax4) = plt.subplots(4, sharex=True)
     # ax1.plot(signal)
     # ax2.plot(unbiased_signal)
     # ax3.plot(bandpass_signal)
@@ -90,45 +87,35 @@ def process_muscle(signal: np.ndarray):
     
     return rectified_signal
 
-# def plot_signal(signal: np.ndarray, title: str):
-#     plt.plot(signal)
-#     plt.title(title)
-#     plt.xlabel("X")
-#     plt.ylabel("Y")
-#     plt.show()
 muscle_max_arr = []
 for muscle, col in muscles.items(): #idx is indexing the muscle column value
-    print("****** NEW MUSCLE ******")
-    print(f"Processing muscle: {muscle} from column {col}")
-    print(f"Processing Trial 1 ...")
+    #print("****** NEW MUSCLE ******")
+    #print(f"Processing muscle: {muscle} from column {col}")
+    #print(f"Processing Trial 1 ...")
     trial1_path = f"{subject_folder}\{sub_num}_MVC_{muscle}_1_a.tsv"
     t1 = pd.read_csv(trial1_path, sep='\t', header=13) # reads the trial from the indexed column
     trial1_signal = t1[f"EMG {col}"].to_numpy() #obtains the indexed signal of the 2nd trial
     processed_muscle_signal_t1 = process_muscle(trial1_signal)
     trial1_max = np.max(processed_muscle_signal_t1) #gets max value from processed trial 1 signal
-    print(trial1_max)
-    print(f"Processing Trial 2 ...")
+    #print(trial1_max)
+    #print(f"Processing Trial 2 ...")
     trial2_path = f"{subject_folder}/{sub_num}_MVC_{muscle}_2_a.tsv"
     t2 = pd.read_csv(trial2_path, sep='\t', header=13)
     trial2_signal = t2[f"EMG {col}"].to_numpy() #obtains the indexed signal of the 2nd trial
     processed_muscle_signal_t2 = process_muscle(trial2_signal)
     trial2_max = np.max(processed_muscle_signal_t2) #gets max value from processed trial 2 signal
-    print(trial2_max)
+    #print(trial2_max)
    
-    print(muscle_max_arr)
     muscle_mvc_max = max(trial1_max, trial2_max)
-    print(muscle_mvc_max)
     muscle_max_arr.append(muscle_mvc_max)
-    print(muscle_max_arr)
  
 # write the muscle_max_arr to a csv
 # convert csv to dataframe
-subject_mvc_csv = pd.DataFrame(muscle_max_arr) #, columns = ['UTRAP', 'SUPRA', 'INFRA', 'TRICEP', 'BICEP', 'PECC' 'PECS', 'ADELT', 'MDELT', 'EDC', 'ECU', 'ECRB']).to_numpy()
-
-# Transpose the MVC max csv so values can be column matched
-subject_mvc_csv_t = subject_mvc_csv.T
-print(subject_mvc_csv_t)
+muscle_max_arr = np.array(muscle_max_arr)
+muscle_max_arr = np.expand_dims(muscle_max_arr, axis=0)
+subject_mvc_csv = pd.DataFrame(data=muscle_max_arr, columns=muscles.keys())
+print(subject_mvc_csv)
 
 # convert max value array to csv
-subject_mvc_csv_t.to_csv(f"{subject_folder}/{sub_num}_MVC_values.csv")
+subject_mvc_csv.to_csv(f"{subject_folder}/{sub_num}_MVC_valuestest3.csv")
 print(f"subject MVC values have been written to {subject_folder}/{sub_num}")
