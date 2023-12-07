@@ -15,8 +15,8 @@ import matplotlib.pyplot as plt
 #save max values in a file
 
 # set subject number
-sub_num = "S05"
-subject_folder = r"C:\Users\kruss\OneDrive - University of Waterloo\Documents\OSU\Data\S05\Data_Raw\Trial_EMG\MVC" #sets path for files
+sub_num = "S03"
+subject_folder = r"C:\Users\kruss\OneDrive - University of Waterloo\Documents\OSU\Data\S03\Data_Raw\Trial_EMG\MVC" #sets path for files
 subject_dirs = os.listdir(subject_folder) # creates a list of the files in the subject folder
 
 muscles = {
@@ -25,8 +25,8 @@ muscles = {
     "INFRA": 3,
     "TRICEP": 4,
     "BICEP": 5,
-    "PEC(C)": 6,
-    "PEC(S)": 7,
+    "PECC": 6,
+    "PECS": 7,
     "ADELT": 8,
     "MDELT": 9,
     "EDC": 10,
@@ -82,41 +82,53 @@ def process_muscle(signal: np.ndarray):
     rectified_signal = full_wave_rectify(bandpass_signal)
     # plot_signal(rectified_signal, "Rectified Signal")
     _, (ax1, ax2, ax3, ax4) = plt.subplots(4, sharex=True)
-    ax1.plot(signal)
-    ax2.plot(unbiased_signal)
-    ax3.plot(bandpass_signal)
-    ax4.plot(rectified_signal)
-    plt.show()
+    # ax1.plot(signal)
+    # ax2.plot(unbiased_signal)
+    # ax3.plot(bandpass_signal)
+    # ax4.plot(rectified_signal)
+    # plt.show()
     
     return rectified_signal
 
-def plot_signal(signal: np.ndarray, title: str):
-    plt.plot(signal)
-    plt.title(title)
-    plt.xlabel("X")
-    plt.ylabel("Y")
-    plt.show()
-
+# def plot_signal(signal: np.ndarray, title: str):
+#     plt.plot(signal)
+#     plt.title(title)
+#     plt.xlabel("X")
+#     plt.ylabel("Y")
+#     plt.show()
+muscle_max_arr = []
 for muscle, col in muscles.items(): #idx is indexing the muscle column value
     print("****** NEW MUSCLE ******")
     print(f"Processing muscle: {muscle} from column {col}")
     print(f"Processing Trial 1 ...")
     trial1_path = f"{subject_folder}\{sub_num}_MVC_{muscle}_1_a.tsv"
     t1 = pd.read_csv(trial1_path, sep='\t', header=13) # reads the trial from the indexed column
-    trial1_signal = t1[f"EMG {col}"].to_numpy()
-    processed_muscle_signal = process_muscle(trial1_signal)
-    trial1_max = np.max(processed_muscle_signal)
+    trial1_signal = t1[f"EMG {col}"].to_numpy() #obtains the indexed signal of the 2nd trial
+    processed_muscle_signal_t1 = process_muscle(trial1_signal)
+    trial1_max = np.max(processed_muscle_signal_t1) #gets max value from processed trial 1 signal
     print(trial1_max)
+    print(f"Processing Trial 2 ...")
+    trial2_path = f"{subject_folder}/{sub_num}_MVC_{muscle}_2_a.tsv"
+    t2 = pd.read_csv(trial2_path, sep='\t', header=13)
+    trial2_signal = t2[f"EMG {col}"].to_numpy() #obtains the indexed signal of the 2nd trial
+    processed_muscle_signal_t2 = process_muscle(trial2_signal)
+    trial2_max = np.max(processed_muscle_signal_t2) #gets max value from processed trial 2 signal
+    print(trial2_max)
+   
+    print(muscle_max_arr)
+    muscle_mvc_max = max(trial1_max, trial2_max)
+    print(muscle_mvc_max)
+    muscle_max_arr.append(muscle_mvc_max)
+    print(muscle_max_arr)
+ 
+# write the muscle_max_arr to a csv
+# convert csv to dataframe
+subject_mvc_csv = pd.DataFrame(muscle_max_arr) #, columns = ['UTRAP', 'SUPRA', 'INFRA', 'TRICEP', 'BICEP', 'PECC' 'PECS', 'ADELT', 'MDELT', 'EDC', 'ECU', 'ECRB']).to_numpy()
 
-    # print(f"Processing Trial 2 ...")
-    # trial2_path = f"{subject_folder}\{sub_num}_MVC_{muscle}_2_a.tsv"
-    # t2 = pd.read_csv(trial2_path, sep='\t', header=13)
-    # trial2_max = t2[f"EMG {col}"].max()
-    # print(trial2_max)
-    # print("\n\n")
-    
-    # max_trial = max(trial1_max, trial2_max)
+# Transpose the MVC max csv so values can be column matched
+subject_mvc_csv_t = subject_mvc_csv.T
+print(subject_mvc_csv_t)
 
-# for 
-# if statement to store highest max of specific muscle
-# create an array with all of the max muscles
+# convert max value array to csv
+subject_mvc_csv_t.to_csv(f"{subject_folder}/{sub_num}_MVC_values.csv")
+print(f"subject MVC values have been written to {subject_folder}/{sub_num}")
