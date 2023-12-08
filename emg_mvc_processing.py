@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 # set subject number
 sub_num = "S03"
-subject_folder = r"C:\Users\kruss\OneDrive - University of Waterloo\Documents\OSU\Data\S03\Data_Raw\Trial_EMG\MVC" #sets path for files
+subject_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_EMG/MVC" #sets path for files
 subject_dirs = os.listdir(subject_folder) # creates a list of the files in the subject folder
 
 muscles = {
