@@ -19,7 +19,7 @@ sub_num = "S05"
 subject_folder = r"C:\Users\kruss\OneDrive - University of Waterloo\Documents\OSU\Data\S05\Data_Raw\Trial_EMG\MVC" #sets path for files
 subject_dirs = os.listdir(subject_folder) # creates a list of the files in the subject folder
 
-#dir = glob.glob(f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data\S05\Data_Raw\Trial_EMG\Trial_EMG_Files")
+dir = glob.glob(f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data\S05\Data_Raw\Trial_EMG\Trial_EMG_Files")
 
 muscles = {
     "UTRAP": 1,
