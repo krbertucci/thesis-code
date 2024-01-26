@@ -1,4 +1,4 @@
-#OSU TASK EMG - Kayla Russell-Bertucci (last modified: Jan 9, 2023)
+#OSU TASK EMG - Kayla Russell-Bertucci (last modified: Jan 25, 2023)
 # INPUTS
 #   = 1. Subject Number
 #   = 2. Folder names containing MVC files and trial files
@@ -9,7 +9,7 @@
 # OUTPUT 
 #   = 1. MVC max values for each muscle exports to a csv
 #   = 2. %MVC peak for individual muscles in each mouse sensitivity and difficulty per participant exported to csv
-#
+#   = 3. %MVC mean of each muscle in each condition. takes mean of 3 trials for each condition.
 # TRIAL NAMING CONVENTIONS
 # eh - easy diff high sens 
 # el - easy diff low sens
@@ -18,7 +18,6 @@
 # hl - hard diff low sens
 # hp  - hard diff high sens
 
-
 import pandas as pd
 import numpy as np
 import glob
@@ -26,12 +25,22 @@ import emg_signal_processing_functions as emg_sp
 
 # CHANGE SUBJECT NUMBER BEFORE RUNNING SCRIPT
 sub_num = "S05"
-trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_EMG/Trial_EMG_Files" #sets path for files
-
+#sets path for files
+trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_EMG/Trial_EMG_Files" 
+#sets path for mvc files
 mvc_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_EMG/MVC"
 
 # dictionary with each condition and empty values - the values will be updated with the maxes from line 100
 condition_maxs = {
+    "EASY_PREF": [],
+    "EASY_HIGH": [],
+    "EASY_LOW": [],
+    "HARD_PREF": [],
+    "HARD_HIGH": [],
+    "HARD_LOW": [],
+}
+# dictionary with each condition and empty values - values will be the means of each condition from line 
+condition_means = {
     "EASY_PREF": [],
     "EASY_HIGH": [],
     "EASY_LOW": [],
@@ -95,7 +104,7 @@ for muscle, col in muscles.items():
         condition_trial_paths = glob.glob(f'{trial_folder}/{folder_prefix}')
         # sets max to -1. max will always be greater than -1. if csv contains -1, there is an issue or trial does not exist
         condition_max = -1
-        
+        condition_mean = []
         # iterates through trial count (condition_trial) of the grouped files in condition_trial_paths 
         for condition_trial in condition_trial_paths:
             # creates a data frame from csv containing trial data
@@ -108,16 +117,24 @@ for muscle, col in muscles.items():
             condition_trial_max = np.max(processed_signal)
             # temporarily stores the max of the current condiion 
             condition_max = max(condition_max, condition_trial_max)  
+            # obtains mean of the signal from the processed signal
+            condition_trial_mean = np.mean(processed_signal)
+            # appends the mean of the current trial to condition_mean
+            condition_mean.append(condition_trial_mean)
         # appends the max value from condition_max to the empty value in condition_maxs dictionary
+        condition_meanofmeans = np.mean(condition_mean)
+        # appends the max of the condition to condition_max
         condition_maxs[condition].append(condition_max)
-        # normalizes the condiion maxes to the mvc max value of each muscle if the condition max is not -1
+        # normalize the condition mean to % MVC. if value does not exist then places -1
+        normalized_mean = (condition_meanofmeans/muscle_mvc_max) if condition_meanofmeans >= 0 else -1
+        # appends the normalized means to the value in the conditions_means dictionary
+        condition_means[condition].append(normalized_mean)
+        # normalize the condiion maxes to the mvc max value of each muscle if the condition max is not -1
         normalized_max = (condition_max/muscle_mvc_max) if condition_max != -1 else -1
         # appends the normalized max to the value in normalized_max dictionary
         norm_maxs.append(normalized_max)
-        
 
 # EXPORT VALUES TO CSV
-
 #  create an array that contains the mvc max values
 mvc_muscle_max_arr = np.array(muscle_mvc_max_arr)
 # adds a column of zeroes
@@ -136,3 +153,8 @@ print(f"subject max emg values have been written to {trial_folder}/{sub_num}_con
 df_norm = pd.DataFrame.from_dict(normalized_maxs, orient='index', columns=muscles.keys())
 df_norm.to_csv(f'{trial_folder}/{sub_num}_normalized_condition_maxs.csv')
 print(f"subject max emg values have been written to {trial_folder}/{sub_num}_normalized_condition_maxs.csv'")
+
+# creates a data frame with the normalized means of each condition
+df = pd.DataFrame.from_dict(condition_means, orient='index', columns=muscles.keys())
+df.to_csv(f'{trial_folder}/{sub_num}_condition_means.csv')
+print(f"subject mean emg values have been written to {trial_folder}/{sub_num}_condition_means.csv'")
