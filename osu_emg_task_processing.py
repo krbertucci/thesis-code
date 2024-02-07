@@ -19,9 +19,12 @@
 # hp  - hard diff high sens
 
 import pandas as pd
+import os
 import numpy as np
 import glob
+import matplotlib.pyplot as plt
 import emg_signal_processing_functions as emg_sp
+
 
 # CHANGE SUBJECT NUMBER BEFORE RUNNING SCRIPT
 sub_num = "S05"
@@ -73,6 +76,43 @@ muscles = {
     "ECRB": 12
 } 
 
+mvc_val_dict = {
+    "UTRAP": [],
+    "SUPRA": [],
+    "INFRA": [],
+    "TRICEP": [],
+    "BICEP": [],
+    "PECC": [],
+    "PECS": [],
+    "ADELT": [],
+    "MDELT": [],
+    "EDC": [],
+    "ECU": [],
+    "ECRB": []
+}
+
+
+
+def plot_signal(signal: np.array, path: str, title:str):
+    """ Plot the signal.
+    
+    Arg:
+        signal: the signal to plot.
+        title: the title of the plot
+    """
+    # Increase figure size
+    plt.figure(figsize=(12,6))
+    plt.plot(signal)
+    plt.title(title)
+
+    #Create path if it does not exist
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    plt.savefig(f"{path}/{title}.png")
+    plt.close()
+
+
 # empty array to append individual mvc values in column order
 muscle_mvc_max_arr = []
 for muscle, col in muscles.items():
@@ -88,20 +128,23 @@ for muscle, col in muscles.items():
         # obtains the indexed signal of the 2nd trial
         mvc_df_signal = mvc_df[f"EMG {col}"].to_numpy()
         # processes the signal 
-        processed_mvc_signal = emg_sp.process_muscle(mvc_df_signal)
+        processed_mvc_signal = emg_sp.process_signal(mvc_df_signal)
+        # PLOTING
+        plot_signal(processed_mvc_signal, f"{trial_folder}/mvc_trials/{muscle}", f"MVC_{attempt}_a")
         # gets max value from processed signal
         mvc_trial_max = np.max(processed_mvc_signal)
         # temporarily stores the max value between previous or current trial. previous can be muscle_mvc_max
         muscle_mvc_max = max(muscle_mvc_max, mvc_trial_max)
     # once max values are stored to muscle_mvc_max, they are appended to muscle_mvc_max_arr before the loop moves on to the next muscle 
     muscle_mvc_max_arr.append(muscle_mvc_max)
-
+    
     # iterates through dictionary 'normalized_maxes' by condition which is paired to norm_maxs
     for condition, norm_maxs in normalized_maxs.items():
         # sets folder prefix to obtain files
         folder_prefix = f'd_{sub_num}_{condition}*.tsv'
         # groups trial paths based on their folder prefix which contains the condition name
         condition_trial_paths = glob.glob(f'{trial_folder}/{folder_prefix}')
+        if len(condition_trial_paths) == 0: continue
         # sets max to -1. max will always be greater than -1. if csv contains -1, there is an issue or trial does not exist
         condition_max = -1
         condition_mean = []
@@ -112,7 +155,8 @@ for muscle, col in muscles.items():
             # converts condition_df csv to a numpy file
             condition_signal = condition_df[f"EMG {col}"].to_numpy()
             # process trial signal using signal processing function (bandpass, fwr)
-            processed_signal = emg_sp.process_muscle(condition_signal)
+            processed_signal = emg_sp.process_signal(condition_signal)
+            plot_signal(processed_signal, f"{trial_folder}/trial_emg_plots/{muscle}", f"processed_{condition}")
             # obtains maximal value from the processed signal
             condition_trial_max = np.max(processed_signal)
             # temporarily stores the max of the current condiion 
@@ -144,17 +188,21 @@ mvc_muscle_csv = pd.DataFrame(data=mvc_muscle_max_arr, columns=muscles.keys())
 # converts the data frame to a csv format
 mvc_muscle_csv.to_csv(f"{mvc_folder}/{sub_num}_MVC_values.csv")
 
+
+#export MVC values
+#df_mvc = pd.DataFrame.from_dict()
+
 # creates a data frame with the un-normalized condition max values
-df = pd.DataFrame.from_dict(condition_maxs, orient='index', columns=muscles.keys())
-df.to_csv(f'{trial_folder}/{sub_num}_condition_maxs.csv')
+df_conmax = pd.DataFrame.from_dict(condition_maxs, orient='index', columns=muscles.keys())
+df_conmax.to_csv(f'{trial_folder}/{sub_num}_condition_maxs.csv')
 print(f"subject max emg values have been written to {trial_folder}/{sub_num}_condition_maxs.csv'")
 
 # creates a data frame with the normalized condition max values
-df_norm = pd.DataFrame.from_dict(normalized_maxs, orient='index', columns=muscles.keys())
-df_norm.to_csv(f'{trial_folder}/{sub_num}_normalized_condition_maxs.csv')
+df_normconmax = pd.DataFrame.from_dict(normalized_maxs, orient='index', columns=muscles.keys())
+df_normconmax.to_csv(f'{trial_folder}/{sub_num}_normalized_condition_maxs.csv')
 print(f"subject max emg values have been written to {trial_folder}/{sub_num}_normalized_condition_maxs.csv'")
 
 # creates a data frame with the normalized means of each condition
-df = pd.DataFrame.from_dict(condition_means, orient='index', columns=muscles.keys())
-df.to_csv(f'{trial_folder}/{sub_num}_condition_means.csv')
-print(f"subject mean emg values have been written to {trial_folder}/{sub_num}_condition_means.csv'")
+df_normmean = pd.DataFrame.from_dict(condition_means, orient='index', columns=muscles.keys())
+df_normmean.to_csv(f'{trial_folder}/{sub_num}_normalized_condition_means.csv')
+print(f"subject mean emg values have been written to {trial_folder}/{sub_num}_normalized_condition_means.csv'")
