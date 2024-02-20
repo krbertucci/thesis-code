@@ -131,7 +131,7 @@ for muscle, col in tqdm(muscles.items()):
         # processes the signal 
         processed_mvc_signal = emg_sp.process_signal(mvc_df_signal)
         # PLOTING
-        plot_signal(processed_mvc_signal, f"{trial_folder}/mvc_trials/{muscle}", f"MVC_{attempt}_a")
+        plot_signal(processed_mvc_signal, f"{trial_folder}/MVC_trials/", f"MVC_{muscle}_{attempt}_a")
         # gets max value from processed signal
         mvc_trial_max = np.max(processed_mvc_signal)
         # temporarily stores the max value between previous or current trial. previous can be muscle_mvc_max
@@ -160,7 +160,7 @@ for muscle, col in tqdm(muscles.items()):
             # process trial signal using signal processing function (bandpass, fwr)
             processed_signal = emg_sp.process_signal(condition_signal)
             #plots processed signal of each condition trial
-            plot_signal(processed_signal, f"{trial_folder}/Trial_EMG_plots/{muscle}", condition_trial_basename)
+            plot_signal(processed_signal, f"{trial_folder}/Trial_EMG_plots/{muscle}", f'{condition_trial_basename}_{muscle}')
             # obtains maximal value from the processed signal
             condition_trial_max = np.max(processed_signal)
             # temporarily stores the max of the current condiion 
