@@ -8,10 +8,11 @@
 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import glob
 
 # input subject
-sub_num = "S05"
+sub_num = "S12"
 # set path for files
 trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_Kinematics/Digitized_TSV"
 
@@ -21,11 +22,11 @@ fs = 100
 # CALIBRATION
 
 # set cal file folder
-cal_file = f"{trial_folder}/d_{sub_num}_CAL_2.tsv"
+cal_file = f"{trial_folder}/d_{sub_num}_CAL_1.tsv"
 # reads csv into a data frame
 cal_raw = pd.read_csv(cal_file, sep='\t', header = 12)
 # sets the row for the cal trial (note: frame#-1)
-cal_frame = 3
+cal_frame = 2
 # create dictionary containing marker names and their columns
 
 #create a dictionary for the markers, marker name : indexed lines from the file
@@ -59,7 +60,7 @@ cal_clusters = {
 
 # ROTATE TO ISB AXES
     #Define axes rotation matrix
-        #QTM conventions: +X = , +Y = , +Z = up
+        #QTM conventions: +X = forward, +Y = up, +Z = right
         #ISB conventions: +X = forward, +Y = up, +Z = right
 ISB_X = np.array([0, 1, 0])
 ISB_Y = np.array([0, 0, 1])
@@ -79,15 +80,45 @@ def rotate_vector(vector, rotation_matrix):
     vector = np.squeeze(vector) #ensure vector is 1D
     return np.dot(rotation_matrix, vector)
 
+
+''' If values need to be rotated then uncomment below '''
 # Apply rotation to cal_markers
 for marker_name, marker_values in cal_markers.items():
     cal_markers[marker_name] = rotate_vector(marker_values, ISB)
-
 # Apply rotation to cal_clusters
 for cluster_name, cluster_values in cal_clusters.items():
     cal_clusters[cluster_name] = rotate_vector(cluster_values, ISB)
 
 print(cal_markers)
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.set_title('CAL_isb')
+
+''' VISUAL CHECK OF MARKERS '''
+# Function to add scatter plot and text annotations
+def add_scatter_and_text(ax, marker_name, markers_dict):
+    ''' Visual check of markers '''
+    x, y, z = markers_dict[marker_name]
+    ax.scatter(x, y, z, c='r', marker='o', label=marker_name)
+    ax.text(x, y, z, f'{marker_name}', color='r')
+
+for marker_name in cal_markers:
+    add_scatter_and_text(ax, marker_name, cal_markers)
+
+plt.show()
+# print(cal_markers)
 # Define Cal markers
 # mcp2_cal = cal_raw.iloc[cal_frame,
 
+# USE FOR TRIALS
+
+# for cal_frame in range(len(cal_raw)):
+#     # Update cal_markers for each marker
+#     for marker_name, marker_columns in cal_markers.items():
+#         marker_values = cal_raw.iloc[cal_frame, marker_columns].values
+#         cal_markers[marker_name] = rotate_vector(marker_values, ISB)
+
+# # Convert cal_markers dictionary to a data frame
+# cal_markers_df = pd.DataFrame(cal_markers)  # Transpose for better orientation
+# cal_markers_df.columns = ['X', 'Y', 'Z']  # Rename columns if needed
