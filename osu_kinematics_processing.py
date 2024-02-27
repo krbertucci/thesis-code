@@ -10,9 +10,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import glob
+import plotly.express as px
+
 
 # input subject
-sub_num = "S12"
+sub_num = "S11"
 # set path for files
 trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_Kinematics/Digitized_TSV"
 
@@ -67,7 +69,7 @@ ISB_Y = np.array([0, 0, 1])
 ISB_Z = np.array([-1, 0, 0])
 ISB = [ISB_X, ISB_Y, ISB_Z]
 
-print(cal_markers)
+
 
 def rotate_vector(vector, rotation_matrix):
     #function to rotate the marker vectors by the ISB matrix
@@ -82,18 +84,30 @@ def rotate_vector(vector, rotation_matrix):
 
 
 ''' If values need to be rotated then uncomment below '''
-# Apply rotation to cal_markers
-for marker_name, marker_values in cal_markers.items():
-    cal_markers[marker_name] = rotate_vector(marker_values, ISB)
-# Apply rotation to cal_clusters
-for cluster_name, cluster_values in cal_clusters.items():
-    cal_clusters[cluster_name] = rotate_vector(cluster_values, ISB)
+# # Apply rotation to cal_markers
+# for marker_name, marker_values in cal_markers.items():
+#     cal_markers[marker_name] = rotate_vector(marker_values, ISB)
+# # Apply rotation to cal_clusters
+# for cluster_name, cluster_values in cal_clusters.items():
+#     cal_clusters[cluster_name] = rotate_vector(cluster_values, ISB)
 
-print(cal_markers)
+#print(cal_markers)
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.set_title('CAL_isb')
+
+cal_markers_arr = []
+#Create array of the dictionari
+for values in cal_markers.values():
+    cal_markers_arr.append(values)
+cal_markers_arr = np.array(cal_markers_arr)
+
+print(cal_markers_arr)
+
+# fig = px.scatter_3d(x=cal_markers_arr[:,0], y = cal_markers_arr[:,1], z = cal_markers_arr[:,2])
+# fig.show()
+
 
 ''' VISUAL CHECK OF MARKERS '''
 # Function to add scatter plot and text annotations
@@ -102,6 +116,9 @@ def add_scatter_and_text(ax, marker_name, markers_dict):
     x, y, z = markers_dict[marker_name]
     ax.scatter(x, y, z, c='r', marker='o', label=marker_name)
     ax.text(x, y, z, f'{marker_name}', color='r')
+    ax.set_xlim(0, 2000)
+    ax.set_ylim(0,2000)
+    ax.set_zlim(0,2000)
 
 for marker_name in cal_markers:
     add_scatter_and_text(ax, marker_name, cal_markers)
