@@ -9,7 +9,7 @@ subject_maxs_dfs = []
     # change range to the desired subjects
 for sub_num in range(1,13):
     # Create path to the csv based on list from 0 to 34
-    # S{sub_num:02d}
+    # S{sub_num:02d} adds a 0 to single digit subject numbers
     sub_path_means = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/S{sub_num:02d}/Data_Raw/Trial_EMG/Trial_EMG_Files/S{sub_num:02d}_sorted_normalized_condition_means.csv"
     sub_path_maxs = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/S{sub_num:02d}/Data_Raw/Trial_EMG/Trial_EMG_Files/S{sub_num:02d}_sorted_normalized_condition_maxs.csv"
     # Import csv into df from the path
