@@ -159,9 +159,10 @@ for muscle, col in tqdm(muscles.items()):
             condition_signal = condition_df[f"EMG {col}"].to_numpy()
             # process trial signal using signal processing function (bandpass, fwr)
             processed_signal = emg_sp.process_signal(condition_signal)
-            clipped_processed_signal = processed_signal(range(6000,106460))
+            #clips outer 4.5 seconds off each trial to remove processing noise
+            clipped_processed_signal = processed_signal[9000:107000]
             #plots processed signal of each condition trial
-            plot_signal(clipped_processed_signal, f"{trial_folder}/Trial_EMG_plots/{muscle}", f'{condition_trial_basename}_{muscle}')
+            plot_signal(clipped_processed_signal, f"{trial_folder}/Trial_EMG_plots/", f'{muscle}_{condition_trial_basename}')
             # obtains maximal value from the processed signal
             condition_trial_max = np.max(clipped_processed_signal)
             # temporarily stores the max of the current condiion 
