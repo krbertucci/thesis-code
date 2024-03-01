@@ -169,16 +169,19 @@ chest_x = np.cross(chest_temp, chest_z)/np.linalg.norm(np.cross(chest_temp, ches
 chest_y = np.cross(chest_z, chest_x)/np.linalg.norm(np.cross(chest_z, chest_x))
 
     # Right Upper Arm
-ua_y = (ua3 - ua2) / np.linalg.norm(ua3-ua2)
-ua_temp = (ua1 - ua3) / np.linalg.norm(ua1 - ua3)
+ua_y = (ua3 - ua1) / np.linalg.norm(ua3-ua1)
+ua_temp = (ua2 - ua3) / np.linalg.norm(ua2 - ua3)
 ua_x = np.cross(ua_y, ua_temp) / np.linalg.norm(np.cross(ua_y, ua_temp))
 ua_z = np.cross(ua_x, ua_y) / np.linalg.norm(np.cross(ua_x, ua_y))
 
     #Right Forearm
-fa_y = (fa3 - fa2) / np.linalg.norm(fa3-fa2)
-fa_temp = (fa1 - fa3) / np.linalg.norm(fa1 - fa3)
+fa_y = (fa3 - fa1) / np.linalg.norm(fa3-fa1)
+fa_temp = (fa2 - fa3) / np.linalg.norm(fa2 - fa3)
 fa_x = np.cross(fa_y, fa_temp) / np.linalg.norm(np.cross(fa_y, fa_temp))
 fa_z = np.cross(fa_x, fa_y) / np.linalg.norm(np.cross(fa_x, fa_y))
+
+    # Right hand
+# y = towards wrist, z = towards thumn, x = towards palm
 
 
 
@@ -204,3 +207,4 @@ ax.legend()
 
     # Show the plot
 plt.show()
+
