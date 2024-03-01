@@ -6,6 +6,7 @@
 # 3. Filters and pads data
 # OUTPUT = Processed task trials (individual trial ranges and averaged ranges)
 
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
