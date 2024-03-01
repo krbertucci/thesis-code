@@ -5,30 +5,31 @@
 # 2. Recreates markers using LCS
 # 3. Filters and pads data
 # OUTPUT = Processed task trials (individual trial ranges and averaged ranges)
+ 
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import glob
 import plotly.express as px
+from mpl_toolkits.mplot3d import Axes3D
 
 
 # input subject
-sub_num = "S11"
+sub_num = "S07"
 # set path for files
 trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_Kinematics/Digitized_TSV"
-
 # sample rate
 fs = 100
 
 # CALIBRATION
 
 # set cal file folder
-cal_file = f"{trial_folder}/d_{sub_num}_CAL_1.tsv"
+cal_file = r"C:\Users\kruss\OneDrive - University of Waterloo\Documents\OSU\Data\S07\Data_Raw\Trial_Kinematic\Digitized_TSV/d_S07_CAL_2.tsv"
 # reads csv into a data frame
-cal_raw = pd.read_csv(cal_file, sep='\t', header = 12)
+cal_raw = pd.read_csv(cal_file, sep='\t', header = 13)
 # sets the row for the cal trial (note: frame#-1)
-cal_frame = 2
+cal_frame = 5
 # create dictionary containing marker names and their columns
 
 #create a dictionary for the markers, marker name : indexed lines from the file
@@ -116,14 +117,20 @@ def add_scatter_and_text(ax, marker_name, markers_dict):
     x, y, z = markers_dict[marker_name]
     ax.scatter(x, y, z, c='r', marker='o', label=marker_name)
     ax.text(x, y, z, f'{marker_name}', color='r')
-    ax.set_xlim(0, 2000)
-    ax.set_ylim(0,2000)
-    ax.set_zlim(0,2000)
+    ax.set_xlim(0, 1500)
+    ax.set_ylim(0,1500)
+    ax.set_zlim(0,1500)
+ # Set labels
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
 
+    # Set legend
+ax.legend()
 for marker_name in cal_markers:
     add_scatter_and_text(ax, marker_name, cal_markers)
 
-plt.show()
+#plt.show()
 # print(cal_markers)
 # Define Cal markers
 # mcp2_cal = cal_raw.iloc[cal_frame,
@@ -139,3 +146,61 @@ plt.show()
 # # Convert cal_markers dictionary to a data frame
 # cal_markers_df = pd.DataFrame(cal_markers)  # Transpose for better orientation
 # cal_markers_df.columns = ['X', 'Y', 'Z']  # Rename columns if needed
+
+fa1 = cal_raw.iloc[cal_frame, 12:15].values
+fa2 = cal_raw.iloc[cal_frame, 15:18].values
+fa3 = cal_raw.iloc[cal_frame, 18:21].values
+ua1 = cal_raw.iloc[cal_frame, 27:30].values
+ua2 = cal_raw.iloc[cal_frame, 30:33].values
+ua3 = cal_raw.iloc[cal_frame, 33:36].values
+chest1 = cal_raw.iloc[cal_frame, 45:48].values
+chest2 = cal_raw.iloc[cal_frame, 48:51].values
+chest3 = cal_raw.iloc[cal_frame, 51:54].values
+chest4 = cal_raw.iloc[cal_frame, 54:57].values
+chest5 = cal_raw.iloc[cal_frame, 57:60].values
+
+
+# Define the Local Coordinate System of the Clusters during calibration trial
+
+    # Chest
+chest_z = (chest5-chest4)/np.linalg.norm(chest5-chest4)
+chest_temp = (chest1-chest5)/np.linalg.norm(chest1-chest5)
+chest_x = np.cross(chest_temp, chest_z)/np.linalg.norm(np.cross(chest_temp, chest_z))
+chest_y = np.cross(chest_z, chest_x)/np.linalg.norm(np.cross(chest_z, chest_x))
+
+    # Right Upper Arm
+ua_y = (ua3 - ua2) / np.linalg.norm(ua3-ua2)
+ua_temp = (ua1 - ua3) / np.linalg.norm(ua1 - ua3)
+ua_x = np.cross(ua_y, ua_temp) / np.linalg.norm(np.cross(ua_y, ua_temp))
+ua_z = np.cross(ua_x, ua_y) / np.linalg.norm(np.cross(ua_x, ua_y))
+
+    #Right Forearm
+fa_y = (fa3 - fa2) / np.linalg.norm(fa3-fa2)
+fa_temp = (fa1 - fa3) / np.linalg.norm(fa1 - fa3)
+fa_x = np.cross(fa_y, fa_temp) / np.linalg.norm(np.cross(fa_y, fa_temp))
+fa_z = np.cross(fa_x, fa_y) / np.linalg.norm(np.cross(fa_x, fa_y))
+
+
+
+
+# Vector Plotting
+origin = [0, 0 ,0]
+ax.quiver(*origin, *chest_x, color='r', label='Chest X')
+ax.quiver(*origin, *chest_y, color='g', label='Chest Y')
+ax.quiver(*origin, *chest_z, color='b', label='Chest Z')
+
+    # Set plot limits
+ax.set_xlim([-10, 10])
+ax.set_ylim([-10, 10])
+ax.set_zlim([-10, 10])
+
+ # Set labels
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+
+    # Set legend
+ax.legend()
+
+    # Show the plot
+plt.show()
