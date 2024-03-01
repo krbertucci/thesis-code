@@ -7,7 +7,7 @@ subject_means_dfs = []
 subject_maxs_dfs = [] 
 # Create list of 0 to 34
     # change range to the desired subjects
-for sub_num in range(1,13):
+for sub_num in range(1,35):
     # Create path to the csv based on list from 0 to 34
     # S{sub_num:02d} adds a 0 to single digit subject numbers
     sub_path_means = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/S{sub_num:02d}/Data_Raw/Trial_EMG/Trial_EMG_Files/S{sub_num:02d}_sorted_normalized_condition_means.csv"
@@ -21,7 +21,8 @@ for sub_num in range(1,13):
 
 concatenated_subs_means = pd.concat(subject_means_dfs, ignore_index=True)
 concatenated_subs_maxs = pd.concat(subject_maxs_dfs, ignore_index=True)
-print(concatenated_subs_means)
-print(concatenated_subs_maxs)
+#print(concatenated_subs_means)
+#print(concatenated_subs_maxs)
 concatenated_subs_means.to_csv(f"{data_folder}/osu_subject_means.csv")
 concatenated_subs_maxs.to_csv(f"{data_folder}/osu_subject_maxs.csv")
+print(f'files have been saved to {data_folder}')
