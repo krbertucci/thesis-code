@@ -120,6 +120,7 @@ def add_scatter_and_text(ax, marker_name, markers_dict):
     ax.set_xlim(0, 1500)
     ax.set_ylim(0,1500)
     ax.set_zlim(0,1500)
+    origin = [0, 0, 0]
  # Set labels
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
@@ -130,7 +131,7 @@ ax.legend()
 for marker_name in cal_markers:
     add_scatter_and_text(ax, marker_name, cal_markers)
 
-#plt.show()
+# plt.show()
 # print(cal_markers)
 # Define Cal markers
 # mcp2_cal = cal_raw.iloc[cal_frame,
@@ -169,16 +170,16 @@ chest_x = np.cross(chest_temp, chest_z)/np.linalg.norm(np.cross(chest_temp, ches
 chest_y = np.cross(chest_z, chest_x)/np.linalg.norm(np.cross(chest_z, chest_x))
 
     # Right Upper Arm
-ua_y = (ua3 - ua1) / np.linalg.norm(ua3-ua1)
-ua_temp = (ua2 - ua3) / np.linalg.norm(ua2 - ua3)
+ua_y = (ua1 - ua3) / np.linalg.norm(ua1-ua3)
+ua_temp = (ua1 - ua2) / np.linalg.norm(ua1 - ua2)
 ua_x = np.cross(ua_y, ua_temp) / np.linalg.norm(np.cross(ua_y, ua_temp))
 ua_z = np.cross(ua_x, ua_y) / np.linalg.norm(np.cross(ua_x, ua_y))
 
     #Right Forearm
-fa_y = (fa3 - fa1) / np.linalg.norm(fa3-fa1)
+fa_y = (fa1 - fa3) / np.linalg.norm(fa1-fa3)
 fa_temp = (fa2 - fa3) / np.linalg.norm(fa2 - fa3)
-fa_x = np.cross(fa_y, fa_temp) / np.linalg.norm(np.cross(fa_y, fa_temp))
-fa_z = np.cross(fa_x, fa_y) / np.linalg.norm(np.cross(fa_x, fa_y))
+fa_z = np.cross(fa_y, fa_temp) / np.linalg.norm(np.cross(fa_y, fa_temp))
+fa_x = np.cross(fa_y, fa_z) / np.linalg.norm(np.cross(fa_y, fa_z))
 
     # Right hand
 # y = towards wrist, z = towards thumn, x = towards palm
@@ -188,9 +189,9 @@ fa_z = np.cross(fa_x, fa_y) / np.linalg.norm(np.cross(fa_x, fa_y))
 
 # Vector Plotting
 origin = [0, 0 ,0]
-ax.quiver(*origin, *chest_x, color='r', label='Chest X')
-ax.quiver(*origin, *chest_y, color='g', label='Chest Y')
-ax.quiver(*origin, *chest_z, color='b', label='Chest Z')
+ax.quiver(*origin, *fa_x, color='r', label='Chest X')
+ax.quiver(*origin, *fa_y, color='g', label='Chest Y')
+ax.quiver(*origin, *fa_z, color='b', label='Chest Z')
 
     # Set plot limits
 ax.set_xlim([-10, 10])
