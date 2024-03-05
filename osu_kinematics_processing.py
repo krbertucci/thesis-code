@@ -10,9 +10,10 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import glob
 import plotly.express as px
-from mpl_toolkits.mplot3d import Axes3D
+
 
 
 # input subject
@@ -207,5 +208,95 @@ ax.set_zlabel('Z')
 ax.legend()
 
     # Show the plot
-plt.show()
+# plt.show()
 
+# Define global coordinate axes
+xglobal = np.array([1, 0, 0])
+yglobal = np.array([0, 1, 0])
+zglobal = np.array([0, 0, 1])
+
+# Compute rotation matrix to go from GCS to Cluster LCS
+
+global_chest = np.array([
+    [np.dot(chest_x, xglobal), np.dot(chest_x, yglobal), np.dot(chest_x, zglobal)],
+    [np.dot(chest_y, xglobal), np.dot(chest_y , yglobal), np.dot(chest_y , zglobal)],
+    [np.dot(chest_z, xglobal), np.dot(chest_z, yglobal), np.dot(chest_z, zglobal)],
+])
+
+global_ua = np.array([
+    [np.dot(ua_x, xglobal), np.dot(ua_x, yglobal), np.dot(ua_x, zglobal)],
+    [np.dot(ua_y, xglobal), np.dot(ua_y , yglobal), np.dot(ua_y , zglobal)],
+    [np.dot(ua_z, xglobal), np.dot(ua_z, yglobal), np.dot(ua_z, zglobal)],
+])
+
+global_fa = np.array([
+    [np.dot(fa_x, xglobal), np.dot(fa_x, yglobal), np.dot(fa_x, zglobal)],
+    [np.dot(fa_y, xglobal), np.dot(fa_y , yglobal), np.dot(fa_y , zglobal)],
+    [np.dot(fa_z, xglobal), np.dot(fa_z, yglobal), np.dot(fa_z, zglobal)],
+])
+
+# Find the relationship between Clusters and markers
+print('the GCS values are as follows')
+print(global_chest)
+print('the ss markers are below')
+print(cal_markers["ss"])
+print('the chest1 markers are below')
+print(chest1)
+# Chest to SS, XP, C7, chest origin set to chest4 (bottom left)
+ss_chest = np.dot(global_chest, np.array(cal_markers["ss"]) - np.array(chest4))
+xp_chest = np.dot(global_chest, np.array(cal_markers["xp"]) - np.array(chest4))
+c7_chest = np.dot(global_chest, np.array(cal_markers["c7"]) - np.array(chest4))
+
+print('the ss to chest are below')
+print(ss_chest)
+print('the xp to chest are below')
+print(xp_chest)
+print('the c7 to chest are below')
+print(c7_chest)
+# Upper Arm to ME, LE, ua origin set to ua1
+me_ua = np.dot(global_ua, np.array(cal_markers["me"]) - np.array(ua1))
+le_ua = np.dot(global_ua, np.array(cal_markers["le"]) - np.array(ua1))
+
+print('the me to ua are below')
+print(me_ua)
+print('the le to ua are below')
+print(le_ua)
+
+# Forearm to US, RS
+us_fa = np.dot(global_fa, np.array(cal_markers["us"]) - np.array(fa1))
+rs_fa = np.dot(global_fa, np.array(cal_markers["rs"]) - np.array(fa1))
+
+print('the us to fa are below')
+print(us_fa)
+print('the rs to fa are below')
+print(rs_fa)
+
+
+# Create a 3D plot
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+# Plot markers
+ax.scatter(cal_markers["ss"][0], cal_markers["ss"][1], cal_markers["ss"][2], c='m', marker='o', label='SS')
+ax.scatter(cal_markers["xp"][0], cal_markers["xp"][1], cal_markers["xp"][2], c='m', marker='o', label='XP')
+ax.scatter(cal_markers["ss"][0], cal_markers["ss"][1], cal_markers["ss"][2], c='m', marker='o', label='SS')
+
+# ax.scatter(XP[0, 0], XP[0, 1], XP[0, 2], c='m', marker='o', label='XP')
+# ax.scatter(L5[0, 0], L5[0, 1], L5[0, 2], c='m', marker='o', label='L5')
+# ax.scatter(C7[0, 0], C7[0, 1], C7[0, 2], c='m', marker='o', label='C7')
+# ax.scatter(T8[0, 0], T8[0, 1], T8[0, 2], c='m', marker='o', label='T8')
+
+# Plot additional markers
+# ... (Repeat the pattern for other markers)
+
+# Plot lines
+# ax.plot([XP[0, 0], SS[0, 0]], [XP[0, 1], SS[0, 1]], [XP[0, 2], SS[0, 2]], color='black')
+# ... (Repeat the pattern for other lines)
+
+# Set axis labels
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+
+# Show the plot
+plt.show()
