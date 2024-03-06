@@ -279,18 +279,17 @@ ax = fig.add_subplot(111, projection='3d')
 # Plot markers
 ax.scatter(cal_markers["ss"][0], cal_markers["ss"][1], cal_markers["ss"][2], c='m', marker='o', label='SS')
 ax.scatter(cal_markers["xp"][0], cal_markers["xp"][1], cal_markers["xp"][2], c='m', marker='o', label='XP')
-ax.scatter(cal_markers["ss"][0], cal_markers["ss"][1], cal_markers["ss"][2], c='m', marker='o', label='SS')
+ax.scatter(cal_markers["c7"][0], cal_markers["c7"][1], cal_markers["c7"][2], c='m', marker='o', label='C7')
 
-# ax.scatter(XP[0, 0], XP[0, 1], XP[0, 2], c='m', marker='o', label='XP')
-# ax.scatter(L5[0, 0], L5[0, 1], L5[0, 2], c='m', marker='o', label='L5')
-# ax.scatter(C7[0, 0], C7[0, 1], C7[0, 2], c='m', marker='o', label='C7')
-# ax.scatter(T8[0, 0], T8[0, 1], T8[0, 2], c='m', marker='o', label='T8')
+ax.scatter(cal_clusters["chest1"][0], cal_clusters["chest1"][1], cal_clusters["chest1"][2], c='m', marker='o', label='chest1')
+ax.scatter(cal_clusters["chest4"][0], cal_clusters["chest4"][1], cal_clusters["chest4"][2], c='m', marker='o', label='chest4')
+ax.scatter(cal_clusters["chest5"][0], cal_clusters["chest5"][1], cal_clusters["chest5"][2], c='m', marker='o', label='chest5')
 
 # Plot additional markers
 # ... (Repeat the pattern for other markers)
 
 # Plot lines
-# ax.plot([XP[0, 0], SS[0, 0]], [XP[0, 1], SS[0, 1]], [XP[0, 2], SS[0, 2]], color='black')
+# ax.plot(cal_markers["xp"][0,0], cal_markers["ss"][0,0], [XP[0, 1], SS[0, 1]], [XP[0, 2], SS[0, 2]], color='black')
 # ... (Repeat the pattern for other lines)
 
 # Set axis labels
