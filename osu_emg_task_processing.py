@@ -27,7 +27,7 @@ import emg_signal_processing_functions as emg_sp
 from tqdm import tqdm
 
 # CHANGE SUBJECT NUMBER BEFORE RUNNING SCRIPT
-sub_num = "S01"
+sub_num = "S25"
 #sets path for files
 trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_EMG/Trial_EMG_Files" 
 #sets path for mvc files
