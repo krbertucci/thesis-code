@@ -65,43 +65,6 @@ cal_clusters = {
 
 ## IMPORT TASK TRIAL AND DATA ##
 
-#Set up Task File Directories 
-trial_folder = r'C:\Users\kruss\OneDrive - University of Waterloo\Documents\OSU\Data\S01\Data_Raw\Trial_Kinematic\Digitized_TSV\d_S01_HIGH_2.tsv'
-
-
-#folder_prefix = f'd_{sub_num}_{condition}*.tsv'
-# reads csv into a data frame
-trial_raw = pd.read_csv(cal_file, sep='\t', header = 13)
-# Define LCS and unit vectors for task clusters
-
-
-trial_markers = {
-    "mcp2" : trial_raw.iloc[0:3].values,
-    "mcp5" : trial_raw.iloc[3:6].values,
-    "rs" : trial_raw.iloc[:9].values,
-    "us" : trial_raw.iloc[:12].values,
-    "le" : trial_raw.iloc[21:24].values,
-    "me" : trial_raw.iloc[24:27].values,
-    "r_acr" : trial_raw.iloc[36:39].values,
-    "ss" : trial_raw.iloc[42:45].values,
-    "xp" : trial_raw.iloc[60:63].values,
-    "c7" : trial_raw.iloc[39:42].values,
-    "l_acr" : trial_raw.iloc[63:66].values,
-    }
-# create a dictionary for the clusters. cluster marker : indexed frame from file
-trial_clusters = {
-    "fa1": trial_raw.iloc[12:15].values,
-    "fa2" : trial_raw.iloc[15:16].values,
-    "fa3" : trial_raw.iloc[18:21].values,
-    "ua1" : trial_raw.iloc[27:30].values,
-    "ua2" : trial_raw.iloc[30:33].values,
-    "ua3" : trial_raw.iloc[33:36].values,
-    "chest1" : trial_raw.iloc[45:48].values,
-    "chest2" : trial_raw.iloc[48:51].values,
-    "chest3" : trial_raw.iloc[51:54].values,
-    "chest4" : trial_raw.iloc[54:57].values,
-    "chest5" : trial_raw.iloc[57:60].values,
-}
 
 
 # ROTATE TO ISB AXES
@@ -341,3 +304,86 @@ ax.set_zlim([-2000, 2000])
 # Show the plot
 # plt.show()
 
+''' TASK '''
+# add in condition dictionaries from EMG processing 
+#folder_prefix = f'd_{sub_num}_{condition}*.tsv'
+# reads csv into a data frame
+trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_Kinematics/Digitized_TSV" 
+trial_file = f"{trial_folder}/d_{sub_num}"
+trial_raw = pd.read_csv(trial_file, sep='\t', header = 13)
+
+
+trial_markers = {
+    "mcp2" : trial_raw.iloc[0:3].values,
+    "mcp5" : trial_raw.iloc[3:6].values,
+    "rs" : trial_raw.iloc[:9].values,
+    "us" : trial_raw.iloc[:12].values,
+    "le" : trial_raw.iloc[21:24].values,
+    "me" : trial_raw.iloc[24:27].values,
+    "r_acr" : trial_raw.iloc[36:39].values,
+    "ss" : trial_raw.iloc[42:45].values,
+    "xp" : trial_raw.iloc[60:63].values,
+    "c7" : trial_raw.iloc[39:42].values,
+    "l_acr" : trial_raw.iloc[63:66].values,
+    }
+
+# create a dictionary for the clusters. cluster marker : indexed frame from file
+trial_clusters = {
+    "fa1": trial_raw.iloc[12:15].values,
+    "fa2" : trial_raw.iloc[15:16].values,
+    "fa3" : trial_raw.iloc[18:21].values,
+    "ua1" : trial_raw.iloc[27:30].values,
+    "ua2" : trial_raw.iloc[30:33].values,
+    "ua3" : trial_raw.iloc[33:36].values,
+    "chest1" : trial_raw.iloc[45:48].values,
+    "chest2" : trial_raw.iloc[48:51].values,
+    "chest3" : trial_raw.iloc[51:54].values,
+    "chest4" : trial_raw.iloc[54:57].values,
+    "chest5" : trial_raw.iloc[57:60].values,
+}
+
+
+# dictionary with each condition name and empty values 
+condition_names = {
+    "EASY_PREF": [],
+    "EASY_HIGH": [],
+    "EASY_LOW": [],
+    "HARD_PREF": [],
+    "HARD_HIGH": [],
+    "HARD_LOW": [],
+}
+
+
+''' DEFINE LCS AND UNIT VECTORS FOR TASK CLUSTERS '''
+# use imported task trial to iterate through cluster markers
+# remaking coordinate systems using task clusters
+
+#iterate through the length of the trial to create a LCS for each frame
+for frames in len(trial_raw):
+    #forearm
+    fa_trial_y = ((np.array(trial_clusters["fa3"]) - np.array(trial_clusters["fa1"]))) / np.linalg.norm(np.array(trial_clusters["fa3"]) - np.array(trial_clusters["fa1"]))
+    fa_trial_temp = ((np.array(trial_clusters["fa2"]) - np.array(trial_clusters["fa1"]))) / np.linalg.norm(np.array(trial_clusters["fa2"]) - np.array(trial_clusters["fa1"]))
+    fa_trial_x = np.cross(fa_trial_y, fa_trial_temp) / np.linalg.norm(np.cross(fa_trial_y, fa_trial_temp))
+    fa_trial_z = np.cross(fa_trial_y, fa_trial_x) / np.linalg.norm(np.cross(fa_trial_y, fa_trial_x))
+    #upper arm
+    ua_trial_y = ((np.array(trial_clusters["ua3"]) - np.array(trial_clusters["ua1"]))) / np.linalg.norm(np.array(trial_clusters["ua3"]) - np.array(trial_clusters["ua1"]))
+    ua_trial_temp = ((np.array(trial_clusters["ua2"]) - np.array(trial_clusters["ua1"]))) / np.linalg.norm(np.array(trial_clusters["ua2"]) - np.array(trial_clusters["ua1"]))
+    ua_trial_z = np.cross(ua_trial_y, ua_trial_temp) / np.linalg.norm(np.cross(ua_trial_y, ua_trial_temp))
+    ua_trial_x = np.cross(ua_trial_y, ua_trial_z) / np.linalg.norm(np.cross(ua_trial_y, ua_trial_z))
+    #Chest
+    chest_trial_z = ((np.array(trial_clusters["chest4"]) - np.array(trial_clusters["chest5"]))) / np.linalg.norm(np.array(trial_clusters["chest4"]) - np.array(trial_clusters["chest5"]))
+    chest_trial_temp = ((np.array(trial_clusters["chest2"]) - np.array(trial_clusters["chest5"]))) / np.linalg.norm(np.array(trial_clusters["chest2"]) - np.array(trial_clusters["chest5"]))
+    chest_trial_x = np.cross(chest_trial_z, chest_trial_temp) / np.linalg.norm(np.cross(chest_trial_z, chest_trial_temp))
+    chest_trial_y = np.cross(chest_trial_z, chest_trial_x) / np.linalg.norm(np.cross(chest_trial_z, chest_trial_x))
+    
+
+
+#tried to make for loop but idk how to incorporate it oops
+# for condition, values in condition_names.items():
+#     #sets folder prefix to obtain files
+#     folder_prefix = f'd_{sub_num}_{condition}*.tsv'
+#     # groups trial paths based on their folder prefix containing condition name
+#     condition_trial_paths = glob.glob(f'{task_folder}/{folder_prefix}')
+#     if len(condition_trial_paths) == 0: continue #doesnt break for low lvl
+#     for condition_trial in condition_trial_paths:
+    
