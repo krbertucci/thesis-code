@@ -310,7 +310,7 @@ ax.set_zlim([-2000, 2000])
 # reads csv into a data frame
 trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_Kinematics/Digitized_TSV" 
 trial_file = f"{trial_folder}/d_{sub_num}"
-trial_raw = pd.read_csv(trial_file, sep='\t', header = 13)
+trial_raw = pd.read_csv(trial_file, sep='\t', header = 13) #sets csv to df
 
 
 trial_markers = {
@@ -342,40 +342,61 @@ trial_clusters = {
     "chest5" : trial_raw.iloc[57:60].values,
 }
 
-
-# dictionary with each condition name and empty values 
-condition_names = {
-    "EASY_PREF": [],
-    "EASY_HIGH": [],
-    "EASY_LOW": [],
-    "HARD_PREF": [],
-    "HARD_HIGH": [],
-    "HARD_LOW": [],
-}
+# Define trial cluster indexing
+# (r = frames, column = 3), dataframe
+trial_fa1 = trial_raw.iloc[:,12:15].values
+trial_fa2 = trial_raw.iloc[:,15:18].values
+trial_fa3 = trial_raw.iloc[:,18:21].values
+trial_ua1 = trial_raw.iloc[:,27:30].values
+trial_ua2 = trial_raw.iloc[:,30:33].values
+trial_ua3 = trial_raw.iloc[:,33:36].values
+trial_chest1 = trial_raw.iloc[:,45:48].values
+trial_chest2 = trial_raw.iloc[:,48:51].values
+trial_chest3 = trial_raw.iloc[:,51:54].values
+trial_chest4 = trial_raw.iloc[:,54:57].values
+trial_chest5 = trial_raw.iloc[:,57:60].values
 
 
 ''' DEFINE LCS AND UNIT VECTORS FOR TASK CLUSTERS '''
 # use imported task trial to iterate through cluster markers
 # remaking coordinate systems using task clusters
+trial_frame_count = len(trial_raw)
+
+# create empty lists to store LCS vectors
+# forearm vectors 
+fa_trial_x = []
+fa_trial_y = []
+fa_trial_z = []
+
+# upper arm vectors
+ua_trial_x = []
+ua_trial_y = []
+ua_trial_z = []
+
+# chest vectors
+chest_trial_x = []
+chest_trial_y = []
+chest_trial_z = []
 
 #iterate through the length of the trial to create a LCS for each frame
-for frames in len(trial_raw):
-    #forearm
-    fa_trial_y = ((np.array(trial_clusters["fa3"]) - np.array(trial_clusters["fa1"]))) / np.linalg.norm(np.array(trial_clusters["fa3"]) - np.array(trial_clusters["fa1"]))
-    fa_trial_temp = ((np.array(trial_clusters["fa2"]) - np.array(trial_clusters["fa1"]))) / np.linalg.norm(np.array(trial_clusters["fa2"]) - np.array(trial_clusters["fa1"]))
-    fa_trial_x = np.cross(fa_trial_y, fa_trial_temp) / np.linalg.norm(np.cross(fa_trial_y, fa_trial_temp))
-    fa_trial_z = np.cross(fa_trial_y, fa_trial_x) / np.linalg.norm(np.cross(fa_trial_y, fa_trial_x))
-    #upper arm
-    ua_trial_y = ((np.array(trial_clusters["ua3"]) - np.array(trial_clusters["ua1"]))) / np.linalg.norm(np.array(trial_clusters["ua3"]) - np.array(trial_clusters["ua1"]))
-    ua_trial_temp = ((np.array(trial_clusters["ua2"]) - np.array(trial_clusters["ua1"]))) / np.linalg.norm(np.array(trial_clusters["ua2"]) - np.array(trial_clusters["ua1"]))
-    ua_trial_z = np.cross(ua_trial_y, ua_trial_temp) / np.linalg.norm(np.cross(ua_trial_y, ua_trial_temp))
-    ua_trial_x = np.cross(ua_trial_y, ua_trial_z) / np.linalg.norm(np.cross(ua_trial_y, ua_trial_z))
+#iterate through the length of the trial to create a LCS for each frame
+for frame in range(trial_frame_count):
+    #Forearm
+    fa_trial_y_frame = ((trial_fa3[frame, :] - trial_fa1[frame, :])) /(np.linalg.norm(trial_fa3[frame, :] - trial_fa1[frame, :]))
+    fa_trial_temp_frame = (trial_fa2[frame,: ] - trial_fa1[frame, :]) / (np.linalg.norm(trial_fa2[frame, :] - trial_fa1[frame, :]))
+    fa_trial_x_frame = np.cross(fa_trial_y_frame, fa_trial_temp_frame) / np.linalg.norm(np.cross(fa_trial_y_frame, fa_trial_temp_frame))
+    fa_trial_z_frame = np.cross(fa_trial_x_frame, fa_trial_y_frame) / np.linalg.norm(np.cross(fa_trial_x_frame, fa_trial_y_frame))
+    #Upper arm
+    ua_trial_y_frame = ((trial_ua3[frame, :] - trial_ua1[frame, :])) /(np.linalg.norm(trial_ua3[frame, :] - trial_ua1[frame, :]))
+    ua_trial_temp_frame = (trial_ua2[frame, :] - trial_ua1[frame, :]) / (np.linalg.norm(trial_ua2[frame, :] - trial_ua1[frame, :]))
+    ua_trial_x_frame = np.cross(ua_trial_y_frame, ua_trial_temp_frame) / np.linalg.norm(np.cross(ua_trial_y_frame, ua_trial_temp_frame))
+    ua_trial_z_frame = np.cross(ua_trial_y_frame, ua_trial_x_frame) / np.linalg.norm(np.cross(ua_trial_y_frame, ua_trial_x_frame))
     #Chest
-    chest_trial_z = ((np.array(trial_clusters["chest4"]) - np.array(trial_clusters["chest5"]))) / np.linalg.norm(np.array(trial_clusters["chest4"]) - np.array(trial_clusters["chest5"]))
-    chest_trial_temp = ((np.array(trial_clusters["chest2"]) - np.array(trial_clusters["chest5"]))) / np.linalg.norm(np.array(trial_clusters["chest2"]) - np.array(trial_clusters["chest5"]))
-    chest_trial_x = np.cross(chest_trial_z, chest_trial_temp) / np.linalg.norm(np.cross(chest_trial_z, chest_trial_temp))
-    chest_trial_y = np.cross(chest_trial_z, chest_trial_x) / np.linalg.norm(np.cross(chest_trial_z, chest_trial_x))
-    
+    chest_trial_z_frame = ((trial_chest4[frame, :] - trial_chest5[frame, :])) /(np.linalg.norm(trial_chest4[frame, :] - trial_chest5[frame, :]))
+    chest_trial_temp_frame = (trial_chest2[frame, :] - trial_chest5[frame, :]) / (np.linalg.norm(trial_chest2[frame, :] - trial_chest5[frame, :]))
+    chest_trial_x_frame = np.cross(chest_trial_z_frame, chest_trial_temp_frame) / np.linalg.norm(np.cross(chest_trial_z_frame, chest_trial_temp_frame))
+    chest_trial_y_frame = np.cross(chest_trial_z_frame, chest_trial_x_frame) / np.linalg.norm(np.cross(chest_trial_z_frame, chest_trial_x_frame))
+
 
 
 #tried to make for loop but idk how to incorporate it oops
@@ -387,3 +408,14 @@ for frames in len(trial_raw):
 #     if len(condition_trial_paths) == 0: continue #doesnt break for low lvl
 #     for condition_trial in condition_trial_paths:
     
+
+    # dictionary with each condition name and empty values 
+condition_names = {
+    "EASY_PREF": [],
+    "EASY_HIGH": [],
+    "EASY_LOW": [],
+    "HARD_PREF": [],
+    "HARD_HIGH": [],
+    "HARD_LOW": [],
+}
+
