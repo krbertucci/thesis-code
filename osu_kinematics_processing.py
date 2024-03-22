@@ -168,30 +168,36 @@ cal_chest5 = cal_raw.iloc[cal_frame, 57:60].values
 
 # Define the Local Coordinate System of the Clusters during calibration trial
 
-    # Chest
-chest_z = (cal_chest4-cal_chest5)/np.linalg.norm(cal_chest4-cal_chest5)
-chest_temp = (cal_chest2-cal_chest5)/np.linalg.norm(cal_chest2-cal_chest5)
-chest_x = np.cross(chest_temp, chest_z)/np.linalg.norm(np.cross(chest_temp, chest_z))
-chest_y = np.cross(chest_z, chest_x)/np.linalg.norm(np.cross(chest_z, chest_x))
+    # Chest, O = chest5, +Y = superior, +X = anterior, +Z = right 
+cal_chest_z = (cal_chest4-cal_chest5)/np.linalg.norm(cal_chest4-cal_chest5)
+cal_chest_temp = (cal_chest3-cal_chest5)/np.linalg.norm(cal_chest3-cal_chest5)
+cal_chest_x = np.cross(cal_chest_temp, cal_chest_z)/np.linalg.norm(np.cross(cal_chest_temp, cal_chest_z))
+cal_chest_y = np.cross(cal_chest_z, cal_chest_x)/np.linalg.norm(np.cross(cal_chest_z, cal_chest_x))
 
-    # Right Upper Arm
-ua_y = (cal_ua3 - cal_ua1) / np.linalg.norm(cal_ua3-cal_ua1)
-ua_temp = (cal_ua2 - cal_ua1) / np.linalg.norm(cal_ua2 - cal_ua1)
-ua_z = np.cross(ua_y, ua_temp) / np.linalg.norm(np.cross(ua_y, ua_temp))
-ua_x = np.cross(ua_y, ua_z) / np.linalg.norm(np.cross(ua_y, ua_z))
+    # Right Upper Arm, tip facing POSTERIOR, O = ua1, +Y = superior, +X = anterior, +Z = lateral
+cal_ua_y = (cal_ua3 - cal_ua1) / np.linalg.norm(cal_ua3-cal_ua1)
+cal_ua_temp = (cal_ua2 - cal_ua1) / np.linalg.norm(cal_ua2 - cal_ua1)
+cal_ua_z = np.cross(cal_ua_y, cal_ua_temp) / np.linalg.norm(np.cross(cal_ua_y, cal_ua_temp))
+cal_ua_x = np.cross(cal_ua_y, cal_ua_z) / np.linalg.norm(np.cross(cal_ua_y, cal_ua_z))
+
+    # Right Upper Arm, tip facing ANTERIOR, O = ua1, +Y = superior, +X = anterior, +Z = lateral
+# cal_ua_y = (cal_ua3 - cal_ua1) / np.linalg.norm(cal_ua3-cal_ua1)
+# cal_ua_temp = (cal_ua2 - cal_ua1) / np.linalg.norm(cal_ua2 - cal_ua1)
+# cal_ua_z = np.cross(cal_ua_temp, cal_ua_y) / np.linalg.norm(np.cross(cal_ua_temp, cal_ua_y))
+# cal_ua_x = np.cross(cal_ua_y, cal_ua_z) / np.linalg.norm(np.cross(cal_ua_y, cal_ua_z))
 
     #Right Forearm
-fa_y = (cal_fa3 - cal_fa1) / np.linalg.norm(cal_fa3-cal_fa1)
-fa_temp = (cal_fa2 - cal_fa1) / np.linalg.norm(cal_fa2 - cal_fa1)
-fa_x = np.cross(fa_y, fa_temp) / np.linalg.norm(np.cross(fa_y, fa_temp))
-fa_z = np.cross(fa_y, fa_x) / np.linalg.norm(np.cross(fa_y, fa_x))
+cal_fa_y = (cal_fa3 - cal_fa1) / np.linalg.norm(cal_fa3-cal_fa1)
+cal_fa_temp = (cal_fa2 - cal_fa1) / np.linalg.norm(cal_fa2 - cal_fa1)
+cal_fa_x = np.cross(cal_fa_y, cal_fa_temp) / np.linalg.norm(np.cross(cal_fa_y, cal_fa_temp))
+cal_fa_z = np.cross(cal_fa_x, cal_fa_y) / np.linalg.norm(np.cross(cal_fa_x, cal_fa_y))
 
     # Right hand
 # y = towards wrist, z = towards thumb, x = towards palm
-hand_y = ((np.array(cal_markers["rs"]) - np.array(cal_markers["mcp2"]))) / np.linalg.norm(np.array(cal_markers["rs"]) - np.array(cal_markers["mcp2"]))
-hand_temp = ((np.array(cal_markers["us"]) - np.array(cal_markers["mcp2"]))) / np.linalg.norm(np.array(cal_markers["us"]) - np.array(cal_markers["mcp2"]))
-hand_x = np.cross(hand_temp, hand_y) / np.linalg.norm(np.cross(hand_temp, hand_y))
-hand_z = np.cross(hand_y, hand_x) / np.linalg.norm(np.cross(hand_y, hand_x))
+cal_hand_y = ((np.array(cal_markers["rs"]) - np.array(cal_markers["mcp2"]))) / np.linalg.norm(np.array(cal_markers["rs"]) - np.array(cal_markers["mcp2"]))
+cal_hand_temp = ((np.array(cal_markers["us"]) - np.array(cal_markers["mcp2"]))) / np.linalg.norm(np.array(cal_markers["us"]) - np.array(cal_markers["mcp2"]))
+cal_hand_x = np.cross(cal_hand_y, cal_hand_temp) / np.linalg.norm(np.cross(cal_hand_y, cal_hand_temp))
+cal_hand_z = np.cross(cal_hand_y, cal_hand_x) / np.linalg.norm(np.cross(cal_hand_y, cal_hand_x))
 
 # # Vector Plotting
 # origin = [0, 0 ,0]
@@ -218,27 +224,27 @@ global_z = np.array([0, 0, 1])
 # Compute rotation matrix to go from GCS to Cluster LCS
 
 global_cal_chest = np.array([
-    [np.dot(chest_x, global_x), np.dot(chest_x, global_y), np.dot(chest_x, global_z)],
-    [np.dot(chest_y, global_x), np.dot(chest_y , global_y), np.dot(chest_y , global_z)],
-    [np.dot(chest_z, global_x), np.dot(chest_z, global_y), np.dot(chest_z, global_z)],
+    [np.dot(cal_chest_x, global_x), np.dot(cal_chest_x, global_y), np.dot(cal_chest_x, global_z)],
+    [np.dot(cal_chest_y, global_x), np.dot(cal_chest_y , global_y), np.dot(cal_chest_y , global_z)],
+    [np.dot(cal_chest_z, global_x), np.dot(cal_chest_z, global_y), np.dot(cal_chest_z, global_z)],
 ])
 
 global_cal_ua = np.array([
-    [np.dot(ua_x, global_x), np.dot(ua_x, global_y), np.dot(ua_x, global_z)],
-    [np.dot(ua_y, global_x), np.dot(ua_y , global_y), np.dot(ua_y , global_z)],
-    [np.dot(ua_z, global_x), np.dot(ua_z, global_y), np.dot(ua_z, global_z)],
+    [np.dot(cal_ua_x, global_x), np.dot(cal_ua_x, global_y), np.dot(cal_ua_x, global_z)],
+    [np.dot(cal_ua_y, global_x), np.dot(cal_ua_y , global_y), np.dot(cal_ua_y , global_z)],
+    [np.dot(cal_ua_z, global_x), np.dot(cal_ua_z, global_y), np.dot(cal_ua_z, global_z)],
 ])
 
 global_cal_fa = np.array([
-    [np.dot(fa_x, global_x), np.dot(fa_x, global_y), np.dot(fa_x, global_z)],
-    [np.dot(fa_y, global_x), np.dot(fa_y , global_y), np.dot(fa_y , global_z)],
-    [np.dot(fa_z, global_x), np.dot(fa_z, global_y), np.dot(fa_z, global_z)],
+    [np.dot(cal_fa_x, global_x), np.dot(cal_fa_x, global_y), np.dot(cal_fa_x, global_z)],
+    [np.dot(cal_fa_y, global_x), np.dot(cal_fa_y , global_y), np.dot(cal_fa_y , global_z)],
+    [np.dot(cal_fa_z, global_x), np.dot(cal_fa_z, global_y), np.dot(cal_fa_z, global_z)],
 ])
 
 global_cal_hand = np.array([
-    [np.dot(hand_x, global_x), np.dot(hand_x, global_y), np.dot(hand_x, global_z)],
-    [np.dot(hand_y, global_x), np.dot(hand_y , global_y), np.dot(hand_y , global_z)],
-    [np.dot(hand_z, global_x), np.dot(hand_z, global_y), np.dot(hand_z, global_z)],
+    [np.dot(cal_hand_x, global_x), np.dot(cal_hand_x, global_y), np.dot(cal_hand_x, global_z)],
+    [np.dot(cal_hand_y, global_x), np.dot(cal_hand_y , global_y), np.dot(cal_hand_y , global_z)],
+    [np.dot(cal_hand_z, global_x), np.dot(cal_hand_z, global_y), np.dot(cal_hand_z, global_z)],
 ])
 
 # Define the relationship between Clusters and markers
@@ -312,36 +318,6 @@ trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/
 trial_file = f"{trial_folder}/d_{sub_num}"
 trial_raw = pd.read_csv(trial_file, sep='\t', header = 13) #sets csv to df
 
-
-trial_markers = {
-    "mcp2" : trial_raw.iloc[0:3].values,
-    "mcp5" : trial_raw.iloc[3:6].values,
-    "rs" : trial_raw.iloc[:9].values,
-    "us" : trial_raw.iloc[:12].values,
-    "le" : trial_raw.iloc[21:24].values,
-    "me" : trial_raw.iloc[24:27].values,
-    "r_acr" : trial_raw.iloc[36:39].values,
-    "ss" : trial_raw.iloc[42:45].values,
-    "xp" : trial_raw.iloc[60:63].values,
-    "c7" : trial_raw.iloc[39:42].values,
-    "l_acr" : trial_raw.iloc[63:66].values,
-    }
-
-# create a dictionary for the clusters. cluster marker : indexed frame from file
-trial_clusters = {
-    "fa1": trial_raw.iloc[12:15].values,
-    "fa2" : trial_raw.iloc[15:16].values,
-    "fa3" : trial_raw.iloc[18:21].values,
-    "ua1" : trial_raw.iloc[27:30].values,
-    "ua2" : trial_raw.iloc[30:33].values,
-    "ua3" : trial_raw.iloc[33:36].values,
-    "chest1" : trial_raw.iloc[45:48].values,
-    "chest2" : trial_raw.iloc[48:51].values,
-    "chest3" : trial_raw.iloc[51:54].values,
-    "chest4" : trial_raw.iloc[54:57].values,
-    "chest5" : trial_raw.iloc[57:60].values,
-}
-
 # Define trial cluster indexing
 # (r = frames, column = 3), dataframe
 trial_mcp2 = trial_raw.iloc[0:3].values
@@ -397,7 +373,7 @@ for frame in range(trial_frame_count):
     
     #Forearm
     fa_trial_y_frame = ((trial_fa3[frame, :] - trial_fa1[frame, :])) /(np.linalg.norm(trial_fa3[frame, :] - trial_fa1[frame, :]))
-    fa_trial_temp_frame = (trial_fa2[frame,: ] - trial_fa1[frame, :]) / (np.linalg.norm(trial_fa2[frame, :] - trial_fa1[frame, :]))
+    fa_trial_temp_frame = (trial_fa2[frame,:] - trial_fa1[frame, :]) / (np.linalg.norm(trial_fa2[frame, :] - trial_fa1[frame, :]))
     fa_trial_x_frame = np.cross(fa_trial_y_frame, fa_trial_temp_frame) / np.linalg.norm(np.cross(fa_trial_y_frame, fa_trial_temp_frame))
     fa_trial_z_frame = np.cross(fa_trial_x_frame, fa_trial_y_frame) / np.linalg.norm(np.cross(fa_trial_x_frame, fa_trial_y_frame))
     #Upper arm
@@ -458,13 +434,7 @@ for frame in range(trial_frame_count):
 #     for condition_trial in condition_trial_paths:
     
 
-    # dictionary with each condition name and empty values 
-condition_names = {
-    "EASY_PREF": [],
-    "EASY_HIGH": [],
-    "EASY_LOW": [],
-    "HARD_PREF": [],
-    "HARD_HIGH": [],
-    "HARD_LOW": [],
-}
-
+# **** 6. Create virtual markers from the cal and task relationship
+    # select one cluster per marker
+# virtual = 1 cluster marker + (trial GRL*marker to cluster vector)
+    
