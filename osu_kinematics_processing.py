@@ -211,34 +211,34 @@ hand_z = np.cross(hand_y, hand_x) / np.linalg.norm(np.cross(hand_y, hand_x))
 # # plt.show()
 
 # Define global coordinate axes
-xglobal = np.array([1, 0, 0])
-yglobal = np.array([0, 1, 0])
-zglobal = np.array([0, 0, 1])
+global_x = np.array([1, 0, 0])
+global_y = np.array([0, 1, 0])
+global_z = np.array([0, 0, 1])
 
 # Compute rotation matrix to go from GCS to Cluster LCS
 
 global_cal_chest = np.array([
-    [np.dot(chest_x, xglobal), np.dot(chest_x, yglobal), np.dot(chest_x, zglobal)],
-    [np.dot(chest_y, xglobal), np.dot(chest_y , yglobal), np.dot(chest_y , zglobal)],
-    [np.dot(chest_z, xglobal), np.dot(chest_z, yglobal), np.dot(chest_z, zglobal)],
+    [np.dot(chest_x, global_x), np.dot(chest_x, global_y), np.dot(chest_x, global_z)],
+    [np.dot(chest_y, global_x), np.dot(chest_y , global_y), np.dot(chest_y , global_z)],
+    [np.dot(chest_z, global_x), np.dot(chest_z, global_y), np.dot(chest_z, global_z)],
 ])
 
 global_cal_ua = np.array([
-    [np.dot(ua_x, xglobal), np.dot(ua_x, yglobal), np.dot(ua_x, zglobal)],
-    [np.dot(ua_y, xglobal), np.dot(ua_y , yglobal), np.dot(ua_y , zglobal)],
-    [np.dot(ua_z, xglobal), np.dot(ua_z, yglobal), np.dot(ua_z, zglobal)],
+    [np.dot(ua_x, global_x), np.dot(ua_x, global_y), np.dot(ua_x, global_z)],
+    [np.dot(ua_y, global_x), np.dot(ua_y , global_y), np.dot(ua_y , global_z)],
+    [np.dot(ua_z, global_x), np.dot(ua_z, global_y), np.dot(ua_z, global_z)],
 ])
 
 global_cal_fa = np.array([
-    [np.dot(fa_x, xglobal), np.dot(fa_x, yglobal), np.dot(fa_x, zglobal)],
-    [np.dot(fa_y, xglobal), np.dot(fa_y , yglobal), np.dot(fa_y , zglobal)],
-    [np.dot(fa_z, xglobal), np.dot(fa_z, yglobal), np.dot(fa_z, zglobal)],
+    [np.dot(fa_x, global_x), np.dot(fa_x, global_y), np.dot(fa_x, global_z)],
+    [np.dot(fa_y, global_x), np.dot(fa_y , global_y), np.dot(fa_y , global_z)],
+    [np.dot(fa_z, global_x), np.dot(fa_z, global_y), np.dot(fa_z, global_z)],
 ])
 
 global_cal_hand = np.array([
-    [np.dot(hand_x, xglobal), np.dot(hand_x, yglobal), np.dot(hand_x, zglobal)],
-    [np.dot(hand_y, xglobal), np.dot(hand_y , yglobal), np.dot(hand_y , zglobal)],
-    [np.dot(hand_z, xglobal), np.dot(hand_z, yglobal), np.dot(hand_z, zglobal)],
+    [np.dot(hand_x, global_x), np.dot(hand_x, global_y), np.dot(hand_x, global_z)],
+    [np.dot(hand_y, global_x), np.dot(hand_y , global_y), np.dot(hand_y , global_z)],
+    [np.dot(hand_z, global_x), np.dot(hand_z, global_y), np.dot(hand_z, global_z)],
 ])
 
 # Define the relationship between Clusters and markers
@@ -344,6 +344,10 @@ trial_clusters = {
 
 # Define trial cluster indexing
 # (r = frames, column = 3), dataframe
+trial_mcp2 = trial_raw.iloc[0:3].values
+trial_mcp5 = trial_raw.iloc[3:6].values
+trial_rs = trial_raw.iloc[:9].values
+trial_us = trial_raw.iloc[:12].values
 trial_fa1 = trial_raw.iloc[:,12:15].values
 trial_fa2 = trial_raw.iloc[:,15:18].values
 trial_fa3 = trial_raw.iloc[:,18:21].values
@@ -363,6 +367,11 @@ trial_chest5 = trial_raw.iloc[:,57:60].values
 trial_frame_count = len(trial_raw)
 
 # create empty lists to store LCS vectors
+# hand vectors
+hand_trial_x = []
+hand_trial_y = []
+hand_trial_z = []
+
 # forearm vectors 
 fa_trial_x = []
 fa_trial_y = []
@@ -379,8 +388,13 @@ chest_trial_y = []
 chest_trial_z = []
 
 #iterate through the length of the trial to create a LCS for each frame
-#iterate through the length of the trial to create a LCS for each frame
 for frame in range(trial_frame_count):
+    #Hand, O = mcp2, Y = towards wrist, Z = radial X = dorsal
+    hand_trial_y_frame = ((trial_rs[frame, :] - trial_mcp2[frame, :])) /(np.linalg.norm(trial_rs[frame, :] - trial_mcp2[frame, :]))
+    hand_trial_temp_frame = (trial_us[frame,: ] - trial_mcp2[frame, :]) / (np.linalg.norm(trial_us[frame, :] - trial_mcp2[frame, :]))
+    hand_trial_z_frame = np.cross(hand_trial_y_frame, hand_trial_temp_frame) / np.linalg.norm(np.cross(hand_trial_y_frame, hand_trial_temp_frame))
+    hand_trial_x_frame = np.cross(hand_trial_z_frame, hand_trial_y_frame) / np.linalg.norm(np.cross(hand_trial_z_frame, hand_trial_z_frame))
+    
     #Forearm
     fa_trial_y_frame = ((trial_fa3[frame, :] - trial_fa1[frame, :])) /(np.linalg.norm(trial_fa3[frame, :] - trial_fa1[frame, :]))
     fa_trial_temp_frame = (trial_fa2[frame,: ] - trial_fa1[frame, :]) / (np.linalg.norm(trial_fa2[frame, :] - trial_fa1[frame, :]))
@@ -397,7 +411,42 @@ for frame in range(trial_frame_count):
     chest_trial_x_frame = np.cross(chest_trial_z_frame, chest_trial_temp_frame) / np.linalg.norm(np.cross(chest_trial_z_frame, chest_trial_temp_frame))
     chest_trial_y_frame = np.cross(chest_trial_z_frame, chest_trial_x_frame) / np.linalg.norm(np.cross(chest_trial_z_frame, chest_trial_x_frame))
 
+# ******* 5. Define rotation matrix (global to local) for task clusters *******
+    
+# # set empty arrays for rotation matrix of each LCS
+# hand_trial_GRL = np.zeros((3,3))
+# fa_trial_GRL = np.zeros((3,3))    
+# ua_trial_GRL = np.zeros((3,3))
+# chest_trial_GRL = np.zeros((3,3))
 
+def compute_GRL_rotation_matrix(LCS_v_x, LCS_v_y, LCS_v_z):
+    """ Computes a Global to Local rotation matrix
+    Inputs
+    LCS_v_x = x vector of the LCS
+    LCS_v_y = y vector of the LCS
+    LCS_v_z = z vector of the LCS
+    """
+    trial_global_rot = np.zeros((3,3))
+
+    trial_global_rot[0,0] = np.dot(LCS_v_x, global_x)
+    trial_global_rot[0,1] = np.dot(LCS_v_x, global_y)
+    trial_global_rot[0,2] = np.dot(LCS_v_x, global_z)
+    trial_global_rot[1,0] = np.dot(LCS_v_y, global_x)
+    trial_global_rot[1,1] = np.dot(LCS_v_y, global_y)
+    trial_global_rot[1,2] = np.dot(LCS_v_y, global_z)
+    trial_global_rot[2,0] = np.dot(LCS_v_z, global_x)
+    trial_global_rot[2,1] = np.dot(LCS_v_z, global_y)
+    trial_global_rot[2,2] = np.dot(LCS_v_z, global_z)
+
+    return trial_global_rot
+
+
+# iterate through 
+for frame in range(trial_frame_count):
+    hand_trial_GRL = compute_GRL_rotation_matrix(hand_trial_x_frame, hand_trial_y_frame, hand_trial_z_frame)
+    fa_trial_GRL = compute_GRL_rotation_matrix(fa_trial_x_frame, fa_trial_y_frame, fa_trial_z_frame)
+    ua_trial_GRL = compute_GRL_rotation_matrix(ua_trial_x_frame, ua_trial_y_frame, ua_trial_z_frame)
+    chest_trial_GRL = compute_GRL_rotation_matrix(chest_trial_x_frame, chest_trial_y_frame, chest_trial_z_frame)
 
 #tried to make for loop but idk how to incorporate it oops
 # for condition, values in condition_names.items():
