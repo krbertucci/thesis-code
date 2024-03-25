@@ -17,7 +17,7 @@ import plotly.express as px
 
 
 # input subject
-sub_num = "S07"
+sub_num = "S04"
 # set path for files
 trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_Kinematics/Digitized_TSV"
 # sample rate
@@ -186,18 +186,17 @@ cal_ua_x = np.cross(cal_ua_y, cal_ua_z) / np.linalg.norm(np.cross(cal_ua_y, cal_
 # cal_ua_z = np.cross(cal_ua_temp, cal_ua_y) / np.linalg.norm(np.cross(cal_ua_temp, cal_ua_y))
 # cal_ua_x = np.cross(cal_ua_y, cal_ua_z) / np.linalg.norm(np.cross(cal_ua_y, cal_ua_z))
 
-    #Right Forearm
+    #Right Forearm, O = fa1, y = towards elbow, z = posterior, x = lateral
 cal_fa_y = (cal_fa3 - cal_fa1) / np.linalg.norm(cal_fa3-cal_fa1)
 cal_fa_temp = (cal_fa2 - cal_fa1) / np.linalg.norm(cal_fa2 - cal_fa1)
 cal_fa_x = np.cross(cal_fa_y, cal_fa_temp) / np.linalg.norm(np.cross(cal_fa_y, cal_fa_temp))
 cal_fa_z = np.cross(cal_fa_x, cal_fa_y) / np.linalg.norm(np.cross(cal_fa_x, cal_fa_y))
 
-    # Right hand
-# y = towards wrist, z = towards thumb, x = towards palm
+    # Right hand, O = mcp2, y = towards wrist, z = towards thumb, x = towards palm
 cal_hand_y = ((np.array(cal_markers["rs"]) - np.array(cal_markers["mcp2"]))) / np.linalg.norm(np.array(cal_markers["rs"]) - np.array(cal_markers["mcp2"]))
 cal_hand_temp = ((np.array(cal_markers["us"]) - np.array(cal_markers["mcp2"]))) / np.linalg.norm(np.array(cal_markers["us"]) - np.array(cal_markers["mcp2"]))
 cal_hand_x = np.cross(cal_hand_y, cal_hand_temp) / np.linalg.norm(np.cross(cal_hand_y, cal_hand_temp))
-cal_hand_z = np.cross(cal_hand_y, cal_hand_x) / np.linalg.norm(np.cross(cal_hand_y, cal_hand_x))
+cal_hand_z = np.cross(cal_hand_x, cal_hand_y) / np.linalg.norm(np.cross(cal_hand_x, cal_hand_y))
 
 # # Vector Plotting
 # origin = [0, 0 ,0]
@@ -264,24 +263,24 @@ rs_v_fa = np.dot(global_cal_fa, np.array(cal_markers["rs"]) - np.array(cal_fa1))
 me_v_fa = np.dot(global_cal_ua, np.array(cal_markers["me"]) - np.array(cal_fa1))
 le_v_fa = np.dot(global_cal_ua, np.array(cal_markers["me"]) - np.array(cal_fa1))
 
-print(f'the vector from chest to ss in GCS is {ss_v_chest}')
 
-# Create a 3D plot
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
 
-# Plot all cal markers 
-ax.scatter(cal_markers["ss"][0], cal_markers["ss"][1], cal_markers["ss"][2], c='m', marker='o', label='SS')
-ax.scatter(cal_markers["xp"][0], cal_markers["xp"][1], cal_markers["xp"][2], c='m', marker='o', label='XP')
-ax.scatter(cal_markers["c7"][0], cal_markers["c7"][1], cal_markers["c7"][2], c='m', marker='o', label='C7')
-ax.scatter(cal_markers["r_acr"][0], cal_markers["r_acr"][1], cal_markers["r_acr"][2], c='m', marker='o', label='R_ACR')
-ax.scatter(cal_markers["l_acr"][0], cal_markers["l_acr"][1], cal_markers["l_acr"][2], c='m', marker='o', label='L_ACR')
-ax.scatter(cal_markers["me"][0], cal_markers["me"][1], cal_markers["me"][2], c='m', marker='o', label='me')
-ax.scatter(cal_markers["le"][0], cal_markers["le"][1], cal_markers["le"][2], c='m', marker='o', label='le')
-ax.scatter(cal_markers["rs"][0], cal_markers["rs"][1], cal_markers["rs"][2], c='m', marker='o', label='rs')
-ax.scatter(cal_markers["us"][0], cal_markers["us"][1], cal_markers["us"][2], c='m', marker='o', label='us')
-ax.scatter(cal_markers["mcp2"][0], cal_markers["mcp2"][1], cal_markers["mcp2"][2], c='m', marker='o', label='mcp2')
-ax.scatter(cal_markers["mcp5"][0], cal_markers["mcp5"][1], cal_markers["mcp5"][2], c='m', marker='o', label='mcp5')
+# # Create a 3D plot
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+
+# # Plot all cal markers 
+# ax.scatter(cal_markers["ss"][0], cal_markers["ss"][1], cal_markers["ss"][2], c='m', marker='o', label='SS')
+# ax.scatter(cal_markers["xp"][0], cal_markers["xp"][1], cal_markers["xp"][2], c='m', marker='o', label='XP')
+# ax.scatter(cal_markers["c7"][0], cal_markers["c7"][1], cal_markers["c7"][2], c='m', marker='o', label='C7')
+# ax.scatter(cal_markers["r_acr"][0], cal_markers["r_acr"][1], cal_markers["r_acr"][2], c='m', marker='o', label='R_ACR')
+# ax.scatter(cal_markers["l_acr"][0], cal_markers["l_acr"][1], cal_markers["l_acr"][2], c='m', marker='o', label='L_ACR')
+# ax.scatter(cal_markers["me"][0], cal_markers["me"][1], cal_markers["me"][2], c='m', marker='o', label='me')
+# ax.scatter(cal_markers["le"][0], cal_markers["le"][1], cal_markers["le"][2], c='m', marker='o', label='le')
+# ax.scatter(cal_markers["rs"][0], cal_markers["rs"][1], cal_markers["rs"][2], c='m', marker='o', label='rs')
+# ax.scatter(cal_markers["us"][0], cal_markers["us"][1], cal_markers["us"][2], c='m', marker='o', label='us')
+# ax.scatter(cal_markers["mcp2"][0], cal_markers["mcp2"][1], cal_markers["mcp2"][2], c='m', marker='o', label='mcp2')
+# ax.scatter(cal_markers["mcp5"][0], cal_markers["mcp5"][1], cal_markers["mcp5"][2], c='m', marker='o', label='mcp5')
 
 
 
@@ -315,27 +314,32 @@ ax.set_zlim([-2000, 2000])
 #folder_prefix = f'd_{sub_num}_{condition}*.tsv'
 # reads csv into a data frame
 trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_Kinematics/Digitized_TSV" 
-trial_file = f"{trial_folder}/d_{sub_num}"
+trial_file = f"{trial_folder}/d_{sub_num}_EASY_LOW_2.tsv"
 trial_raw = pd.read_csv(trial_file, sep='\t', header = 13) #sets csv to df
 
 # Define trial cluster indexing
 # (r = frames, column = 3), dataframe
-trial_mcp2 = trial_raw.iloc[0:3].values
-trial_mcp5 = trial_raw.iloc[3:6].values
-trial_rs = trial_raw.iloc[:9].values
-trial_us = trial_raw.iloc[:12].values
+trial_mcp2 = trial_raw.iloc[:,0:3].values
+trial_mcp5 = trial_raw.iloc[:,3:6].values
+trial_rs = trial_raw.iloc[:,6:9].values
+trial_us = trial_raw.iloc[:,9:12].values
+trial_le = trial_raw.iloc[:,21:24].values
+trial_me = trial_raw.iloc[:,24:27].values
 trial_fa1 = trial_raw.iloc[:,12:15].values
 trial_fa2 = trial_raw.iloc[:,15:18].values
 trial_fa3 = trial_raw.iloc[:,18:21].values
 trial_ua1 = trial_raw.iloc[:,27:30].values
 trial_ua2 = trial_raw.iloc[:,30:33].values
 trial_ua3 = trial_raw.iloc[:,33:36].values
+trial_racr = trial_raw.iloc[:, 36:39].values
 trial_chest1 = trial_raw.iloc[:,45:48].values
 trial_chest2 = trial_raw.iloc[:,48:51].values
 trial_chest3 = trial_raw.iloc[:,51:54].values
 trial_chest4 = trial_raw.iloc[:,54:57].values
 trial_chest5 = trial_raw.iloc[:,57:60].values
-
+trial_ss = trial_raw.iloc[:,42:45].values
+trial_xp = trial_raw.iloc[:, 60:63].values
+trial_c7 = trial_raw.iloc[:, 39:42].values
 
 ''' DEFINE LCS AND UNIT VECTORS FOR TASK CLUSTERS '''
 # use imported task trial to iterate through cluster markers
@@ -365,28 +369,32 @@ chest_trial_z = []
 
 #iterate through the length of the trial to create a LCS for each frame
 for frame in range(trial_frame_count):
-    #Hand, O = mcp2, Y = towards wrist, Z = radial X = dorsal
-    hand_trial_y_frame = ((trial_rs[frame, :] - trial_mcp2[frame, :])) /(np.linalg.norm(trial_rs[frame, :] - trial_mcp2[frame, :]))
-    hand_trial_temp_frame = (trial_us[frame,: ] - trial_mcp2[frame, :]) / (np.linalg.norm(trial_us[frame, :] - trial_mcp2[frame, :]))
-    hand_trial_z_frame = np.cross(hand_trial_y_frame, hand_trial_temp_frame) / np.linalg.norm(np.cross(hand_trial_y_frame, hand_trial_temp_frame))
-    hand_trial_x_frame = np.cross(hand_trial_z_frame, hand_trial_y_frame) / np.linalg.norm(np.cross(hand_trial_z_frame, hand_trial_z_frame))
-    
-    #Forearm
+     #Chest
+    chest_trial_z_frame = ((trial_chest4[frame, :] - trial_chest5[frame, :])) /(np.linalg.norm(trial_chest4[frame, :] - trial_chest5[frame, :]))
+    chest_trial_temp_frame = (trial_chest3[frame, :] - trial_chest5[frame, :]) / (np.linalg.norm(trial_chest3[frame, :] - trial_chest5[frame, :]))
+    chest_trial_x_frame = np.cross(chest_trial_temp_frame, chest_trial_z_frame) / np.linalg.norm(np.cross(chest_trial_temp_frame, chest_trial_z_frame))
+    chest_trial_y_frame = np.cross(chest_trial_z_frame, chest_trial_x_frame) / np.linalg.norm(np.cross(chest_trial_z_frame, chest_trial_x_frame))
+    # Right Upper Arm, tip facing POSTERIOR, O = ua1, +Y = superior, +X = anterior, +Z = lateral
+    ua_trial_y_frame = ((trial_ua3[frame, :] - trial_ua1[frame, :])) /(np.linalg.norm(trial_ua3[frame, :] - trial_ua1[frame, :]))
+    ua_trial_temp_frame = (trial_ua2[frame, :] - trial_ua1[frame, :]) / (np.linalg.norm(trial_ua2[frame, :] - trial_ua1[frame, :]))
+    ua_trial_z_frame = np.cross(ua_trial_y_frame, ua_trial_temp_frame) / np.linalg.norm(np.cross(ua_trial_y_frame, ua_trial_temp_frame))
+    ua_trial_x_frame = np.cross(ua_trial_y_frame, ua_trial_z_frame) / np.linalg.norm(np.cross(ua_trial_y_frame, ua_trial_z_frame))
+    #Right Upper Arm, tip facing ANTERIOR, O = ua1, +Y = superior, +X = anterior, +Z = lateral
+    # ua_trial_y_frame = ((trial_ua3[frame, :] - trial_ua1[frame, :])) /(np.linalg.norm(trial_ua3[frame, :] - trial_ua1[frame, :]))
+    # ua_trial_temp_frame = (trial_ua2[frame, :] - trial_ua1[frame, :]) / (np.linalg.norm(trial_ua2[frame, :] - trial_ua1[frame, :]))
+    # ua_trial_z_frame = np.cross(ua_trial_temp_frame, ua_trial_y_frame) / np.linalg.norm(np.cross(ua_trial_temp_frame, ua_trial_y_frame))
+    # ua_trial_x_frame = np.cross(ua_trial_y_frame, ua_trial_z_frame) / np.linalg.norm(np.cross(ua_trial_y_frame, ua_trial_z_frame))
+    #Forearm, O = fa1, y = towards elbow, z = posterior, x = lateral
     fa_trial_y_frame = ((trial_fa3[frame, :] - trial_fa1[frame, :])) /(np.linalg.norm(trial_fa3[frame, :] - trial_fa1[frame, :]))
     fa_trial_temp_frame = (trial_fa2[frame,:] - trial_fa1[frame, :]) / (np.linalg.norm(trial_fa2[frame, :] - trial_fa1[frame, :]))
     fa_trial_x_frame = np.cross(fa_trial_y_frame, fa_trial_temp_frame) / np.linalg.norm(np.cross(fa_trial_y_frame, fa_trial_temp_frame))
     fa_trial_z_frame = np.cross(fa_trial_x_frame, fa_trial_y_frame) / np.linalg.norm(np.cross(fa_trial_x_frame, fa_trial_y_frame))
-    #Upper arm
-    ua_trial_y_frame = ((trial_ua3[frame, :] - trial_ua1[frame, :])) /(np.linalg.norm(trial_ua3[frame, :] - trial_ua1[frame, :]))
-    ua_trial_temp_frame = (trial_ua2[frame, :] - trial_ua1[frame, :]) / (np.linalg.norm(trial_ua2[frame, :] - trial_ua1[frame, :]))
-    ua_trial_x_frame = np.cross(ua_trial_y_frame, ua_trial_temp_frame) / np.linalg.norm(np.cross(ua_trial_y_frame, ua_trial_temp_frame))
-    ua_trial_z_frame = np.cross(ua_trial_y_frame, ua_trial_x_frame) / np.linalg.norm(np.cross(ua_trial_y_frame, ua_trial_x_frame))
-    #Chest
-    chest_trial_z_frame = ((trial_chest4[frame, :] - trial_chest5[frame, :])) /(np.linalg.norm(trial_chest4[frame, :] - trial_chest5[frame, :]))
-    chest_trial_temp_frame = (trial_chest2[frame, :] - trial_chest5[frame, :]) / (np.linalg.norm(trial_chest2[frame, :] - trial_chest5[frame, :]))
-    chest_trial_x_frame = np.cross(chest_trial_z_frame, chest_trial_temp_frame) / np.linalg.norm(np.cross(chest_trial_z_frame, chest_trial_temp_frame))
-    chest_trial_y_frame = np.cross(chest_trial_z_frame, chest_trial_x_frame) / np.linalg.norm(np.cross(chest_trial_z_frame, chest_trial_x_frame))
-
+    #Hand, O = mcp2, Y = towards wrist, Z = radial X = dorsal
+    hand_trial_y_frame = ((trial_rs[frame, :] - trial_mcp2[frame, :])) /(np.linalg.norm(trial_rs[frame, :] - trial_mcp2[frame, :]))
+    hand_trial_temp_frame = (trial_us[frame,: ] - trial_mcp2[frame, :]) / (np.linalg.norm(trial_us[frame, :] - trial_mcp2[frame, :]))
+    hand_trial_x_frame = np.cross(hand_trial_y_frame, hand_trial_temp_frame) / np.linalg.norm(np.cross(hand_trial_y_frame, hand_trial_temp_frame))
+    hand_trial_z_frame = np.cross(hand_trial_x_frame, hand_trial_y_frame) / np.linalg.norm(np.cross(hand_trial_x_frame, hand_trial_y_frame))
+      
 # ******* 5. Define rotation matrix (global to local) for task clusters *******
     
 # # set empty arrays for rotation matrix of each LCS
@@ -424,6 +432,59 @@ for frame in range(trial_frame_count):
     ua_trial_GRL = compute_GRL_rotation_matrix(ua_trial_x_frame, ua_trial_y_frame, ua_trial_z_frame)
     chest_trial_GRL = compute_GRL_rotation_matrix(chest_trial_x_frame, chest_trial_y_frame, chest_trial_z_frame)
 
+
+# **** 6. Create virtual markers from the cal and task relationship
+    # select one cluster per marker
+# virtual = 1 cluster marker + (trial GRL*marker to cluster vector)
+    
+# Not recreating hand - no cluster 
+    
+# # Recreate forearm from FA1 - ME and LE, US and RS
+#     #not using for recreation
+# le_fa_trial_virtual = (trial_fa1 + np.dot(fa_trial_GRL, le_v_fa))
+# me_fa_trial_virtual = (trial_fa1 + np.dot(fa_trial_GRL, me_v_fa))
+# rs_fa_trial_virtual = (trial_fa1 + np.dot(fa_trial_GRL, rs_v_fa))
+# us_fa_trial_virtual = (trial_fa1 + np.dot(fa_trial_GRL, us_v_fa))
+
+#recreate upper arm from UA1 - ME, LE, R_ACR
+le_ua_trial_virtual = (trial_ua1 + np.dot(ua_trial_GRL, le_v_ua))
+me_ua_trial_virtual = (trial_ua1 + np.dot(ua_trial_GRL, me_v_ua))
+racr_ua_trial_virtual = (trial_ua1 + np.dot(ua_trial_GRL, r_acr_v_ua))
+
+#recreate torso from CHEST1 - SS XP 
+ss_chest_trial_virtual = (trial_chest1 + np.dot(chest_trial_GRL, ss_v_chest))
+xp_chest_trial_virtual = (trial_chest1 + np.dot(chest_trial_GRL, xp_v_chest))
+c7_chest_trial_virtual = (trial_chest1 + np.dot(chest_trial_GRL, c7_v_chest))
+
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(le_ua_trial_virtual[0,0], le_ua_trial_virtual[0,1],le_ua_trial_virtual[0,2], c='r', marker='o', label='le')
+ax.scatter(me_ua_trial_virtual[0,0], me_ua_trial_virtual[0,1],me_ua_trial_virtual[0,2], c='r', marker='o', label='me')
+ax.scatter(racr_ua_trial_virtual[0,0], racr_ua_trial_virtual[0,1], racr_ua_trial_virtual[0,2], c='b', marker='o', label='racr')
+ax.scatter(ss_chest_trial_virtual[0,0], ss_chest_trial_virtual[0,1], ss_chest_trial_virtual[0,2], c='m', marker='o', label='ss')
+ax.scatter(xp_chest_trial_virtual[0,0], xp_chest_trial_virtual[0,1], xp_chest_trial_virtual[0,2], c='m', marker='o', label='xp')
+ax.scatter(c7_chest_trial_virtual[0,0], c7_chest_trial_virtual[0,1], c7_chest_trial_virtual[0,2], c='g', marker='o', label='c7')
+ax.scatter(trial_rs[0,0], trial_rs[0,1],trial_rs[0,2], c='c', marker='o', label='rs')
+ax.scatter(trial_us[0,0], trial_us[0,1],trial_us[0,2], c='c', marker='o', label='us')
+ax.scatter(trial_fa1[0,0], trial_fa1[0,1],trial_fa1[0,2], c='k', marker='o', label='fa1')
+ax.scatter(trial_fa2[0,0], trial_fa2[0,1],trial_fa2[0,2], c='k', marker='o', label='fa2')
+ax.scatter(trial_fa3[0,0], trial_fa3[0,1],trial_fa3[0,2], c='k', marker='o', label='fa3')
+ax.scatter(trial_ua1[0,0], trial_ua1[0,1],trial_ua1[0,2], c='y', marker='o', label='ua1')
+ax.scatter(trial_ua2[0,0], trial_ua2[0,1],trial_ua2[0,2], c='y', marker='o', label='ua2')
+ax.scatter(trial_ua3[0,0], trial_ua3[0,1],trial_ua3[0,2], c='y', marker='o', label='ua3')
+
+
+ax.legend()
+
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+
+ax.set_xlim([-1500, 2000])
+ax.set_ylim([100, 2000])
+ax.set_zlim([-1000, 1500])
+plt.show()
 #tried to make for loop but idk how to incorporate it oops
 # for condition, values in condition_names.items():
 #     #sets folder prefix to obtain files
@@ -434,7 +495,4 @@ for frame in range(trial_frame_count):
 #     for condition_trial in condition_trial_paths:
     
 
-# **** 6. Create virtual markers from the cal and task relationship
-    # select one cluster per marker
-# virtual = 1 cluster marker + (trial GRL*marker to cluster vector)
-    
+
