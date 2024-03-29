@@ -473,3 +473,46 @@ def butter_low(signal: np.ndarray):
     sos = scipy.signal.butter(order, Wn, btype='lowpass', fs=fs, output='sos')
     lowpass_filtered_signal = scipy.signal.sosfiltfilt(sos, signal)
     return lowpass_filtered_signal
+
+
+# filter virtual markers and 'raw' hand markers
+
+le_trial_filtered = np.empty_like(le_ua_trial_virtual)
+me_trial_filtered = np.empty_like(me_ua_trial_virtual)
+racr_trial_filtered = np.empty_like(racr_ua_trial_virtual)
+ss_trial_filtered = np.empty_like(ss_chest_trial_virtual)
+xp_trial_filtered = np.empty_like(xp_chest_trial_virtual)
+c7_trial_filtered = np.empty_like(c7_chest_trial_virtual)
+rs_trial_filtered = np.empty_like(trial_rs)
+us_trial_filtered = np.empty_like(trial_us)
+mcp2_trial_filtered = np.empty_like(trial_mcp2)
+mcp5_trial_filtered = np.empty_like(trial_mcp5)
+
+
+for i in range(le_ua_trial_virtual.shape[1]):
+  le_trial_filtered[:,i] = butter_low(le_ua_trial_virtual[:, i])
+  me_trial_filtered[:,i] = butter_low(me_ua_trial_virtual[:, i])
+  racr_trial_filtered[:,i] = butter_low(racr_ua_trial_virtual[:,i])
+  ss_trial_filtered[:,i] = butter_low(ss_chest_trial_virtual[:,i])
+  xp_trial_filtered[:,i] = butter_low(xp_chest_trial_virtual[:,i])
+  c7_trial_filtered[:,i] = butter_low(c7_chest_trial_virtual[:,i])
+  rs_trial_filtered[:,i] = butter_low(trial_rs[:,i])
+  us_trial_filtered[:,i] = butter_low(trial_us[:,i])
+  mcp2_trial_filtered[:,i] = butter_low(trial_mcp2[:,i])
+  mcp5_trial_filtered[:,i] = butter_low(trial_mcp5[:,i])
+
+
+#Calculate joint centers
+sjc_adjustment = np.array([0, -0.06, 0]) # -60 mm in the y
+# set empty arrays to the size of marker trial data
+wjc = np.empty_like(le_trial_filtered)
+ejc = np.empty_like(le_trial_filtered)
+sjc = np.empty_like(le_trial_filtered)
+
+for i in range(le_ua_trial_virtual.shape[1]):
+  # wrist - midpoint between rs and us
+  wjc[:,i] = (rs_trial_filtered[:,i] + us_trial_filtered[:,i])/2
+  # elbow - midpoint between rs and us
+  ejc[:,i] = (le_trial_filtered[:,i]) + (me_trial_filtered[:,i])/2
+  # shoulder - acromion - 60mm in the y dir
+  sjc[:,i] = (racr_trial_filtered[:,i] - sjc_adjustment[i])
