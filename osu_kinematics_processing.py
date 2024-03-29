@@ -13,11 +13,11 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import glob
 import plotly.express as px
-
+import scipy
 
 
 # input subject
-sub_num = "S04"
+sub_num = "S06"
 # set path for files
 trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_Kinematics/Digitized_TSV"
 # sample rate
@@ -133,13 +133,14 @@ def add_scatter_and_text(ax, marker_name, markers_dict):
 
     # Set legend
 ax.legend()
+
+
+    # Set legend
+ax.legend()
 # for marker_name in cal_markers:
 #     add_scatter_and_text(ax, marker_name, cal_markers)
 
 # plt.show()
-# print(cal_markers)
-# Define Cal markers
-# mcp2_cal = cal_raw.iloc[cal_frame,
 
 # USE FOR TRIALS
 
@@ -149,10 +150,7 @@ ax.legend()
 #         marker_values = cal_raw.iloc[cal_frame, marker_columns].values
 #         cal_markers[marker_name] = rotate_vector(marker_values, ISB)
 
-# # Convert cal_markers dictionary to a data frame
-# cal_markers_df = pd.DataFrame(cal_markers)  # Transpose for better orientation
-# cal_markers_df.columns = ['X', 'Y', 'Z']  # Rename columns if needed
-
+# cal marker arrays
 cal_fa1 = cal_raw.iloc[cal_frame, 12:15].values
 cal_fa2 = cal_raw.iloc[cal_frame, 15:18].values
 cal_fa3 = cal_raw.iloc[cal_frame, 18:21].values
@@ -199,26 +197,28 @@ cal_hand_x = np.cross(cal_hand_y, cal_hand_temp) / np.linalg.norm(np.cross(cal_h
 cal_hand_z = np.cross(cal_hand_x, cal_hand_y) / np.linalg.norm(np.cross(cal_hand_x, cal_hand_y))
 
 # # Vector Plotting
-# origin = [0, 0 ,0]
-# ax.quiver(*origin, *hand_x, color='r', label='Chest X')
-# ax.quiver(*origin, *hand_y, color='g', label='Chest Y')
-# ax.quiver(*origin, *hand_z, color='b', label='Chest Z')
-# # Set plot limits
-# ax.set_xlim([-10, 10])
-# ax.set_ylim([-10, 10])
-# ax.set_zlim([-10, 10])
-# # Set labels
-# ax.set_xlabel('X')
-# ax.set_ylabel('Y')
-# ax.set_zlabel('Z')
+origin = [0, 0 ,0]
+ax.quiver(*origin, *cal_chest_x, color='r', label='Chest X')
+ax.quiver(*origin, *cal_chest_y, color='g', label='Chest Y')
+ax.quiver(*origin, *cal_chest_z, color='b', label='Chest Z')
+# Set plot limits
+ax.set_xlim([-10, 10])
+ax.set_ylim([-10, 10])
+ax.set_zlim([-10, 10])
+# Set labels
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
 
-# ax.legend()
-# # plt.show()
+ax.legend()
+# plt.show()
 
 # Define global coordinate axes
 global_x = np.array([1, 0, 0])
 global_y = np.array([0, 1, 0])
 global_z = np.array([0, 0, 1])
+
+
 
 # Compute rotation matrix to go from GCS to Cluster LCS
 
@@ -265,56 +265,14 @@ le_v_fa = np.dot(global_cal_ua, np.array(cal_markers["me"]) - np.array(cal_fa1))
 
 
 
-# # Create a 3D plot
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
 
-# # Plot all cal markers 
-# ax.scatter(cal_markers["ss"][0], cal_markers["ss"][1], cal_markers["ss"][2], c='m', marker='o', label='SS')
-# ax.scatter(cal_markers["xp"][0], cal_markers["xp"][1], cal_markers["xp"][2], c='m', marker='o', label='XP')
-# ax.scatter(cal_markers["c7"][0], cal_markers["c7"][1], cal_markers["c7"][2], c='m', marker='o', label='C7')
-# ax.scatter(cal_markers["r_acr"][0], cal_markers["r_acr"][1], cal_markers["r_acr"][2], c='m', marker='o', label='R_ACR')
-# ax.scatter(cal_markers["l_acr"][0], cal_markers["l_acr"][1], cal_markers["l_acr"][2], c='m', marker='o', label='L_ACR')
-# ax.scatter(cal_markers["me"][0], cal_markers["me"][1], cal_markers["me"][2], c='m', marker='o', label='me')
-# ax.scatter(cal_markers["le"][0], cal_markers["le"][1], cal_markers["le"][2], c='m', marker='o', label='le')
-# ax.scatter(cal_markers["rs"][0], cal_markers["rs"][1], cal_markers["rs"][2], c='m', marker='o', label='rs')
-# ax.scatter(cal_markers["us"][0], cal_markers["us"][1], cal_markers["us"][2], c='m', marker='o', label='us')
-# ax.scatter(cal_markers["mcp2"][0], cal_markers["mcp2"][1], cal_markers["mcp2"][2], c='m', marker='o', label='mcp2')
-# ax.scatter(cal_markers["mcp5"][0], cal_markers["mcp5"][1], cal_markers["mcp5"][2], c='m', marker='o', label='mcp5')
-
-
-
-ax.legend()
-
-# ax.scatter(XP[0, 0], XP[0, 1], XP[0, 2], c='m', marker='o', label='XP')
-# ax.scatter(L5[0, 0], L5[0, 1], L5[0, 2], c='m', marker='o', label='L5')
-# ax.scatter(C7[0, 0], C7[0, 1], C7[0, 2], c='m', marker='o', label='C7')
-# ax.scatter(T8[0, 0], T8[0, 1], T8[0, 2], c='m', marker='o', label='T8')
-
-# Plot additional markers
-# ... (Repeat the pattern for other markers)
-
-# Plot lines
-# ax.plot([XP[0, 0], SS[0, 0]], [XP[0, 1], SS[0, 1]], [XP[0, 2], SS[0, 2]], color='black')
-# ... (Repeat the pattern for other lines)
-
-# Set axis labels
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
-
-ax.set_xlim([-2000, 2000])
-ax.set_ylim([-2000, 2000])
-ax.set_zlim([-2000, 2000])
-# Show the plot
-# plt.show()
 
 ''' TASK '''
 # add in condition dictionaries from EMG processing 
 #folder_prefix = f'd_{sub_num}_{condition}*.tsv'
 # reads csv into a data frame
 trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_Kinematics/Digitized_TSV" 
-trial_file = f"{trial_folder}/d_{sub_num}_EASY_LOW_2.tsv"
+trial_file = f"{trial_folder}/d_{sub_num}_EASY_LOW_4.tsv"
 trial_raw = pd.read_csv(trial_file, sep='\t', header = 13) #sets csv to df
 
 # Define trial cluster indexing
@@ -332,6 +290,7 @@ trial_ua1 = trial_raw.iloc[:,27:30].values
 trial_ua2 = trial_raw.iloc[:,30:33].values
 trial_ua3 = trial_raw.iloc[:,33:36].values
 trial_racr = trial_raw.iloc[:, 36:39].values
+trial_lacr = trial_raw.iloc[:, 63:66].values
 trial_chest1 = trial_raw.iloc[:,45:48].values
 trial_chest2 = trial_raw.iloc[:,48:51].values
 trial_chest3 = trial_raw.iloc[:,51:54].values
@@ -340,6 +299,8 @@ trial_chest5 = trial_raw.iloc[:,57:60].values
 trial_ss = trial_raw.iloc[:,42:45].values
 trial_xp = trial_raw.iloc[:, 60:63].values
 trial_c7 = trial_raw.iloc[:, 39:42].values
+
+
 
 ''' DEFINE LCS AND UNIT VECTORS FOR TASK CLUSTERS '''
 # use imported task trial to iterate through cluster markers
@@ -425,12 +386,17 @@ def compute_GRL_rotation_matrix(LCS_v_x, LCS_v_y, LCS_v_z):
     return trial_global_rot
 
 
-# iterate through 
+# rotate each LCS to GCS
 for frame in range(trial_frame_count):
     hand_trial_GRL = compute_GRL_rotation_matrix(hand_trial_x_frame, hand_trial_y_frame, hand_trial_z_frame)
     fa_trial_GRL = compute_GRL_rotation_matrix(fa_trial_x_frame, fa_trial_y_frame, fa_trial_z_frame)
     ua_trial_GRL = compute_GRL_rotation_matrix(ua_trial_x_frame, ua_trial_y_frame, ua_trial_z_frame)
     chest_trial_GRL = compute_GRL_rotation_matrix(chest_trial_x_frame, chest_trial_y_frame, chest_trial_z_frame)
+
+# rotate individual markers to GCS
+
+global_mcp2 = np.array([
+    [np.dot(trial_mcp2[0], global_x), np.dot(trial_mcp2[1], global_y), np.dot(trial_mcp2[2], global_z)]])
 
 
 # **** 6. Create virtual markers from the cal and task relationship
@@ -456,7 +422,7 @@ ss_chest_trial_virtual = (trial_chest1 + np.dot(chest_trial_GRL, ss_v_chest))
 xp_chest_trial_virtual = (trial_chest1 + np.dot(chest_trial_GRL, xp_v_chest))
 c7_chest_trial_virtual = (trial_chest1 + np.dot(chest_trial_GRL, c7_v_chest))
 
-
+# plot virtual markers and trial markers 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.scatter(le_ua_trial_virtual[0,0], le_ua_trial_virtual[0,1],le_ua_trial_virtual[0,2], c='r', marker='o', label='le')
@@ -465,34 +431,45 @@ ax.scatter(racr_ua_trial_virtual[0,0], racr_ua_trial_virtual[0,1], racr_ua_trial
 ax.scatter(ss_chest_trial_virtual[0,0], ss_chest_trial_virtual[0,1], ss_chest_trial_virtual[0,2], c='m', marker='o', label='ss')
 ax.scatter(xp_chest_trial_virtual[0,0], xp_chest_trial_virtual[0,1], xp_chest_trial_virtual[0,2], c='m', marker='o', label='xp')
 ax.scatter(c7_chest_trial_virtual[0,0], c7_chest_trial_virtual[0,1], c7_chest_trial_virtual[0,2], c='g', marker='o', label='c7')
+ax.scatter(trial_lacr[0,0], trial_lacr[0,1],trial_lacr[0,2], c='b', marker='o', label='lacr')
 ax.scatter(trial_rs[0,0], trial_rs[0,1],trial_rs[0,2], c='c', marker='o', label='rs')
 ax.scatter(trial_us[0,0], trial_us[0,1],trial_us[0,2], c='c', marker='o', label='us')
+ax.scatter(trial_mcp2[0,0], trial_mcp2[0,1],trial_mcp2[0,2], c='r', marker='o', label='mcp2')
+ax.scatter(trial_mcp5[0,0], trial_mcp5[0,1],trial_mcp5[0,2], c='r', marker='o', label='mcp5')
 ax.scatter(trial_fa1[0,0], trial_fa1[0,1],trial_fa1[0,2], c='k', marker='o', label='fa1')
 ax.scatter(trial_fa2[0,0], trial_fa2[0,1],trial_fa2[0,2], c='k', marker='o', label='fa2')
 ax.scatter(trial_fa3[0,0], trial_fa3[0,1],trial_fa3[0,2], c='k', marker='o', label='fa3')
-ax.scatter(trial_ua1[0,0], trial_ua1[0,1],trial_ua1[0,2], c='y', marker='o', label='ua1')
-ax.scatter(trial_ua2[0,0], trial_ua2[0,1],trial_ua2[0,2], c='y', marker='o', label='ua2')
-ax.scatter(trial_ua3[0,0], trial_ua3[0,1],trial_ua3[0,2], c='y', marker='o', label='ua3')
-
+ax.scatter(trial_ua1[0,0], trial_ua1[0,1],trial_ua1[0,2], c='k', marker='o', label='ua1')
+ax.scatter(trial_ua2[0,0], trial_ua2[0,1],trial_ua2[0,2], c='k', marker='o', label='ua2')
+ax.scatter(trial_ua3[0,0], trial_ua3[0,1],trial_ua3[0,2], c='k', marker='o', label='ua3')
 
 ax.legend()
 
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Z')
-
-ax.set_xlim([-1500, 2000])
-ax.set_ylim([100, 2000])
-ax.set_zlim([-1000, 1500])
+# set lims to all positive, where they sit
+ax.set_xlim([0, 1300])
+ax.set_ylim([100, 1200])
+ax.set_zlim([0, 1300])
 plt.show()
-#tried to make for loop but idk how to incorporate it oops
-# for condition, values in condition_names.items():
-#     #sets folder prefix to obtain files
-#     folder_prefix = f'd_{sub_num}_{condition}*.tsv'
-#     # groups trial paths based on their folder prefix containing condition name
-#     condition_trial_paths = glob.glob(f'{task_folder}/{folder_prefix}')
-#     if len(condition_trial_paths) == 0: continue #doesnt break for low lvl
-#     for condition_trial in condition_trial_paths:
+
     
+# butterworth filter 
+def butter_low(signal: np.ndarray):
+    """
+    Apply a dual-pass 2nd order Butterworth low-pass filter to the input signal
 
+  Inputs: 
+    signal (numpy.ndarray): Input signal to be filtered
 
+  Returns:
+    numpy.ndarray: Low-pass filtered signals
+    """
+    fs = 100 # Sampling frequency
+    order = 2 # filter order
+    cutoff_f = 4 # Lowpass cutoff @ 4 Hz 
+    Wn = (cutoff_f/(0.5*fs))
+    sos = scipy.signal.butter(order, Wn, btype='lowpass', fs=fs, output='sos')
+    lowpass_filtered_signal = scipy.signal.sosfiltfilt(sos, signal)
+    return lowpass_filtered_signal
