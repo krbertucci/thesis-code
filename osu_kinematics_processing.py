@@ -508,6 +508,7 @@ sjc_adjustment = np.array([0, -0.06, 0]) # -60 mm in the y
 wjc = np.empty_like(le_trial_filtered)
 ejc = np.empty_like(le_trial_filtered)
 sjc = np.empty_like(le_trial_filtered)
+hand_origin = np.empty_like(le_trial_filtered)
 
 for i in range(le_ua_trial_virtual.shape[1]):
   # wrist - midpoint between rs and us
@@ -516,3 +517,60 @@ for i in range(le_ua_trial_virtual.shape[1]):
   ejc[:,i] = (le_trial_filtered[:,i]) + (me_trial_filtered[:,i])/2
   # shoulder - acromion - 60mm in the y dir
   sjc[:,i] = (racr_trial_filtered[:,i] - sjc_adjustment[i])
+  # hand origin
+  hand_origin[:,i] = (mcp2_trial_filtered[:,i] + mcp5_trial_filtered[:,i])/2
+
+#Create segment LCSs 
+    # USE FILTERED DATA POINTS
+# create empty lists to store segment LCS vectors
+#forearm segment LCS vectors
+fa_seg_trial_y = np.empty_like(le_trial_filtered)
+fa_seg_trial_x = np.empty_like(le_trial_filtered)
+fa_seg_trial_z = np.empty_like(le_trial_filtered)
+fa_seg_trial_temp = np.empty_like(le_trial_filtered)
+
+#upper arm / humerus segment LCS vectors
+ua_seg_trial_y = np.empty_like(le_trial_filtered)
+ua_seg_trial_z = np.empty_like(le_trial_filtered)
+ua_seg_trial_x = np.empty_like(le_trial_filtered)
+ua_seg_trial_temp = np.empty_like(le_trial_filtered)
+
+#thorax segment LCS vectors
+thrx_seg_trial_y = np.empty_like(le_trial_filtered)
+thrx_seg_trial_z = np.empty_like(le_trial_filtered)
+thrx_seg_trial_x = np.empty_like(le_trial_filtered)
+thrx_seg_trial_temp = np.empty_like(le_trial_filtered)
+
+
+#hand segment vectors
+hand_seg_trial_z = np.empty_like(le_trial_filtered)
+hand_seg_trial_x = np.empty_like(le_trial_filtered)
+hand_seg_trial_z = np.empty_like(le_trial_filtered)
+hand_seg_trial_temp = np.empty_like(le_trial_filtered)
+
+for i in range(le_ua_trial_virtual.shape[1]):
+    #forearm 
+    fa_seg_trial_y[:,i] = ((ejc[:, i] - us_trial_filtered[:, i])) /(np.linalg.norm(ejc[:, i] - us_trial_filtered[:, i]))
+    fa_seg_trial_temp[:,i] = (rs_trial_filtered[:,i] - us_trial_filtered[:,i]) / (np.linalg.norm(rs_trial_filtered[:,i] - us_trial_filtered[:,i]))
+    fa_seg_trial_x = np.cross(fa_seg_trial_y, fa_seg_trial_temp) / np.linalg.norm(np.cross(fa_seg_trial_y, fa_seg_trial_temp))
+    fa_seg_trial_z = np.cross(fa_seg_trial_x, fa_seg_trial_y) / np.linalg.norm(np.cross(fa_seg_trial_x, fa_seg_trial_y))
+    #upper arm
+    ua_seg_trial_y[:,i] = ((sjc[:,i] - ejc[:,i])) /(np.linalg.norm(sjc[:,i] - ejc[:,i]))
+    ua_seg_trial_temp[:,i] = (ua_seg_trial_y[:,i] - fa_seg_trial_y[:,i]) / (np.linalg.norm(ua_seg_trial_y[:,i] - fa_seg_trial_y[:,i]))
+    ua_seg_trial_z= np.cross(ua_seg_trial_y, ua_seg_trial_temp) / np.linalg.norm(np.cross(ua_seg_trial_y, ua_seg_trial_temp))
+    ua_seg_trial_x = np.cross(ua_seg_trial_z, ua_seg_trial_y) / np.linalg.norm(np.cross(ua_seg_trial_z, ua_seg_trial_y))
+    
+    #thorax
+    thrx_seg_trial_y = [0,1,0]
+    thrx_seg_trial_temp[:,i] = (c7_trial_filtered[:,i] - ss_trial_filtered[:,i]) / (np.linalg.norm(c7_trial_filtered[:,i] - ss_trial_filtered[:,i]))
+    thrx_seg_trial_z = np.cross(thrx_seg_trial_y, thrx_seg_trial_temp) / np.linalg.norm(np.cross(thrx_seg_trial_y, thrx_seg_trial_temp))
+    thrx_seg_trial_x = np.cross(thrx_seg_trial_z, thrx_seg_trial_y) / np.linalg.norm(np.cross(thrx_seg_trial_z, thrx_seg_trial_y))
+    
+    #hand
+    # #Y towards wrist, Z towards thumb X = y x z
+    hand_seg_o = hand_origin[:,i]
+    hand_seg_trial_z[:,i] = (hand_origin[:,i] - mcp2_trial_filtered[:,i]) /(np.linalg.norm(hand_origin[:,i] - mcp2_trial_filtered[:,i]))
+    hand_seg_trial_temp[:,i] = (rs_trial_filtered[:,i] - hand_origin[:,i]) / (np.linalg.norm(rs_trial_filtered[:,i] - hand_origin[:,i]))
+    hand_seg_trial_x = np.cross(hand_seg_trial_temp, hand_seg_trial_z) / np.linalg.norm(np.cross(hand_seg_trial_temp,hand_seg_trial_z))
+    hand_seg_trial_z = np.cross(hand_seg_trial_z, hand_seg_trial_x) / np.linalg.norm(np.cross(hand_seg_trial_z, hand_seg_trial_x))
+    
