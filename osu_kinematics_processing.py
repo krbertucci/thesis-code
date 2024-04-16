@@ -568,6 +568,12 @@ for i in range(le_ua_trial_virtual.shape[1]):
     thrx_seg_trial_z = np.cross(thrx_seg_trial_y, thrx_seg_trial_temp) / np.linalg.norm(np.cross(thrx_seg_trial_y, thrx_seg_trial_temp))
     thrx_seg_trial_x = np.cross(thrx_seg_trial_z, thrx_seg_trial_y) / np.linalg.norm(np.cross(thrx_seg_trial_z, thrx_seg_trial_y))
 
+    hand_seg_o = hand_origin[:,i]
+    hand_seg_trial_z[:,i] = (hand_origin[:,i] - mcp2_trial_filtered[:,i]) /(np.linalg.norm(hand_origin[:,i] - mcp2_trial_filtered[:,i]))
+    hand_seg_trial_temp[:,i] = (rs_trial_filtered[:,i] - hand_origin[:,i]) / (np.linalg.norm(rs_trial_filtered[:,i] - hand_origin[:,i]))
+    hand_seg_trial_x = np.cross(hand_seg_trial_temp, hand_seg_trial_z) / np.linalg.norm(np.cross(hand_seg_trial_temp,hand_seg_trial_z))
+    hand_seg_trial_y = np.cross(hand_seg_trial_z, hand_seg_trial_x) / np.linalg.norm(np.cross(hand_seg_trial_z, hand_seg_trial_x))
+
 
 # visual checks for segment LCS vectors
 
@@ -604,3 +610,26 @@ plt.show()
 # ax.quiver(*origin, *hand_seg_trial_y, color='r', label='FA Y')
 # ax.quiver(*origin, *hand_seg_trial_x, color='g', label='FA X')
 # ax.quiver(*origin, *hand_seg_trial_z, color='b', label='FA Z')
+
+
+# --- create directional cosine matrices ---
+
+# use the unit vectors from each segment
+# formula is i = [(unit vector x (frames, 0)), (unit vector x (frames, 1), (unit vecotr x (frames, 2))]
+
+# STEPS FOR DCM:
+# define distal joint dcm
+# define proximal joint dcm
+# define dcm for distal to proximal
+
+# CREATE DCMS FOR EACH SEGMENT
+for i in range(le_ua_trial_virtual.shape[1]):
+    hand_dcm_trial = np.stack((hand_seg_trial_x[:,i], hand_seg_trial_y[:,i], hand_seg_trial_z[:,i]), axis=-1)
+    fa_dcm_trial = np.stack((fa_seg_trial_x[:,i], fa_seg_trial_y[:,i], fa_seg_trial_z[:,i]), axis=-1)
+    ua_dcm_trial = np.stack((ua_seg_trial_x[:,i], ua_seg_trial_y[:,i], ua_seg_trial_z[:,i]), axis=-1)
+    thrx_dcm_trial = np.stack((thrx_seg_trial_x[:,i], thrx_seg_trial_y[:,i], thrx_seg_trial_z[:,i]), axis=-1)
+    #Define dcms between segments
+    hand_fa_dcm_trial = hand_dcm_trial * fa_dcm_trial
+    fa_ua_dcm_trial = fa_dcm_trial * ua_dcm_trial
+    ua_thrx_dcm_trial = ua_dcm_trial * thrx_dcm_trial
+# CALCULATE EULER ANGLES
