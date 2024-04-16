@@ -100,9 +100,9 @@ def rotate_vector(vector, rotation_matrix):
 
 #print(cal_markers)
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.set_title('CAL_isb')
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# ax.set_title('CAL_isb')
 
 cal_markers_arr = []
 #Create array of the dictionari
@@ -132,11 +132,11 @@ def add_scatter_and_text(ax, marker_name, markers_dict):
     ax.set_zlabel('Z')
 
     # Set legend
-ax.legend()
+# ax.legend()
 
 
     # Set legend
-ax.legend()
+# ax.legend()
 # for marker_name in cal_markers:
 #     add_scatter_and_text(ax, marker_name, cal_markers)
 
@@ -197,21 +197,21 @@ cal_hand_x = np.cross(cal_hand_y, cal_hand_temp) / np.linalg.norm(np.cross(cal_h
 cal_hand_z = np.cross(cal_hand_x, cal_hand_y) / np.linalg.norm(np.cross(cal_hand_x, cal_hand_y))
 
 # # Vector Plotting
-origin = [0, 0 ,0]
-ax.quiver(*origin, *cal_chest_x, color='r', label='Chest X')
-ax.quiver(*origin, *cal_chest_y, color='g', label='Chest Y')
-ax.quiver(*origin, *cal_chest_z, color='b', label='Chest Z')
-# Set plot limits
-ax.set_xlim([-10, 10])
-ax.set_ylim([-10, 10])
-ax.set_zlim([-10, 10])
-# Set labels
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
+# origin = [0, 0 ,0]
+# ax.quiver(*origin, *cal_chest_x, color='r', label='Chest X')
+# ax.quiver(*origin, *cal_chest_y, color='g', label='Chest Y')
+# ax.quiver(*origin, *cal_chest_z, color='b', label='Chest Z')
+# # Set plot limits
+# ax.set_xlim([-10, 10])
+# ax.set_ylim([-10, 10])
+# ax.set_zlim([-10, 10])
+# # Set labels
+# ax.set_xlabel('X')
+# ax.set_ylabel('Y')
+# ax.set_zlabel('Z')
 
-ax.legend()
-# plt.show()
+# ax.legend()
+# # plt.show()
 
 # Define global coordinate axes
 global_x = np.array([1, 0, 0])
@@ -452,7 +452,7 @@ ax.set_zlabel('Z')
 ax.set_xlim([0, 1300])
 ax.set_ylim([100, 1200])
 ax.set_zlim([0, 1300])
-plt.show()
+# plt.show()
 
     
 # butterworth filter 
@@ -548,29 +548,59 @@ hand_seg_trial_x = np.empty_like(le_trial_filtered)
 hand_seg_trial_z = np.empty_like(le_trial_filtered)
 hand_seg_trial_temp = np.empty_like(le_trial_filtered)
 
+
 for i in range(le_ua_trial_virtual.shape[1]):
-    #forearm 
+    #forearm
     fa_seg_trial_y[:,i] = ((ejc[:, i] - us_trial_filtered[:, i])) /(np.linalg.norm(ejc[:, i] - us_trial_filtered[:, i]))
     fa_seg_trial_temp[:,i] = (rs_trial_filtered[:,i] - us_trial_filtered[:,i]) / (np.linalg.norm(rs_trial_filtered[:,i] - us_trial_filtered[:,i]))
     fa_seg_trial_x = np.cross(fa_seg_trial_y, fa_seg_trial_temp) / np.linalg.norm(np.cross(fa_seg_trial_y, fa_seg_trial_temp))
     fa_seg_trial_z = np.cross(fa_seg_trial_x, fa_seg_trial_y) / np.linalg.norm(np.cross(fa_seg_trial_x, fa_seg_trial_y))
+
     #upper arm
     ua_seg_trial_y[:,i] = ((sjc[:,i] - ejc[:,i])) /(np.linalg.norm(sjc[:,i] - ejc[:,i]))
     ua_seg_trial_temp[:,i] = (ua_seg_trial_y[:,i] - fa_seg_trial_y[:,i]) / (np.linalg.norm(ua_seg_trial_y[:,i] - fa_seg_trial_y[:,i]))
-    ua_seg_trial_z= np.cross(ua_seg_trial_y, ua_seg_trial_temp) / np.linalg.norm(np.cross(ua_seg_trial_y, ua_seg_trial_temp))
+    ua_seg_trial_z = np.cross(ua_seg_trial_y, ua_seg_trial_temp) / np.linalg.norm(np.cross(ua_seg_trial_y, ua_seg_trial_temp))
     ua_seg_trial_x = np.cross(ua_seg_trial_z, ua_seg_trial_y) / np.linalg.norm(np.cross(ua_seg_trial_z, ua_seg_trial_y))
-    
+
     #thorax
     thrx_seg_trial_y = [0,1,0]
     thrx_seg_trial_temp[:,i] = (c7_trial_filtered[:,i] - ss_trial_filtered[:,i]) / (np.linalg.norm(c7_trial_filtered[:,i] - ss_trial_filtered[:,i]))
     thrx_seg_trial_z = np.cross(thrx_seg_trial_y, thrx_seg_trial_temp) / np.linalg.norm(np.cross(thrx_seg_trial_y, thrx_seg_trial_temp))
     thrx_seg_trial_x = np.cross(thrx_seg_trial_z, thrx_seg_trial_y) / np.linalg.norm(np.cross(thrx_seg_trial_z, thrx_seg_trial_y))
-    
-    #hand
-    # #Y towards wrist, Z towards thumb X = y x z
-    hand_seg_o = hand_origin[:,i]
-    hand_seg_trial_z[:,i] = (hand_origin[:,i] - mcp2_trial_filtered[:,i]) /(np.linalg.norm(hand_origin[:,i] - mcp2_trial_filtered[:,i]))
-    hand_seg_trial_temp[:,i] = (rs_trial_filtered[:,i] - hand_origin[:,i]) / (np.linalg.norm(rs_trial_filtered[:,i] - hand_origin[:,i]))
-    hand_seg_trial_x = np.cross(hand_seg_trial_temp, hand_seg_trial_z) / np.linalg.norm(np.cross(hand_seg_trial_temp,hand_seg_trial_z))
-    hand_seg_trial_z = np.cross(hand_seg_trial_z, hand_seg_trial_x) / np.linalg.norm(np.cross(hand_seg_trial_z, hand_seg_trial_x))
-    
+
+
+# visual checks for segment LCS vectors
+
+# # Vector Plotting 
+    # forearm plot
+origin = [0, 0 ,0]
+ax.quiver(*origin, *fa_seg_trial_y[0], color='r', label='FA Y')
+ax.quiver(*origin, *fa_seg_trial_x[0], color='g', label='FA X')
+ax.quiver(*origin, *fa_seg_trial_z[0], color='b', label='FA Z')
+
+# Set plot limits
+ax.set_xlim([-10, 10])
+ax.set_ylim([-10, 10])
+ax.set_zlim([-10, 10])
+# Set labels
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+
+plt.show()
+
+    # upper arm plot
+# origin = [0, 0 ,0]
+# ax.quiver(*origin, *ua_seg_trial_y, color='r', label='UA Y')
+# ax.quiver(*origin, *ua_seg_trial_x, color='g', label='UA X')
+# ax.quiver(*origin, *ua_seg_trial_z, color='b', label='UA Z')
+#     #thorax plot
+# origin = [0, 0 ,0]
+# ax.quiver(*origin, *thrx_seg_trial_y, color='r', label='THORAX Y')
+# ax.quiver(*origin, *thrx_seg_trial_x, color='g', label='THORAX X')
+# ax.quiver(*origin, *thrx_seg_trial_z, color='b', label='THORAX Z')
+
+# origin = hand_seg_o
+# ax.quiver(*origin, *hand_seg_trial_y, color='r', label='FA Y')
+# ax.quiver(*origin, *hand_seg_trial_x, color='g', label='FA X')
+# ax.quiver(*origin, *hand_seg_trial_z, color='b', label='FA Z')
