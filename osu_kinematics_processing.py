@@ -568,6 +568,12 @@ for i in range(le_ua_trial_virtual.shape[1]):
     thrx_seg_trial_z = np.cross(thrx_seg_trial_y, thrx_seg_trial_temp) / np.linalg.norm(np.cross(thrx_seg_trial_y, thrx_seg_trial_temp))
     thrx_seg_trial_x = np.cross(thrx_seg_trial_z, thrx_seg_trial_y) / np.linalg.norm(np.cross(thrx_seg_trial_z, thrx_seg_trial_y))
 
+    hand_seg_o = hand_origin[:,i]
+    hand_seg_trial_z[:,i] = (hand_origin[:,i] - mcp2_trial_filtered[:,i]) /(np.linalg.norm(hand_origin[:,i] - mcp2_trial_filtered[:,i]))
+    hand_seg_trial_temp[:,i] = (rs_trial_filtered[:,i] - hand_origin[:,i]) / (np.linalg.norm(rs_trial_filtered[:,i] - hand_origin[:,i]))
+    hand_seg_trial_x = np.cross(hand_seg_trial_temp, hand_seg_trial_z) / np.linalg.norm(np.cross(hand_seg_trial_temp,hand_seg_trial_z))
+    hand_seg_trial_y = np.cross(hand_seg_trial_z, hand_seg_trial_x) / np.linalg.norm(np.cross(hand_seg_trial_z, hand_seg_trial_x))
+
 
 # visual checks for segment LCS vectors
 
