@@ -543,8 +543,8 @@ thrx_seg_trial_temp = np.empty_like(le_trial_filtered)
 
 
 #hand segment vectors
-hand_seg_trial_z = np.empty_like(le_trial_filtered)
 hand_seg_trial_x = np.empty_like(le_trial_filtered)
+hand_seg_trial_y = np.empty_like(le_trial_filtered)
 hand_seg_trial_z = np.empty_like(le_trial_filtered)
 hand_seg_trial_temp = np.empty_like(le_trial_filtered)
 
@@ -604,3 +604,40 @@ plt.show()
 # ax.quiver(*origin, *hand_seg_trial_y, color='r', label='FA Y')
 # ax.quiver(*origin, *hand_seg_trial_x, color='g', label='FA X')
 # ax.quiver(*origin, *hand_seg_trial_z, color='b', label='FA Z')
+
+# CREATE DCMS FOR EACH SEGMENT
+for i in range(le_ua_trial_virtual.shape[1]):
+    hand_dcm_trial = np.stack((hand_seg_trial_x[:,i], hand_seg_trial_y[:,i], hand_seg_trial_z[:,i]), axis=-1)
+    fa_dcm_trial = np.stack((fa_seg_trial_x[:,i], fa_seg_trial_y[:,i], fa_seg_trial_z[:,i]), axis=-1)
+    ua_dcm_trial = np.stack((ua_seg_trial_x[:,i], ua_seg_trial_y[:,i], ua_seg_trial_z[:,i]), axis=-1)
+    thrx_dcm_trial = np.stack((thrx_seg_trial_x[:,i], thrx_seg_trial_y[:,i], thrx_seg_trial_z[:,i]), axis=-1)
+    #Define dcms between segments
+    hand_fa_dcm_trial = hand_dcm_trial * fa_dcm_trial
+    fa_ua_dcm_trial = fa_dcm_trial * ua_dcm_trial
+    ua_thrx_dcm_trial = ua_dcm_trial * thrx_dcm_trial
+
+# Calculate euler angles 
+
+#forearm relative to hand (wrist) Z-X-Y 
+    # alpha (Y) = pronation (+) / supination (-) | displacement = proximal or distal translation
+    # gamma (Z) = flexion (+) / extension (-) | displacement = radial / ulnar translation
+    # beta (X) = radial (-) / ulnar deviation (+) | displacement - dorsal / volar translation
+    
+
+
+#humerum relative to forearm (elbow) Z-X-Y
+    # alphaHF (Z) = flexion (+)/ hyperextension (-)  
+    # gammaHF (Y) = axial rotation of the forearm | pronation (+) / supination (-) 
+    # betaHF (X) = carrying angle, passive response to flex/ext, rarely reported
+
+
+#thorax relative to upper arm (shoulder) Y-X-Y 
+    #gammaH1 (Y) = plane of elevation | 0* = abduction / 90* = forward flexion
+    #betaH (X) = elevation (-) 
+    #gammaH2 (Y) = axial rotation | internal rot (+) / external rot (-)
+
+#thorax relative to global cs Z-X-Y
+    #alphaGT (Z) = flexion (-) / extension (+)
+    #betaGT (X) = lateral flexion | right (+) / left (-)
+    #gammaGT (Y) = axial rotation | left (+) / right (+)
+
