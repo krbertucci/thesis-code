@@ -628,8 +628,13 @@ for i in range(le_ua_trial_virtual.shape[1]):
     # alpha (Y) = pronation (+) / supination (-) | displacement = proximal or distal translation
     # gamma (Z) = flexion (+) / extension (-) | displacement = radial / ulnar translation
     # beta (X) = radial (-) / ulnar deviation (+) | displacement - dorsal / volar translation
-    
+alphaFH = np.arctan2(-hand_fa_dcm_trial[2,1], hand_fa_dcm_trial[2,2])
+betaFH = np.arctan2(hand_fa_dcm_trial[2,0], np.sqrt(hand_fa_dcm_trial[0,0]**2 + hand_fa_dcm_trial[1,0]**2))
+gammaFH = np.arctan2(-hand_fa_dcm_trial[1, 0], hand_fa_dcm_trial[0, 0])
 
+fa_hand_alpha = np.degrees(alphaFH)
+fa_hand_beta = np.degrees(betaFH)
+fa_hand_gamma = np.degrees(gammaFH)
 
 #humerum relative to forearm (elbow) Z-X-Y
     # alphaHF (Z) = flexion (+)/ hyperextension (-)  
