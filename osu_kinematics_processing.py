@@ -66,20 +66,33 @@ cal_clusters = {
 ## IMPORT TASK TRIAL AND DATA ##
 
 
-
+# Participants will either be standing in the same orientation during 
+# cal trials or rotated about Y axis 
+# if participant is standing facing the desk, do not need to rotate the virtual markers
+# if participant is standing facing the door, rotate about Y
 # ROTATE TO ISB AXES
     #Define axes rotation matrix
         #QTM conventions: +X = forward, +Y = up, +Z = right
         #ISB conventions: +X = forward, +Y = up, +Z = right
-ISB_X = np.array([0, 1, 0])
-ISB_Y = np.array([0, 0, 1])
-ISB_Z = np.array([-1, 0, 0])
-ISB = [ISB_X, ISB_Y, ISB_Z]
+ISB_X = np.array([1, 0, 0])
+ISB_Y = np.array([0, 1, 0])
+ISB_Z = np.array([0, 0, 1])
+ISB = np.array([ISB_X, ISB_Y, ISB_Z])
 
+# If CAL facing door
+    # LCS
+        # +X Local = -Z Global
+        # +Y Local = +Y Global
+        # +Z Local = +X Global
+alt_CAL_ISB_X = np.array([0, 0, 1])
+alt_CAL_ISB_Y = np.array([0, 1, 0])
+alt_CAL_ISB_Z = np.array([-1, 0, 0])
+
+alt_CAL_GRL = np.array([alt_CAL_ISB_X, alt_CAL_ISB_Y, alt_CAL_ISB_Z])
 
 
 def rotate_vector(vector, rotation_matrix):
-    #function to rotate the marker vectors by the ISB matrix
+    #function to rotate the marker vectors by the ISB matrix using dot product
     '''  Rotate marker vectors by the rotation matrix.
     
         Arg:
@@ -91,6 +104,7 @@ def rotate_vector(vector, rotation_matrix):
 
 
 ''' If values need to be rotated then uncomment below '''
+
 # # Apply rotation to cal_markers
 # for marker_name, marker_values in cal_markers.items():
 #     cal_markers[marker_name] = rotate_vector(marker_values, ISB)
@@ -111,9 +125,6 @@ for values in cal_markers.values():
 cal_markers_arr = np.array(cal_markers_arr)
 
 
-# fig = px.scatter_3d(x=cal_markers_arr[:,0], y = cal_markers_arr[:,1], z = cal_markers_arr[:,2])
-# fig.show()
-
 
 ''' VISUAL CHECK OF MARKERS '''
 # Function to add scatter plot and text annotations
@@ -132,15 +143,9 @@ def add_scatter_and_text(ax, marker_name, markers_dict):
     ax.set_zlabel('Z')
 
     # Set legend
-# ax.legend()
+    ax.legend()
 
 
-    # Set legend
-# ax.legend()
-# for marker_name in cal_markers:
-#     add_scatter_and_text(ax, marker_name, cal_markers)
-
-# plt.show()
 
 # USE FOR TRIALS
 
@@ -150,7 +155,7 @@ def add_scatter_and_text(ax, marker_name, markers_dict):
 #         marker_values = cal_raw.iloc[cal_frame, marker_columns].values
 #         cal_markers[marker_name] = rotate_vector(marker_values, ISB)
 
-# cal marker arrays
+# cal cluster marker arrays
 cal_fa1 = cal_raw.iloc[cal_frame, 12:15].values
 cal_fa2 = cal_raw.iloc[cal_frame, 15:18].values
 cal_fa3 = cal_raw.iloc[cal_frame, 18:21].values
@@ -163,7 +168,13 @@ cal_chest3 = cal_raw.iloc[cal_frame, 51:54].values
 cal_chest4 = cal_raw.iloc[cal_frame, 54:57].values
 cal_chest5 = cal_raw.iloc[cal_frame, 57:60].values
 
+cal_ss = cal_raw.iloc[cal_frame, 42:45].values
+cal_xp = cal_raw.iloc[cal_frame, 60:63].values,
+cal_c7 = cal_raw.iloc[cal_frame, 39:42].values,
 
+print(cal_ss)
+cal_ss = (np.dot(ISB,cal_ss))
+print(cal_ss)
 # Define the Local Coordinate System of the Clusters during calibration trial
 
     # Chest, O = chest5, +Y = superior, +X = anterior, +Z = right 
@@ -196,55 +207,41 @@ cal_hand_temp = ((np.array(cal_markers["us"]) - np.array(cal_markers["mcp2"]))) 
 cal_hand_x = np.cross(cal_hand_y, cal_hand_temp) / np.linalg.norm(np.cross(cal_hand_y, cal_hand_temp))
 cal_hand_z = np.cross(cal_hand_x, cal_hand_y) / np.linalg.norm(np.cross(cal_hand_x, cal_hand_y))
 
-# # Vector Plotting
-# origin = [0, 0 ,0]
-# ax.quiver(*origin, *cal_chest_x, color='r', label='Chest X')
-# ax.quiver(*origin, *cal_chest_y, color='g', label='Chest Y')
-# ax.quiver(*origin, *cal_chest_z, color='b', label='Chest Z')
-# # Set plot limits
-# ax.set_xlim([-10, 10])
-# ax.set_ylim([-10, 10])
-# ax.set_zlim([-10, 10])
-# # Set labels
-# ax.set_xlabel('X')
-# ax.set_ylabel('Y')
-# ax.set_zlabel('Z')
 
-# ax.legend()
-# # plt.show()
 
 # Define global coordinate axes
 global_x = np.array([1, 0, 0])
 global_y = np.array([0, 1, 0])
 global_z = np.array([0, 0, 1])
 
+def compute_GRL_rotation_matrix(LCS_v_x, LCS_v_y, LCS_v_z):
+    """ Computes a Global to Local rotation matrix
+    Inputs
+    LCS_v_x = x vector of the LCS
+    LCS_v_y = y vector of the LCS
+    LCS_v_z = z vector of the LCS
+    """
+    trial_global_rot = np.zeros((3,3))
+
+    trial_global_rot[0,0] = np.dot(LCS_v_x, global_x)
+    trial_global_rot[0,1] = np.dot(LCS_v_x, global_y)
+    trial_global_rot[0,2] = np.dot(LCS_v_x, global_z)
+    trial_global_rot[1,0] = np.dot(LCS_v_y, global_x)
+    trial_global_rot[1,1] = np.dot(LCS_v_y, global_y)
+    trial_global_rot[1,2] = np.dot(LCS_v_y, global_z)
+    trial_global_rot[2,0] = np.dot(LCS_v_z, global_x)
+    trial_global_rot[2,1] = np.dot(LCS_v_z, global_y)
+    trial_global_rot[2,2] = np.dot(LCS_v_z, global_z)
+
+    return trial_global_rot
 
 
 # Compute rotation matrix to go from GCS to Cluster LCS
+global_cal_chest = compute_GRL_rotation_matrix(cal_chest_x, cal_chest_y, cal_chest_z)
+global_cal_ua = compute_GRL_rotation_matrix(cal_ua_x, cal_ua_y, cal_ua_z)
+global_cal_fa = compute_GRL_rotation_matrix(cal_fa_x, cal_fa_y, cal_fa_z)
+global_cal_hand = compute_GRL_rotation_matrix(cal_hand_x, cal_hand_y, cal_hand_z)
 
-global_cal_chest = np.array([
-    [np.dot(cal_chest_x, global_x), np.dot(cal_chest_x, global_y), np.dot(cal_chest_x, global_z)],
-    [np.dot(cal_chest_y, global_x), np.dot(cal_chest_y , global_y), np.dot(cal_chest_y , global_z)],
-    [np.dot(cal_chest_z, global_x), np.dot(cal_chest_z, global_y), np.dot(cal_chest_z, global_z)],
-])
-
-global_cal_ua = np.array([
-    [np.dot(cal_ua_x, global_x), np.dot(cal_ua_x, global_y), np.dot(cal_ua_x, global_z)],
-    [np.dot(cal_ua_y, global_x), np.dot(cal_ua_y , global_y), np.dot(cal_ua_y , global_z)],
-    [np.dot(cal_ua_z, global_x), np.dot(cal_ua_z, global_y), np.dot(cal_ua_z, global_z)],
-])
-
-global_cal_fa = np.array([
-    [np.dot(cal_fa_x, global_x), np.dot(cal_fa_x, global_y), np.dot(cal_fa_x, global_z)],
-    [np.dot(cal_fa_y, global_x), np.dot(cal_fa_y , global_y), np.dot(cal_fa_y , global_z)],
-    [np.dot(cal_fa_z, global_x), np.dot(cal_fa_z, global_y), np.dot(cal_fa_z, global_z)],
-])
-
-global_cal_hand = np.array([
-    [np.dot(cal_hand_x, global_x), np.dot(cal_hand_x, global_y), np.dot(cal_hand_x, global_z)],
-    [np.dot(cal_hand_y, global_x), np.dot(cal_hand_y , global_y), np.dot(cal_hand_y , global_z)],
-    [np.dot(cal_hand_z, global_x), np.dot(cal_hand_z, global_y), np.dot(cal_hand_z, global_z)],
-])
 
 # Define the relationship between Clusters and markers
 # Chest to SS, XP, C7, chest origin set to chest4 (bottom left)
@@ -261,11 +258,69 @@ r_acr_v_ua = np.dot(global_cal_ua, np.array(cal_markers["r_acr"]) - np. array(ca
 us_v_fa = np.dot(global_cal_fa, np.array(cal_markers["us"]) - np.array(cal_fa1))
 rs_v_fa = np.dot(global_cal_fa, np.array(cal_markers["rs"]) - np.array(cal_fa1))
 me_v_fa = np.dot(global_cal_ua, np.array(cal_markers["me"]) - np.array(cal_fa1))
-le_v_fa = np.dot(global_cal_ua, np.array(cal_markers["me"]) - np.array(cal_fa1))
+le_v_fa = np.dot(global_cal_ua, np.array(cal_markers["le"]) - np.array(cal_fa1))
 
+'''TEST REMOVING RM '''
+ss_v_chest = (np.array(cal_markers["ss"]) - np.array(cal_chest4))
+xp_v_chest = (np.array(cal_markers["xp"]) - np.array(cal_chest4))
+c7_v_chest = (np.array(cal_markers["c7"]) - np.array(cal_chest4))
 
+# Upper Arm to ME, LE, ua origin set to ua1
+me_v_ua = (np.array(cal_markers["me"]) - np.array(cal_ua1))
+le_v_ua = (np.array(cal_markers["le"]) - np.array(cal_ua1))
+r_acr_v_ua = (np.array(cal_markers["r_acr"]) - np. array(cal_ua1))
 
+# Forearm to US, RS
+us_v_fa = (np.array(cal_markers["us"]) - np.array(cal_fa1))
+rs_v_fa = (np.array(cal_markers["rs"]) - np.array(cal_fa1))
+me_v_fa = (np.array(cal_markers["me"]) - np.array(cal_fa1))
+le_v_fa = (np.array(cal_markers["le"]) - np.array(cal_fa1))
 
+''' Visual Plotting vectors to virtual markers '''
+
+origin = cal_chest4
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+# scatter plot for original markers
+# origins set to black
+ax.scatter((cal_markers["ss"])[0], (cal_markers["ss"])[1], (cal_markers["ss"])[2], color='steelblue', marker = 'o', label = 'ss')
+ax.scatter((cal_markers["c7"])[0], (cal_markers["c7"])[1], (cal_markers["c7"])[2], color='brown', marker = 'o', label = 'c7')
+ax.scatter((cal_markers["xp"])[0], (cal_markers["xp"])[1], (cal_markers["xp"])[2], color='green', marker = 'o', label = 'xp')
+ax.scatter(cal_chest4[0], cal_chest4[1], cal_chest4[2], color='black', marker = 'o', label = 'chest 4')
+
+ax.scatter(cal_ua1[0], cal_ua1[1], cal_ua1[2], color='black', marker = 'o', label = 'ua1')
+ax.scatter(cal_fa1[0], cal_fa1[1], cal_fa1[2], color='black', marker = 'o', label = 'ua1')
+ax.scatter((cal_markers["r_acr"])[0], (cal_markers["r_acr"])[1], (cal_markers["r_acr"])[2],  color='c', marker = 'o', label = 'r_acr')
+ax.scatter((cal_markers["le"])[0], (cal_markers["le"])[1], (cal_markers["le"])[2],  color='orange', marker = 'o', label = 'le')
+ax.scatter((cal_markers["me"])[0], (cal_markers["me"])[1], (cal_markers["me"])[2],  color='purple', marker = 'o', label = 'me')
+ax.scatter((cal_markers["rs"])[0], (cal_markers["rs"])[1], (cal_markers["rs"])[2],  color='magenta', marker = 'o', label = 'me')
+ax.scatter((cal_markers["us"])[0], (cal_markers["us"])[1], (cal_markers["us"])[2],  color='r', marker = 'o', label = 'me')
+
+#quiver plot to plot vectors between origin and original markers
+ax.quiver(cal_chest4[0], cal_chest4[1], cal_chest4[2], ss_v_chest[0], ss_v_chest[1], ss_v_chest[2], color='steelblue')
+ax.quiver(cal_chest4[0], cal_chest4[1], cal_chest4[2], xp_v_chest[0], xp_v_chest[1], xp_v_chest[2], color='green')
+ax.quiver(cal_chest4[0], cal_chest4[1], cal_chest4[2], c7_v_chest[0], c7_v_chest[1], c7_v_chest[2], color='brown')
+#acromion from ua1
+ax.quiver(cal_ua1[0], cal_ua1[1], cal_ua1[2], r_acr_v_ua[0], r_acr_v_ua[1], r_acr_v_ua[2], color='cyan')
+#me and le from ua1 (if fa cluster is proximal)
+ax.quiver(cal_ua1[0], cal_ua1[1], cal_ua1[2], me_v_ua[0], me_v_ua[1], me_v_ua[2], color='purple')
+ax.quiver(cal_ua1[0], cal_ua1[1], cal_ua1[2], le_v_ua[0], le_v_ua[1], le_v_ua[2], color='orange')
+# me, le, rs, us from fa1
+ax.quiver(cal_fa1[0], cal_fa1[1], cal_fa1[2], me_v_fa[0], me_v_fa[1], me_v_fa[2], color='purple')
+ax.quiver(cal_fa1[0], cal_fa1[1], cal_fa1[2], le_v_fa[0], le_v_fa[1], le_v_fa[2], color='orange')
+ax.quiver(cal_fa1[0], cal_fa1[1], cal_fa1[2], rs_v_fa[0], rs_v_fa[1], rs_v_fa[2], color='red')
+ax.quiver(cal_fa1[0], cal_fa1[1], cal_fa1[2], us_v_fa[0], us_v_fa[1], us_v_fa[2], color='magenta')
+
+# Set plot limits
+ax.set_xlim([-100, 1000])
+ax.set_ylim([500, 1200])
+ax.set_zlim([-0, 1000])
+# Set labels
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+plt.legend()
+plt.show()
 
 ''' TASK '''
 # add in condition dictionaries from EMG processing 
@@ -364,26 +419,6 @@ for frame in range(trial_frame_count):
 # ua_trial_GRL = np.zeros((3,3))
 # chest_trial_GRL = np.zeros((3,3))
 
-def compute_GRL_rotation_matrix(LCS_v_x, LCS_v_y, LCS_v_z):
-    """ Computes a Global to Local rotation matrix
-    Inputs
-    LCS_v_x = x vector of the LCS
-    LCS_v_y = y vector of the LCS
-    LCS_v_z = z vector of the LCS
-    """
-    trial_global_rot = np.zeros((3,3))
-
-    trial_global_rot[0,0] = np.dot(LCS_v_x, global_x)
-    trial_global_rot[0,1] = np.dot(LCS_v_x, global_y)
-    trial_global_rot[0,2] = np.dot(LCS_v_x, global_z)
-    trial_global_rot[1,0] = np.dot(LCS_v_y, global_x)
-    trial_global_rot[1,1] = np.dot(LCS_v_y, global_y)
-    trial_global_rot[1,2] = np.dot(LCS_v_y, global_z)
-    trial_global_rot[2,0] = np.dot(LCS_v_z, global_x)
-    trial_global_rot[2,1] = np.dot(LCS_v_z, global_y)
-    trial_global_rot[2,2] = np.dot(LCS_v_z, global_z)
-
-    return trial_global_rot
 
 
 # rotate each LCS to GCS
@@ -548,7 +583,7 @@ hand_seg_trial_y = np.empty_like(le_trial_filtered)
 hand_seg_trial_z = np.empty_like(le_trial_filtered)
 hand_seg_trial_temp = np.empty_like(le_trial_filtered)
 
-
+#basis vectors
 for i in range(le_ua_trial_virtual.shape[1]):
     #forearm
     fa_seg_trial_y[:,i] = ((ejc[:, i] - us_trial_filtered[:, i])) /(np.linalg.norm(ejc[:, i] - us_trial_filtered[:, i]))
@@ -593,7 +628,7 @@ ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Z')
 
-plt.show()
+# plt.show()
 
     # upper arm plot
 # origin = [0, 0 ,0]
@@ -624,19 +659,23 @@ for i in range(le_ua_trial_virtual.shape[1]):
 
 # Calculate euler angles 
 
-#forearm relative to hand (wrist) Z-X-Y 
+#forearm relative to hand (wrist) Z-X-Y (Wu 2005)
     # alpha (Y) = pronation (+) / supination (-) | displacement = proximal or distal translation
     # gamma (Z) = flexion (+) / extension (-) | displacement = radial / ulnar translation
     # beta (X) = radial (-) / ulnar deviation (+) | displacement - dorsal / volar translation
-alphaFH = np.arctan2(-hand_fa_dcm_trial[2,1], hand_fa_dcm_trial[2,2])
-betaFH = np.arctan2(hand_fa_dcm_trial[2,0], np.sqrt(hand_fa_dcm_trial[0,0]**2 + hand_fa_dcm_trial[1,0]**2))
-gammaFH = np.arctan2(-hand_fa_dcm_trial[1, 0], hand_fa_dcm_trial[0, 0])
 
-fa_hand_alpha = np.degrees(alphaFH)
-fa_hand_beta = np.degrees(betaFH)
-fa_hand_gamma = np.degrees(gammaFH)
+    #beta = asin (dcm (3,2)) # solve for beta first
+    #alpha = acos (dcm(2,2)/cos(beta)) # 2,2 = cos(beta)cos(alpha)
+    #gamma = acos (dcm (3,3)/cos(beta))
+betaWrist = np.arcsin(hand_fa_dcm_trial[2,1])
+alphaWrist = np.arccos(hand_fa_dcm_trial[1,1]/ np.cos(betaWrist))
+gammaWrist = np.arccos(hand_fa_dcm_trial[2, 2] /np.cos(betaWrist))
 
-#humerum relative to forearm (elbow) Z-X-Y
+wrist_alpha = np.degrees(alphaWrist)
+wrist_beta = np.degrees(betaWrist)
+wrist_gamma = np.degrees(gammaWrist)
+
+#humerum relative to ulnar (elbow) Z-X-Y
     # alphaHF (Z) = flexion (+)/ hyperextension (-)  
     # gammaHF (Y) = axial rotation of the forearm | pronation (+) / supination (-) 
     # betaHF (X) = carrying angle, passive response to flex/ext, rarely reported
