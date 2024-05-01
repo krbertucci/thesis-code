@@ -17,7 +17,7 @@ import scipy
 
 
 # input subject
-sub_num = "S06"
+sub_num = "S01"
 # set path for files
 trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_Kinematics/Digitized_TSV"
 # sample rate
@@ -261,66 +261,78 @@ me_v_fa = np.dot(global_cal_ua, np.array(cal_markers["me"]) - np.array(cal_fa1))
 le_v_fa = np.dot(global_cal_ua, np.array(cal_markers["le"]) - np.array(cal_fa1))
 
 '''TEST REMOVING RM '''
-ss_v_chest = (np.array(cal_markers["ss"]) - np.array(cal_chest4))
-xp_v_chest = (np.array(cal_markers["xp"]) - np.array(cal_chest4))
-c7_v_chest = (np.array(cal_markers["c7"]) - np.array(cal_chest4))
+# ss_v_chest = (np.array(cal_markers["ss"]) - np.array(cal_chest4))
+# xp_v_chest = (np.array(cal_markers["xp"]) - np.array(cal_chest4))
+# c7_v_chest = (np.array(cal_markers["c7"]) - np.array(cal_chest4))
 
-# Upper Arm to ME, LE, ua origin set to ua1
-me_v_ua = (np.array(cal_markers["me"]) - np.array(cal_ua1))
-le_v_ua = (np.array(cal_markers["le"]) - np.array(cal_ua1))
-r_acr_v_ua = (np.array(cal_markers["r_acr"]) - np. array(cal_ua1))
+# # Upper Arm to ME, LE, ua origin set to ua1
+# me_v_ua = (np.array(cal_markers["me"]) - np.array(cal_ua1))
+# le_v_ua = (np.array(cal_markers["le"]) - np.array(cal_ua1))
+# r_acr_v_ua = (np.array(cal_markers["r_acr"]) - np. array(cal_ua1))
 
-# Forearm to US, RS
-us_v_fa = (np.array(cal_markers["us"]) - np.array(cal_fa1))
-rs_v_fa = (np.array(cal_markers["rs"]) - np.array(cal_fa1))
-me_v_fa = (np.array(cal_markers["me"]) - np.array(cal_fa1))
-le_v_fa = (np.array(cal_markers["le"]) - np.array(cal_fa1))
+# # Forearm to US, RS
+# us_v_fa = (np.array(cal_markers["us"]) - np.array(cal_fa1))
+# rs_v_fa = (np.array(cal_markers["rs"]) - np.array(cal_fa1))
+# me_v_fa = (np.array(cal_markers["me"]) - np.array(cal_fa1))
+# le_v_fa = (np.array(cal_markers["le"]) - np.array(cal_fa1))
+
+def vector_plot(ax, origin, vector):
+    ''' 
+    plots vector
+    '''
+    ax.quiver(origin[0], origin[1], origin[2], vector[0], vector[1], vector[2], color='purple')
+
 
 ''' Visual Plotting vectors to virtual markers '''
 
-origin = cal_chest4
-fig = plt.figure()
-ax = fig.add_subplot(projection='3d')
-# scatter plot for original markers
-# origins set to black
-ax.scatter((cal_markers["ss"])[0], (cal_markers["ss"])[1], (cal_markers["ss"])[2], color='steelblue', marker = 'o', label = 'ss')
-ax.scatter((cal_markers["c7"])[0], (cal_markers["c7"])[1], (cal_markers["c7"])[2], color='brown', marker = 'o', label = 'c7')
-ax.scatter((cal_markers["xp"])[0], (cal_markers["xp"])[1], (cal_markers["xp"])[2], color='green', marker = 'o', label = 'xp')
-ax.scatter(cal_chest4[0], cal_chest4[1], cal_chest4[2], color='black', marker = 'o', label = 'chest 4')
+# origin = cal_chest4
+# fig = plt.figure()
+# ax = fig.add_subplot(projection='3d')
+# # scatter plot for original markers
+# # origins set to black
+# ax.scatter((cal_markers["ss"])[0], (cal_markers["ss"])[1], (cal_markers["ss"])[2], color='steelblue', marker = 'o', label = 'ss')
+# ax.scatter((cal_markers["c7"])[0], (cal_markers["c7"])[1], (cal_markers["c7"])[2], color='brown', marker = 'o', label = 'c7')
+# ax.scatter((cal_markers["xp"])[0], (cal_markers["xp"])[1], (cal_markers["xp"])[2], color='green', marker = 'o', label = 'xp')
+# ax.scatter(cal_chest4[0], cal_chest4[1], cal_chest4[2], color='black', marker = 'o', label = 'chest 4')
 
-ax.scatter(cal_ua1[0], cal_ua1[1], cal_ua1[2], color='black', marker = 'o', label = 'ua1')
-ax.scatter(cal_fa1[0], cal_fa1[1], cal_fa1[2], color='black', marker = 'o', label = 'ua1')
-ax.scatter((cal_markers["r_acr"])[0], (cal_markers["r_acr"])[1], (cal_markers["r_acr"])[2],  color='c', marker = 'o', label = 'r_acr')
-ax.scatter((cal_markers["le"])[0], (cal_markers["le"])[1], (cal_markers["le"])[2],  color='orange', marker = 'o', label = 'le')
-ax.scatter((cal_markers["me"])[0], (cal_markers["me"])[1], (cal_markers["me"])[2],  color='purple', marker = 'o', label = 'me')
-ax.scatter((cal_markers["rs"])[0], (cal_markers["rs"])[1], (cal_markers["rs"])[2],  color='magenta', marker = 'o', label = 'me')
-ax.scatter((cal_markers["us"])[0], (cal_markers["us"])[1], (cal_markers["us"])[2],  color='r', marker = 'o', label = 'me')
+# ax.scatter(cal_ua1[0], cal_ua1[1], cal_ua1[2], color='black', marker = 'o', label = 'ua1')
+# ax.scatter(cal_fa1[0], cal_fa1[1], cal_fa1[2], color='black', marker = 'o', label = 'ua1')
+# ax.scatter((cal_markers["r_acr"])[0], (cal_markers["r_acr"])[1], (cal_markers["r_acr"])[2],  color='c', marker = 'o', label = 'r_acr')
+# ax.scatter((cal_markers["le"])[0], (cal_markers["le"])[1], (cal_markers["le"])[2],  color='orange', marker = 'o', label = 'le')
+# ax.scatter((cal_markers["me"])[0], (cal_markers["me"])[1], (cal_markers["me"])[2],  color='purple', marker = 'o', label = 'me')
+# ax.scatter((cal_markers["rs"])[0], (cal_markers["rs"])[1], (cal_markers["rs"])[2],  color='magenta', marker = 'o', label = 'me')
+# ax.scatter((cal_markers["us"])[0], (cal_markers["us"])[1], (cal_markers["us"])[2],  color='r', marker = 'o', label = 'me')
 
-#quiver plot to plot vectors between origin and original markers
-ax.quiver(cal_chest4[0], cal_chest4[1], cal_chest4[2], ss_v_chest[0], ss_v_chest[1], ss_v_chest[2], color='steelblue')
-ax.quiver(cal_chest4[0], cal_chest4[1], cal_chest4[2], xp_v_chest[0], xp_v_chest[1], xp_v_chest[2], color='green')
-ax.quiver(cal_chest4[0], cal_chest4[1], cal_chest4[2], c7_v_chest[0], c7_v_chest[1], c7_v_chest[2], color='brown')
-#acromion from ua1
-ax.quiver(cal_ua1[0], cal_ua1[1], cal_ua1[2], r_acr_v_ua[0], r_acr_v_ua[1], r_acr_v_ua[2], color='cyan')
-#me and le from ua1 (if fa cluster is proximal)
-ax.quiver(cal_ua1[0], cal_ua1[1], cal_ua1[2], me_v_ua[0], me_v_ua[1], me_v_ua[2], color='purple')
-ax.quiver(cal_ua1[0], cal_ua1[1], cal_ua1[2], le_v_ua[0], le_v_ua[1], le_v_ua[2], color='orange')
-# me, le, rs, us from fa1
-ax.quiver(cal_fa1[0], cal_fa1[1], cal_fa1[2], me_v_fa[0], me_v_fa[1], me_v_fa[2], color='purple')
-ax.quiver(cal_fa1[0], cal_fa1[1], cal_fa1[2], le_v_fa[0], le_v_fa[1], le_v_fa[2], color='orange')
-ax.quiver(cal_fa1[0], cal_fa1[1], cal_fa1[2], rs_v_fa[0], rs_v_fa[1], rs_v_fa[2], color='red')
-ax.quiver(cal_fa1[0], cal_fa1[1], cal_fa1[2], us_v_fa[0], us_v_fa[1], us_v_fa[2], color='magenta')
+# #quiver plot to plot vectors between origin and original markers
+# ax.quiver(cal_chest4[0], cal_chest4[1], cal_chest4[2], ss_v_chest[0], ss_v_chest[1], ss_v_chest[2], color='steelblue')
+# ax.quiver(cal_chest4[0], cal_chest4[1], cal_chest4[2], xp_v_chest[0], xp_v_chest[1], xp_v_chest[2], color='green')
+# ax.quiver(cal_chest4[0], cal_chest4[1], cal_chest4[2], c7_v_chest[0], c7_v_chest[1], c7_v_chest[2], color='brown')
+# #acromion from ua1
+# ax.quiver(cal_ua1[0], cal_ua1[1], cal_ua1[2], r_acr_v_ua[0], r_acr_v_ua[1], r_acr_v_ua[2], color='cyan')
+# #me and le from ua1 (if fa cluster is proximal)
+# ax.quiver(cal_ua1[0], cal_ua1[1], cal_ua1[2], me_v_ua[0], me_v_ua[1], me_v_ua[2], color='purple')
+# ax.quiver(cal_ua1[0], cal_ua1[1], cal_ua1[2], le_v_ua[0], le_v_ua[1], le_v_ua[2], color='orange')
+# # me, le, rs, us from fa1
+# ax.quiver(cal_fa1[0], cal_fa1[1], cal_fa1[2], me_v_fa[0], me_v_fa[1], me_v_fa[2], color='purple')
+# ax.quiver(cal_fa1[0], cal_fa1[1], cal_fa1[2], le_v_fa[0], le_v_fa[1], le_v_fa[2], color='orange')
+# ax.quiver(cal_fa1[0], cal_fa1[1], cal_fa1[2], rs_v_fa[0], rs_v_fa[1], rs_v_fa[2], color='red')
+# ax.quiver(cal_fa1[0], cal_fa1[1], cal_fa1[2], us_v_fa[0], us_v_fa[1], us_v_fa[2], color='magenta')
 
-# Set plot limits
-ax.set_xlim([-100, 1000])
-ax.set_ylim([500, 1200])
-ax.set_zlim([-0, 1000])
-# Set labels
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
-plt.legend()
-plt.show()
+# ax.quiver(*cal_ua1, *cal_ua_y, color='r', label='UA Y')
+# ax.quiver(*cal_ua1, *cal_ua_x, color='g', label='UA X')
+# ax.quiver(*cal_ua1, *cal_ua_z, color='b', label='UA Z')
+
+
+# # Set plot limits
+# ax.set_xlim([-100, 1000])
+# ax.set_ylim([500, 1200])
+# ax.set_zlim([-0, 1000])
+# # Set labels
+# ax.set_xlabel('X')
+# ax.set_ylabel('Y')
+# ax.set_zlabel('Z')
+# plt.legend()
+# plt.show()
 
 ''' TASK '''
 # add in condition dictionaries from EMG processing 
@@ -458,36 +470,36 @@ xp_chest_trial_virtual = (trial_chest1 + np.dot(chest_trial_GRL, xp_v_chest))
 c7_chest_trial_virtual = (trial_chest1 + np.dot(chest_trial_GRL, c7_v_chest))
 
 # plot virtual markers and trial markers 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.scatter(le_ua_trial_virtual[0,0], le_ua_trial_virtual[0,1],le_ua_trial_virtual[0,2], c='r', marker='o', label='le')
-ax.scatter(me_ua_trial_virtual[0,0], me_ua_trial_virtual[0,1],me_ua_trial_virtual[0,2], c='r', marker='o', label='me')
-ax.scatter(racr_ua_trial_virtual[0,0], racr_ua_trial_virtual[0,1], racr_ua_trial_virtual[0,2], c='b', marker='o', label='racr')
-ax.scatter(ss_chest_trial_virtual[0,0], ss_chest_trial_virtual[0,1], ss_chest_trial_virtual[0,2], c='m', marker='o', label='ss')
-ax.scatter(xp_chest_trial_virtual[0,0], xp_chest_trial_virtual[0,1], xp_chest_trial_virtual[0,2], c='m', marker='o', label='xp')
-ax.scatter(c7_chest_trial_virtual[0,0], c7_chest_trial_virtual[0,1], c7_chest_trial_virtual[0,2], c='g', marker='o', label='c7')
-ax.scatter(trial_lacr[0,0], trial_lacr[0,1],trial_lacr[0,2], c='b', marker='o', label='lacr')
-ax.scatter(trial_rs[0,0], trial_rs[0,1],trial_rs[0,2], c='c', marker='o', label='rs')
-ax.scatter(trial_us[0,0], trial_us[0,1],trial_us[0,2], c='c', marker='o', label='us')
-ax.scatter(trial_mcp2[0,0], trial_mcp2[0,1],trial_mcp2[0,2], c='r', marker='o', label='mcp2')
-ax.scatter(trial_mcp5[0,0], trial_mcp5[0,1],trial_mcp5[0,2], c='r', marker='o', label='mcp5')
-ax.scatter(trial_fa1[0,0], trial_fa1[0,1],trial_fa1[0,2], c='k', marker='o', label='fa1')
-ax.scatter(trial_fa2[0,0], trial_fa2[0,1],trial_fa2[0,2], c='k', marker='o', label='fa2')
-ax.scatter(trial_fa3[0,0], trial_fa3[0,1],trial_fa3[0,2], c='k', marker='o', label='fa3')
-ax.scatter(trial_ua1[0,0], trial_ua1[0,1],trial_ua1[0,2], c='k', marker='o', label='ua1')
-ax.scatter(trial_ua2[0,0], trial_ua2[0,1],trial_ua2[0,2], c='k', marker='o', label='ua2')
-ax.scatter(trial_ua3[0,0], trial_ua3[0,1],trial_ua3[0,2], c='k', marker='o', label='ua3')
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# ax.scatter(le_ua_trial_virtual[0,0], le_ua_trial_virtual[0,1],le_ua_trial_virtual[0,2], c='r', marker='o', label='le')
+# ax.scatter(me_ua_trial_virtual[0,0], me_ua_trial_virtual[0,1],me_ua_trial_virtual[0,2], c='r', marker='o', label='me')
+# ax.scatter(racr_ua_trial_virtual[0,0], racr_ua_trial_virtual[0,1], racr_ua_trial_virtual[0,2], c='b', marker='o', label='racr')
+# ax.scatter(ss_chest_trial_virtual[0,0], ss_chest_trial_virtual[0,1], ss_chest_trial_virtual[0,2], c='m', marker='o', label='ss')
+# ax.scatter(xp_chest_trial_virtual[0,0], xp_chest_trial_virtual[0,1], xp_chest_trial_virtual[0,2], c='m', marker='o', label='xp')
+# ax.scatter(c7_chest_trial_virtual[0,0], c7_chest_trial_virtual[0,1], c7_chest_trial_virtual[0,2], c='g', marker='o', label='c7')
+# ax.scatter(trial_lacr[0,0], trial_lacr[0,1],trial_lacr[0,2], c='b', marker='o', label='lacr')
+# ax.scatter(trial_rs[0,0], trial_rs[0,1],trial_rs[0,2], c='c', marker='o', label='rs')
+# ax.scatter(trial_us[0,0], trial_us[0,1],trial_us[0,2], c='c', marker='o', label='us')
+# ax.scatter(trial_mcp2[0,0], trial_mcp2[0,1],trial_mcp2[0,2], c='r', marker='o', label='mcp2')
+# ax.scatter(trial_mcp5[0,0], trial_mcp5[0,1],trial_mcp5[0,2], c='r', marker='o', label='mcp5')
+# ax.scatter(trial_fa1[0,0], trial_fa1[0,1],trial_fa1[0,2], c='k', marker='o', label='fa1')
+# ax.scatter(trial_fa2[0,0], trial_fa2[0,1],trial_fa2[0,2], c='k', marker='o', label='fa2')
+# ax.scatter(trial_fa3[0,0], trial_fa3[0,1],trial_fa3[0,2], c='k', marker='o', label='fa3')
+# ax.scatter(trial_ua1[0,0], trial_ua1[0,1],trial_ua1[0,2], c='k', marker='o', label='ua1')
+# ax.scatter(trial_ua2[0,0], trial_ua2[0,1],trial_ua2[0,2], c='k', marker='o', label='ua2')
+# ax.scatter(trial_ua3[0,0], trial_ua3[0,1],trial_ua3[0,2], c='k', marker='o', label='ua3')
 
-ax.legend()
+# ax.legend()
 
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
-# set lims to all positive, where they sit
-ax.set_xlim([0, 1300])
-ax.set_ylim([100, 1200])
-ax.set_zlim([0, 1300])
-# plt.show()
+# ax.set_xlabel('X')
+# ax.set_ylabel('Y')
+# ax.set_zlabel('Z')
+# # set lims to all positive, where they sit
+# ax.set_xlim([0, 1300])
+# ax.set_ylim([100, 1200])
+# ax.set_zlim([0, 1300])
+# # plt.show()
 
     
 # butterworth filter 
@@ -538,7 +550,7 @@ for i in range(le_ua_trial_virtual.shape[1]):
 
 
 #Calculate joint centers
-sjc_adjustment = np.array([0, -0.06, 0]) # -60 mm in the y
+sjc_adjustment = np.array([0, -60, 0]) # -60 mm in the y
 # set empty arrays to the size of marker trial data
 wjc = np.empty_like(le_trial_filtered)
 ejc = np.empty_like(le_trial_filtered)
@@ -614,19 +626,19 @@ for i in range(le_ua_trial_virtual.shape[1]):
 
 # # Vector Plotting 
     # forearm plot
-origin = [0, 0 ,0]
-ax.quiver(*origin, *fa_seg_trial_y[0], color='r', label='FA Y')
-ax.quiver(*origin, *fa_seg_trial_x[0], color='g', label='FA X')
-ax.quiver(*origin, *fa_seg_trial_z[0], color='b', label='FA Z')
+# origin = [0, 0 ,0]
+# ax.quiver(*origin, *fa_seg_trial_y[0], color='r', label='FA Y')
+# ax.quiver(*origin, *fa_seg_trial_x[0], color='g', label='FA X')
+# ax.quiver(*origin, *fa_seg_trial_z[0], color='b', label='FA Z')
 
-# Set plot limits
-ax.set_xlim([-10, 10])
-ax.set_ylim([-10, 10])
-ax.set_zlim([-10, 10])
-# Set labels
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
+# # Set plot limits
+# ax.set_xlim([-10, 10])
+# ax.set_ylim([-10, 10])
+# ax.set_zlim([-10, 10])
+# # Set labels
+# ax.set_xlabel('X')
+# ax.set_ylabel('Y')
+# ax.set_zlabel('Z')
 
 # plt.show()
 
@@ -679,6 +691,45 @@ wrist_gamma = np.degrees(gammaWrist)
     # alphaHF (Z) = flexion (+)/ hyperextension (-)  
     # gammaHF (Y) = axial rotation of the forearm | pronation (+) / supination (-) 
     # betaHF (X) = carrying angle, passive response to flex/ext, rarely reported
+
+DCM_elbow = np.zeros((5622,3,3))
+alpha_elbow = np.zeros((5622,1))
+beta_elbow = np.zeros((5622,1))
+gamma_elbow = np.zeros((5622,1))
+
+for frame in range(le_ua_trial_virtual.shape[0]):
+  #hand unit vectors
+  x1_elbow = fa_seg_trial_x[frame,:]
+  y1_elbow = fa_seg_trial_y[frame,:]
+  z1_elbow = fa_seg_trial_z[frame,:]
+
+  #forearm unit vectors
+  x2_elbow = ua_seg_trial_x[frame,:]
+  y2_elbow = ua_seg_trial_y[frame,:]
+  z2_elbow = ua_seg_trial_z[frame,:]
+
+
+  DCM_elbow[frame,:,:] = np.array([
+      [np.dot(x1_elbow, x2_elbow), np.dot(x1_elbow, y2_elbow), np.dot(x1_elbow, z2_elbow)],
+      [np.dot(y1_elbow, x2_elbow), np.dot(y1_elbow, y2_elbow), np.dot(y1_elbow, z2_elbow)],
+      [np.dot(z1_elbow, x2_elbow), np.dot(z1_elbow, y2_elbow), np.dot(z1_elbow, z2_elbow)]])
+
+  #row then col
+  beta_elbow[frame,:] = np.arcsin(DCM_elbow[frame, 1,2])
+  alpha_elbow[frame, :] = np.arccos((DCM_elbow[frame, 1,1])/np.cos(beta_elbow[frame]))
+  gamma_elbow[frame,:] = np.arccos((DCM_elbow[frame, 2,2])/np.cos(beta_elbow[frame]))
+
+alphadeg_elbow = np.degrees(alpha_elbow)
+betadeg_elbow = np.degrees(beta_elbow)
+gammadeg_elbow = np.degrees(gamma_elbow)
+# cosB*cosA = -1.089
+# cosA = -1.1/ cosB
+# A = arccos(-1.1/cosB)
+# sinB = -1.24
+x = np.arange(5622)
+plt.plot(x, gammadeg_elbow)
+plt.show()
+
 
 
 #thorax relative to upper arm (shoulder) Y-X-Y 
