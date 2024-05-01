@@ -96,6 +96,9 @@ alt_CAL_ISB_X = np.array([0, 0, 1])
 alt_CAL_ISB_Y = np.array([0, 1, 0])
 alt_CAL_ISB_Z = np.array([-1, 0, 0])
 
+alt_CAL_ISB = np.array([alt_CAL_ISB_X, alt_CAL_ISB_Y, alt_CAL_ISB_Z])
+
+''' Did not rotate to ISB because room xyz = isb xyz'''
 
 # DEFINE LOCAL COORDINATE SYSTEMS OF CALIBRATION CLUSTERS #
 
@@ -242,6 +245,7 @@ chest_trial_y = []
 chest_trial_z = []
 
 #iterate through the length of the trial to create a LCS for each frame
+''' size = (length of trial,3)''' # CURRENTLY (3,)
 for frame in range(trial_frame_count):
      #Chest
     chest_trial_z_frame = ((trial_chest4[frame, :] - trial_chest5[frame, :])) /(np.linalg.norm(trial_chest4[frame, :] - trial_chest5[frame, :]))
@@ -269,7 +273,7 @@ for frame in range(trial_frame_count):
     hand_trial_x_frame = np.cross(hand_trial_y_frame, hand_trial_temp_frame) / np.linalg.norm(np.cross(hand_trial_y_frame, hand_trial_temp_frame))
     hand_trial_z_frame = np.cross(hand_trial_x_frame, hand_trial_y_frame) / np.linalg.norm(np.cross(hand_trial_x_frame, hand_trial_y_frame))
 
-# DEFINE ROTATION MATRIX (GRL) FOR TASK 
+# DEFINE ROTATION MATRIX (GLOBAL TO LOCAL) FOR TASK CLUSTER/SEGMENTS
 
 hand_trial_GRL = compute_GRL_rotation_matrix(hand_trial_x_frame, hand_trial_y_frame, hand_trial_z_frame)
 fa_trial_GRL = compute_GRL_rotation_matrix(fa_trial_x_frame, fa_trial_y_frame, fa_trial_z_frame)
@@ -355,7 +359,7 @@ for i in range(le_ua_trial_virtual.shape[1]):
 
 #DEFINE TRIAL SEGMENT LCS USING FILTERED VIRTUAL MARKERS
 
-# create empty lists to store segment LCS vectors
+# create empty lists to store trial segment xyz | size = (trial frames , xyz)
 #forearm segment LCS vectors
 fa_seg_trial_y = np.empty_like(le_trial_filtered)
 fa_seg_trial_x = np.empty_like(le_trial_filtered)
@@ -380,42 +384,43 @@ hand_seg_trial_y = np.empty_like(le_trial_filtered)
 hand_seg_trial_z = np.empty_like(le_trial_filtered)
 hand_seg_trial_temp = np.empty_like(le_trial_filtered)
 
-for i in range(le_ua_trial_virtual.shape[1]):
-    #forearm
-    fa_seg_trial_y[:,i] = ((ejc[:, i] - us_trial_filtered[:, i])) /(np.linalg.norm(ejc[:, i] - us_trial_filtered[:, i]))
-    fa_seg_trial_temp[:,i] = (rs_trial_filtered[:,i] - us_trial_filtered[:,i]) / (np.linalg.norm(rs_trial_filtered[:,i] - us_trial_filtered[:,i]))
-    fa_seg_trial_x = np.cross(fa_seg_trial_y, fa_seg_trial_temp) / np.linalg.norm(np.cross(fa_seg_trial_y, fa_seg_trial_temp))
-    fa_seg_trial_z = np.cross(fa_seg_trial_x, fa_seg_trial_y) / np.linalg.norm(np.cross(fa_seg_trial_x, fa_seg_trial_y))
 
-    #upper arm
-    ua_seg_trial_y[:,i] = ((sjc[:,i] - ejc[:,i])) /(np.linalg.norm(sjc[:,i] - ejc[:,i]))
-    ua_seg_trial_temp[:,i] = (ua_seg_trial_y[:,i] - fa_seg_trial_y[:,i]) / (np.linalg.norm(ua_seg_trial_y[:,i] - fa_seg_trial_y[:,i]))
-    ua_seg_trial_z = np.cross(ua_seg_trial_y, ua_seg_trial_temp) / np.linalg.norm(np.cross(ua_seg_trial_y, ua_seg_trial_temp))
-    ua_seg_trial_x = np.cross(ua_seg_trial_z, ua_seg_trial_y) / np.linalg.norm(np.cross(ua_seg_trial_z, ua_seg_trial_y))
+#forearm
+fa_seg_trial_y = ((ejc - us_trial_filtered)) /(np.linalg.norm(ejc - us_trial_filtered))
+fa_seg_trial_temp = (rs_trial_filtered - us_trial_filtered) / (np.linalg.norm(rs_trial_filtered - us_trial_filtered))
+fa_seg_trial_x = np.cross(fa_seg_trial_y, fa_seg_trial_temp) / np.linalg.norm(np.cross(fa_seg_trial_y, fa_seg_trial_temp))
+fa_seg_trial_z = np.cross(fa_seg_trial_x, fa_seg_trial_y) / np.linalg.norm(np.cross(fa_seg_trial_x, fa_seg_trial_y))
 
-    #thorax
-    thrx_seg_trial_y = [0,1,0]
-    thrx_seg_trial_temp[:,i] = (c7_trial_filtered[:,i] - ss_trial_filtered[:,i]) / (np.linalg.norm(c7_trial_filtered[:,i] - ss_trial_filtered[:,i]))
-    thrx_seg_trial_z = np.cross(thrx_seg_trial_y, thrx_seg_trial_temp) / np.linalg.norm(np.cross(thrx_seg_trial_y, thrx_seg_trial_temp))
-    thrx_seg_trial_x = np.cross(thrx_seg_trial_z, thrx_seg_trial_y) / np.linalg.norm(np.cross(thrx_seg_trial_z, thrx_seg_trial_y))
+#upper arm
+ua_seg_trial_y = ((sjc - ejc)) /(np.linalg.norm(sjc - ejc))
+ua_seg_trial_temp = (ua_seg_trial_y - fa_seg_trial_y) / (np.linalg.norm(ua_seg_trial_y - fa_seg_trial_y))
+ua_seg_trial_z = np.cross(ua_seg_trial_y, ua_seg_trial_temp) / np.linalg.norm(np.cross(ua_seg_trial_y, ua_seg_trial_temp))
+ua_seg_trial_x = np.cross(ua_seg_trial_z, ua_seg_trial_y) / np.linalg.norm(np.cross(ua_seg_trial_z, ua_seg_trial_y))
 
-    hand_seg_o = hand_origin[:,i]
-    hand_seg_trial_z[:,i] = (hand_origin[:,i] - mcp2_trial_filtered[:,i]) /(np.linalg.norm(hand_origin[:,i] - mcp2_trial_filtered[:,i]))
-    hand_seg_trial_temp[:,i] = (rs_trial_filtered[:,i] - hand_origin[:,i]) / (np.linalg.norm(rs_trial_filtered[:,i] - hand_origin[:,i]))
-    hand_seg_trial_x = np.cross(hand_seg_trial_temp, hand_seg_trial_z) / np.linalg.norm(np.cross(hand_seg_trial_temp,hand_seg_trial_z))
-    hand_seg_trial_y = np.cross(hand_seg_trial_z, hand_seg_trial_x) / np.linalg.norm(np.cross(hand_seg_trial_z, hand_seg_trial_x))
+#thorax
+thrx_seg_trial_y = [0,1,0]
+thrx_seg_trial_temp = (c7_trial_filtered - ss_trial_filtered) / (np.linalg.norm(c7_trial_filtered - ss_trial_filtered))
+thrx_seg_trial_z = np.cross(thrx_seg_trial_y, thrx_seg_trial_temp) / np.linalg.norm(np.cross(thrx_seg_trial_y, thrx_seg_trial_temp))
+thrx_seg_trial_x = np.cross(thrx_seg_trial_z, thrx_seg_trial_y) / np.linalg.norm(np.cross(thrx_seg_trial_z, thrx_seg_trial_y))
+
+hand_seg_o = hand_origin
+hand_seg_trial_z = (hand_origin - mcp2_trial_filtered) /(np.linalg.norm(hand_origin - mcp2_trial_filtered))
+hand_seg_trial_temp = (rs_trial_filtered - hand_origin) / (np.linalg.norm(rs_trial_filtered - hand_origin))
+hand_seg_trial_x = np.cross(hand_seg_trial_temp, hand_seg_trial_z) / np.linalg.norm(np.cross(hand_seg_trial_temp,hand_seg_trial_z))
+hand_seg_trial_y = np.cross(hand_seg_trial_z, hand_seg_trial_x) / np.linalg.norm(np.cross(hand_seg_trial_z, hand_seg_trial_x))
 
 
 # DEFINE SEGMENT DIRECTION COSINE MATRICES
+frame_count = trial_raw.shape[0]
+print(frame_count)
+''' WRIST'''
 
-    ''' WRIST'''
+DCM_wrist = np.zeros((frame_count,3,3))
+alpha_wrist = np.zeros((frame_count,1))
+beta_wrist = np.zeros((frame_count,1))
+gamma_wrist = np.zeros((frame_count,1))
 
-DCM_wrist = np.zeros((5642,3,3))
-alpha_wrist = np.zeros((5642,1))
-beta_wrist = np.zeros((5642,1))
-gamma_wrist = np.zeros((5642,1))
-
-for frame in range(le_ua_trial_virtual.shape[0]):
+for frame in range(frame_count):
   #hand unit vectors
   x1_wrist = hand_seg_trial_x[frame,:]
   y1_wrist = hand_seg_trial_y[frame,:]
@@ -444,12 +449,12 @@ gammadeg_wrist = np.degrees(gamma_wrist)
 
 ''' ELBOW '''
 
-DCM_elbow = np.zeros((5642,3,3))
-alpha_elbow = np.zeros((5642,1))
-beta_elbow = np.zeros((5642,1))
-gamma_elbow = np.zeros((5642,1))
+DCM_elbow = np.zeros((frame_count,3,3))
+alpha_elbow = np.zeros((frame_count,1))
+beta_elbow = np.zeros((frame_count,1))
+gamma_elbow = np.zeros((frame_count,1))
 
-for frame in range(le_ua_trial_virtual.shape[0]):
+for frame in range(frame_count):
   #hand unit vectors
   x1_elbow = fa_seg_trial_x[frame,:]
   y1_elbow = fa_seg_trial_y[frame,:]
@@ -478,12 +483,12 @@ gammadeg_elbow = np.degrees(gamma_elbow)
 
 ''' SHOULDER '''
 
-DCM_ghj = np.zeros((5642,3,3))
-beta_ghj = np.zeros((5642,1))
-gamma1_ghj = np.zeros((5642,1))
-gamma2_ghj = np.zeros((5642,1))
+DCM_ghj = np.zeros((frame_count,3,3))
+beta_ghj = np.zeros((frame_count,1))
+gamma1_ghj = np.zeros((frame_count,1))
+gamma2_ghj = np.zeros((frame_count,1))
 
-for frame in range(le_ua_trial_virtual.shape[0]):
+for frame in range(frame_count):
   #ua/humerus unit vectors
   x1_ghj = ua_seg_trial_x[frame,:]
   y1_ghj = ua_seg_trial_y[frame,:]
