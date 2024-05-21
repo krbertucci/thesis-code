@@ -434,17 +434,13 @@ for frame in range(trial_frame_count):
     ua_seg_trial_y_norm[frame,:] = ua_seg_trial_y[frame,:] / (np.linalg.norm(ua_seg_trial_y[frame,:]))
     ua_seg_trial_x_norm[frame,:] = ua_seg_trial_x[frame,:] / (np.linalg.norm(ua_seg_trial_x[frame,:]))
     ua_seg_trial_z_norm[frame,:] = ua_seg_trial_z[frame,:] / (np.linalg.norm(ua_seg_trial_z[frame,:]))
-    # print(fa_seg_trial_x_norm.s
-      #thorax
-      # thrx_seg_trial_y = [0,1,0]
-      # thrx_seg_trial_temp = (c7_trial_filtered - ss_trial_filtered) / (np.linalg.norm(c7_trial_filtered - ss_trial_filtered))
-      # thrx_seg_trial_z = np.cross(thrx_seg_trial_y, thrx_seg_trial_temp) / np.linalg.norm(np.cross(thrx_seg_trial_y, thrx_seg_trial_temp))
-      # thrx_seg_trial_x = np.cross(thrx_seg_trial_z, thrx_seg_trial_y) / np.linalg.norm(np.cross(thrx_seg_trial_z, thrx_seg_trial_y))
-
-    # hand_seg_trial_z[frame,:] = (hand_origin[frame,:] - mcp2_trial_filtered[frame,:])
-    # hand_seg_trial_temp[frame,:] = (rs_trial_filtered[frame,:] - hand_origin[frame,:])
-    # hand_seg_trial_x[frame,:] = np.cross(hand_seg_trial_temp[frame,:], hand_seg_trial_z[frame,:]) 
-    # hand_seg_trial_y[frame,:] = np.cross(hand_seg_trial_z[frame,:], hand_seg_trial_x[frame,:]) 
+    print(fa_seg_trial_x_norm.shape)
+    #thorax, origin set to ss
+    thrx_y = [0, 1, 0]
+    thrx_seg_trial_y = [thrx_y - ss_trial_filtered]
+    thrx_seg_trial_temp = (c7_trial_filtered - ss_trial_filtered) / (np.linalg.norm(c7_trial_filtered - ss_trial_filtered))
+    thrx_seg_trial_z = np.cross(thrx_seg_trial_y, thrx_seg_trial_temp) / np.linalg.norm(np.cross(thrx_seg_trial_y, thrx_seg_trial_temp))
+    thrx_seg_trial_x = np.cross(thrx_seg_trial_z, thrx_seg_trial_y) / np.linalg.norm(np.cross(thrx_seg_trial_z, thrx_seg_trial_y))
 
     hand_seg_trial_y[frame,:] = (hand_origin_prox[frame,:] - hand_origin[frame,:])
     hand_seg_trial_temp[frame,:] = (mcp2_trial_filtered[frame,:] - hand_origin[frame,:])
@@ -455,8 +451,8 @@ for frame in range(trial_frame_count):
     hand_seg_trial_x_norm[frame,:] = hand_seg_trial_x[frame,:] / (np.linalg.norm(hand_seg_trial_x[frame,:]))
     hand_seg_trial_z_norm[frame,:] = hand_seg_trial_z[frame,:] / (np.linalg.norm(hand_seg_trial_z[frame,:]))
 
-# # DEFINE SEGMENT DIRECTION COSINE MATRICES
 
+# # DEFINE SEGMENT DIRECTION COSINE MATRICES
 
 # ''' WRIST'''
 #forearm relative to hand (wrist) Z-X-Y (Wu 2005)
