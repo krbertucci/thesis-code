@@ -145,7 +145,7 @@ cal_hand_temp = ((np.array(cal_markers["us"]) - np.array(cal_markers["mcp2"]))) 
 cal_hand_x = np.cross(cal_hand_y, cal_hand_temp) / np.linalg.norm(np.cross(cal_hand_y, cal_hand_temp))
 cal_hand_z = np.cross(cal_hand_x, cal_hand_y) / np.linalg.norm(np.cross(cal_hand_x, cal_hand_y))
 
-
+#calculate relationship between global (identity matrix) and each LCS vector
 def compute_GRL_rotation_matrix(LCS_v_x, LCS_v_y, LCS_v_z):
     """ Computes a Global to Local rotation matrix
     Inputs
@@ -176,14 +176,12 @@ grl_cal_ua = compute_GRL_rotation_matrix(cal_ua_x, cal_ua_y, cal_ua_z)
 grl_cal_fa = compute_GRL_rotation_matrix(cal_fa_x, cal_fa_y, cal_fa_z)
 grl_cal_hand = compute_GRL_rotation_matrix(cal_hand_x, cal_hand_y, cal_hand_z)
 
-
 # VIRTUAL MARKERS | DEFINE RELATIONSHIP BETWEEN CLUSTERS AND MARKERS 
     # vector between marker and cl origin = (GRL rotation matrix) * (vector between markers))
 
 # Chest to SS, XP, C7, chest origin set to chest5 (bottom right)
     # virtual marker = matrix multiplication between rotation matrix from GTL * (vector between desired marker and LCS origin) 
 ss_chest5 = np.matmul(grl_cal_chest, (np.array(cal_ss) - np.array(cal_chest5)))
-print(ss_chest5)
 xp_chest5 = np.matmul(grl_cal_chest, (np.array(cal_xp) - np.array(cal_chest5)))
 c7_chest5 = np.matmul(grl_cal_chest, (np.array(cal_c7) - np.array(cal_chest5)))
 
@@ -220,16 +218,16 @@ trial_fa3 = trial_raw.iloc[:,18:21].values
 trial_ua1 = trial_raw.iloc[:,27:30].values
 trial_ua2 = trial_raw.iloc[:,30:33].values
 trial_ua3 = trial_raw.iloc[:,33:36].values
-trial_racr = trial_raw.iloc[:, 36:39].values
-trial_lacr = trial_raw.iloc[:, 63:66].values
+trial_racr = trial_raw.iloc[:,36:39].values
+trial_lacr = trial_raw.iloc[:,63:66].values
 trial_chest1 = trial_raw.iloc[:,45:48].values
 trial_chest2 = trial_raw.iloc[:,48:51].values
 trial_chest3 = trial_raw.iloc[:,51:54].values
 trial_chest4 = trial_raw.iloc[:,54:57].values
 trial_chest5 = trial_raw.iloc[:,57:60].values
 trial_ss = trial_raw.iloc[:,42:45].values
-trial_xp = trial_raw.iloc[:, 60:63].values
-trial_c7 = trial_raw.iloc[:, 39:42].values
+trial_xp = trial_raw.iloc[:,60:63].values
+trial_c7 = trial_raw.iloc[:,39:42].values
 
 
 # DEFINE LCS AND UNIT VECTORS FOR TASK CLUSTERS
@@ -260,6 +258,7 @@ chest_trial_y = []
 chest_trial_z = []
 
 #iterate through the length of the trial to create a LCS for each frame
+#creating LCS using the clusters | hand uses indiviudal markers
 ''' size = (length of trial,3)''' # CURRENTLY (3,)
 for frame in range(trial_frame_count):
      #Chest
@@ -429,8 +428,8 @@ for frame in range(trial_frame_count):
     #upper arm
     ua_seg_trial_y[frame,:] = ((sjc[frame,:] - ejc[frame,:])) 
     ua_seg_trial_temp[frame,:] = (le_trial_filtered[frame,:] - ejc[frame,:]) 
-    ua_seg_trial_z[frame,:] = np.cross(ua_seg_trial_y[frame,:], ua_seg_trial_temp[frame,:]) 
-    ua_seg_trial_x[frame,:] = np.cross(ua_seg_trial_z[frame,:], ua_seg_trial_y[frame,:]) 
+    ua_seg_trial_x[frame,:] = np.cross(ua_seg_trial_y[frame,:], ua_seg_trial_temp[frame,:]) 
+    ua_seg_trial_z[frame,:] = np.cross(ua_seg_trial_x[frame,:], ua_seg_trial_y[frame,:]) 
 
     ua_seg_trial_y_norm[frame,:] = ua_seg_trial_y[frame,:] / (np.linalg.norm(ua_seg_trial_y[frame,:]))
     ua_seg_trial_x_norm[frame,:] = ua_seg_trial_x[frame,:] / (np.linalg.norm(ua_seg_trial_x[frame,:]))
@@ -448,7 +447,7 @@ for frame in range(trial_frame_count):
     # hand_seg_trial_y[frame,:] = np.cross(hand_seg_trial_z[frame,:], hand_seg_trial_x[frame,:]) 
 
     hand_seg_trial_y[frame,:] = (hand_origin_prox[frame,:] - hand_origin[frame,:])
-    hand_seg_trial_temp[frame,:] = (rs_trial_filtered[frame,:] - hand_origin[frame,:])
+    hand_seg_trial_temp[frame,:] = (mcp2_trial_filtered[frame,:] - hand_origin[frame,:])
     hand_seg_trial_x[frame,:] = np.cross(hand_seg_trial_temp[frame,:], hand_seg_trial_y[frame,:]) 
     hand_seg_trial_z[frame,:] = np.cross(hand_seg_trial_x[frame,:], hand_seg_trial_y[frame,:]) 
 
