@@ -145,7 +145,7 @@ cal_hand_temp = ((np.array(cal_markers["us"]) - np.array(cal_markers["mcp2"]))) 
 cal_hand_x = np.cross(cal_hand_y, cal_hand_temp) / np.linalg.norm(np.cross(cal_hand_y, cal_hand_temp))
 cal_hand_z = np.cross(cal_hand_x, cal_hand_y) / np.linalg.norm(np.cross(cal_hand_x, cal_hand_y))
 
-
+#calculate relationship between global (identity matrix) and each LCS vector
 def compute_GRL_rotation_matrix(LCS_v_x, LCS_v_y, LCS_v_z):
     """ Computes a Global to Local rotation matrix
     Inputs
@@ -176,14 +176,12 @@ grl_cal_ua = compute_GRL_rotation_matrix(cal_ua_x, cal_ua_y, cal_ua_z)
 grl_cal_fa = compute_GRL_rotation_matrix(cal_fa_x, cal_fa_y, cal_fa_z)
 grl_cal_hand = compute_GRL_rotation_matrix(cal_hand_x, cal_hand_y, cal_hand_z)
 
-
 # VIRTUAL MARKERS | DEFINE RELATIONSHIP BETWEEN CLUSTERS AND MARKERS 
     # vector between marker and cl origin = (GRL rotation matrix) * (vector between markers))
 
 # Chest to SS, XP, C7, chest origin set to chest5 (bottom right)
     # virtual marker = matrix multiplication between rotation matrix from GTL * (vector between desired marker and LCS origin) 
 ss_chest5 = np.matmul(grl_cal_chest, (np.array(cal_ss) - np.array(cal_chest5)))
-print(ss_chest5)
 xp_chest5 = np.matmul(grl_cal_chest, (np.array(cal_xp) - np.array(cal_chest5)))
 c7_chest5 = np.matmul(grl_cal_chest, (np.array(cal_c7) - np.array(cal_chest5)))
 
@@ -220,16 +218,16 @@ trial_fa3 = trial_raw.iloc[:,18:21].values
 trial_ua1 = trial_raw.iloc[:,27:30].values
 trial_ua2 = trial_raw.iloc[:,30:33].values
 trial_ua3 = trial_raw.iloc[:,33:36].values
-trial_racr = trial_raw.iloc[:, 36:39].values
-trial_lacr = trial_raw.iloc[:, 63:66].values
+trial_racr = trial_raw.iloc[:,36:39].values
+trial_lacr = trial_raw.iloc[:,63:66].values
 trial_chest1 = trial_raw.iloc[:,45:48].values
 trial_chest2 = trial_raw.iloc[:,48:51].values
 trial_chest3 = trial_raw.iloc[:,51:54].values
 trial_chest4 = trial_raw.iloc[:,54:57].values
 trial_chest5 = trial_raw.iloc[:,57:60].values
 trial_ss = trial_raw.iloc[:,42:45].values
-trial_xp = trial_raw.iloc[:, 60:63].values
-trial_c7 = trial_raw.iloc[:, 39:42].values
+trial_xp = trial_raw.iloc[:,60:63].values
+trial_c7 = trial_raw.iloc[:,39:42].values
 
 
 # DEFINE LCS AND UNIT VECTORS FOR TASK CLUSTERS
@@ -260,6 +258,7 @@ chest_trial_y = []
 chest_trial_z = []
 
 #iterate through the length of the trial to create a LCS for each frame
+#creating LCS using the clusters | hand uses indiviudal markers
 ''' size = (length of trial,3)''' # CURRENTLY (3,)
 for frame in range(trial_frame_count):
      #Chest
@@ -404,6 +403,11 @@ thrx_seg_trial_y = np.empty_like(le_trial_filtered)
 thrx_seg_trial_z = np.empty_like(le_trial_filtered)
 thrx_seg_trial_x = np.empty_like(le_trial_filtered)
 thrx_seg_trial_temp = np.empty_like(le_trial_filtered)
+thrx_y =np.empty_like(le_trial_filtered)
+
+thrx_seg_trial_y_norm  = np.empty_like(le_trial_filtered)
+thrx_seg_trial_x_norm  = np.empty_like(le_trial_filtered)
+thrx_seg_trial_z_norm = np.empty_like(le_trial_filtered)
 
 hand_seg_trial_x_norm = np.empty_like(le_trial_filtered)
 hand_seg_trial_y_norm = np.empty_like(le_trial_filtered)
@@ -423,7 +427,7 @@ for frame in range(trial_frame_count):
 #forearm
     fa_seg_trial_y[frame,:] = ((ejc[frame,:] - us_trial_filtered[frame,:])) 
     fa_seg_trial_temp[frame,:] = (rs_trial_filtered[frame,:] - us_trial_filtered[frame,:]) 
-    fa_seg_trial_x[frame,:] = np.cross(fa_seg_trial_y[frame,:], fa_seg_trial_temp[frame,:])
+    fa_seg_trial_x[frame,:] = np.cross(fa_seg_trial_temp[frame,:], fa_seg_trial_y[frame,:])
     fa_seg_trial_z[frame,:] = np.cross(fa_seg_trial_x[frame,:], fa_seg_trial_y[frame,:]) 
 
     fa_seg_trial_y_norm[frame,:] = fa_seg_trial_y[frame,:]/(np.linalg.norm(fa_seg_trial_y[frame,:]))
@@ -435,10 +439,20 @@ for frame in range(trial_frame_count):
     ua_seg_trial_temp[frame,:] = (le_trial_filtered[frame,:] - ejc[frame,:]) 
     ua_seg_trial_x[frame,:] = np.cross(ua_seg_trial_y[frame,:], ua_seg_trial_temp[frame,:]) 
     ua_seg_trial_z[frame,:] = np.cross(ua_seg_trial_x[frame,:], ua_seg_trial_y[frame,:]) 
+    ua_seg_trial_x[frame,:] = np.cross(ua_seg_trial_y[frame,:], ua_seg_trial_temp[frame,:]) 
+    ua_seg_trial_z[frame,:] = np.cross(ua_seg_trial_x[frame,:], ua_seg_trial_y[frame,:]) 
 
     ua_seg_trial_y_norm[frame,:] = ua_seg_trial_y[frame,:] / (np.linalg.norm(ua_seg_trial_y[frame,:]))
     ua_seg_trial_x_norm[frame,:] = ua_seg_trial_x[frame,:] / (np.linalg.norm(ua_seg_trial_x[frame,:]))
     ua_seg_trial_z_norm[frame,:] = ua_seg_trial_z[frame,:] / (np.linalg.norm(ua_seg_trial_z[frame,:]))
+    
+    #thorax, origin set to ss
+    thrx_y = np.tile([0, 1, 0], (trial_frame_count, 1)) #np.tile creates an array with the repeating number, rows = frames
+    
+    thrx_seg_trial_y[frame,:] = (thrx_y[frame,:] - ss_trial_filtered[frame, :])
+    thrx_seg_trial_temp[frame,:] = (c7_trial_filtered[frame, :] - ss_trial_filtered[frame, :])
+    thrx_seg_trial_z[frame,:] = np.cross(thrx_seg_trial_y[frame, :], thrx_seg_trial_temp[frame, :]) 
+    thrx_seg_trial_x[frame,:] = np.cross(thrx_seg_trial_z[frame, :], thrx_seg_trial_y[frame, :])
     # print(fa_seg_trial_x_norm.s
     #   thorax
     # thrx_seg_trial_y = [0,1,0] 
@@ -446,12 +460,16 @@ for frame in range(trial_frame_count):
     # thrx_seg_trial_z = np.cross(thrx_seg_trial_y, thrx_seg_trial_temp) / np.linalg.norm(np.cross(thrx_seg_trial_y, thrx_seg_trial_temp))
     # thrx_seg_trial_x = np.cross(thrx_seg_trial_z, thrx_seg_trial_y) / np.linalg.norm(np.cross(thrx_seg_trial_z, thrx_seg_trial_y))
 
+    thrx_seg_trial_y_norm[frame,:] = thrx_seg_trial_y[frame,:] / (np.linalg.norm(thrx_seg_trial_y[frame,:]))
+    thrx_seg_trial_x_norm[frame,:] = thrx_seg_trial_x[frame,:] / (np.linalg.norm(thrx_seg_trial_x[frame,:]))
+    thrx_seg_trial_z_norm[frame,:] = thrx_seg_trial_z[frame,:] / (np.linalg.norm(thrx_seg_trial_z[frame,:]))
+    
     # thrx_seg_trial_y_norm[frame,:] = thrx_seg_trial_y[frame,:] / (np.linalg.norm(thrx_seg_trial_y[frame,:]))
     # thrx_seg_trial_x_norm[frame,:] = thrx_seg_trial_x[frame,:] / (np.linalg.norm(thrx_seg_trial_x[frame,:]))
     # thrx_seg_trial_z_norm[frame,:] = thrx_seg_trial_z[frame,:] / (np.linalg.norm(thrx_seg_trial_z[frame,:]))
 
     hand_seg_trial_y[frame,:] = (hand_origin_prox[frame,:] - hand_origin[frame,:])
-    hand_seg_trial_temp[frame,:] = (rs_trial_filtered[frame,:] - hand_origin[frame,:])
+    hand_seg_trial_temp[frame,:] = (mcp2_trial_filtered[frame,:] - hand_origin[frame,:])
     hand_seg_trial_x[frame,:] = np.cross(hand_seg_trial_temp[frame,:], hand_seg_trial_y[frame,:]) 
     hand_seg_trial_z[frame,:] = np.cross(hand_seg_trial_x[frame,:], hand_seg_trial_y[frame,:]) 
 
@@ -499,7 +517,6 @@ for frame in range(trial_frame_count):
 
 # # DEFINE SEGMENT DIRECTION COSINE MATRICES
 
-
 # ''' WRIST'''
 #forearm relative to hand (wrist) Z-X-Y (Wu 2005)
     # alpha (Y) = pronation (+) / supination (-) | displacement = proximal or distal translation
@@ -513,13 +530,14 @@ DCM_wrist = np.zeros((3,3))
 alpha_wrist = np.zeros((trial_frame_count,1))
 beta_wrist = np.zeros((trial_frame_count,1))
 gamma_wrist = np.zeros((trial_frame_count,1))
-
+# compute ijk from x y z basis vectors of each segment
 for frame in range(trial_frame_count):
   hand_seg_i = [hand_seg_trial_x_norm[frame,0], hand_seg_trial_y_norm[frame,0], hand_seg_trial_z_norm[frame,0]]
   hand_seg_j = [hand_seg_trial_x_norm[frame,1], hand_seg_trial_y_norm[frame,1], hand_seg_trial_z_norm[frame,1]]
   hand_seg_k = [hand_seg_trial_x_norm[frame,2], hand_seg_trial_y_norm[frame,2], hand_seg_trial_z_norm[frame,2]]
   hand_dcm_ijk = np.vstack((hand_seg_i, hand_seg_j,hand_seg_k))
   hand_dcm_ijk_t = np.transpose(hand_dcm_ijk) #transposed dcm
+
 
 #   hand_seg_i = [hand_seg_trial_x_norm[frame,0], hand_seg_trial_x_norm[frame,1], hand_seg_trial_x_norm[frame,2]]
 #   hand_seg_j = [hand_seg_trial_y_norm[frame,0], hand_seg_trial_y_norm[frame,1], hand_seg_trial_y_norm[frame,2]]
@@ -539,7 +557,7 @@ for frame in range(trial_frame_count):
 #   fa_dcm_ijk = np.vstack((fa_seg_i, fa_seg_j, fa_seg_k))
   fa_dcm_ijk_t = np.transpose(fa_dcm_ijk) #transposed dcm
   # distal segment should be transposed
-  wrist_dcm = np.matmul(fa_dcm_ijk, hand_dcm_ijk_t )
+  wrist_dcm = np.matmul(fa_dcm_ijk, hand_dcm_ijk_t)
   #iterate through angles at each frame
   beta_wrist[frame,:] = np.arcsin(wrist_dcm[1,2])
   alpha_wrist[frame, :] = np.arccos((wrist_dcm[1,1])/np.cos(beta_wrist[frame]))
@@ -549,6 +567,11 @@ alphadeg_wrist = np.degrees(alpha_wrist)
 betadeg_wrist = np.degrees(beta_wrist)
 gammadeg_wrist = np.degrees(gamma_wrist)
 
+x = np.linspace(0,trial_frame_count,trial_frame_count)
+# plt.set_xlim(0.55, 0.56)
+plt.plot(x, gammadeg_wrist)
+plt.title('wrist angle gamma in degrees')
+plt.show()
 # x = np.linspace(0,trial_frame_count,trial_frame_count)
 # # plt.set_xlim(0.55, 0.56)
 # plt.plot(x, gammadeg_wrist)
@@ -624,6 +647,11 @@ for frame in range(trial_frame_count):
     gammadeg_elbow = np.degrees(gamma_elbow)
 
 
+# x = np.linspace(0,trial_frame_count,trial_frame_count)
+# # plt.set_xlim(0.55, 0.56)
+# plt.plot(x, gammadeg_elbow)
+# plt.title('elbow angle galpha in degrees')
+# plt.show()
 x = np.linspace(0,trial_frame_count,trial_frame_count)
 # plt.set_xlim(0.55, 0.56)
 plt.plot(x, alphadeg_elbow)
