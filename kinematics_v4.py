@@ -798,46 +798,55 @@ beta_wrist = np.zeros((trial_frame_count,1))
 gamma_wrist = np.zeros((trial_frame_count,1))
 # compute ijk from x y z basis vectors of each segment
 for frame in range(trial_frame_count):
-  hand_seg_i = [hand_seg_trial_x_norm[frame,0], hand_seg_trial_y_norm[frame,0], hand_seg_trial_z_norm[frame,0]]
-  hand_seg_j = [hand_seg_trial_x_norm[frame,1], hand_seg_trial_y_norm[frame,1], hand_seg_trial_z_norm[frame,1]]
-  hand_seg_k = [hand_seg_trial_x_norm[frame,2], hand_seg_trial_y_norm[frame,2], hand_seg_trial_z_norm[frame,2]]
-  hand_dcm_ijk = np.vstack((hand_seg_i, hand_seg_j,hand_seg_k))
-  hand_dcm_ijk_t = np.transpose(hand_dcm_ijk) #transposed dcm
+    # Set forearm pre-dcm to the unit vectors from the anatomical lcs
+    fa_dcm_ijk = np.vstack((
+        fa_seg_trial_x_norm[frame],
+        fa_seg_trial_y_norm[frame],
+        fa_seg_trial_z_norm[frame])
+    )
+    fa_dcm_ijk_t = np.transpose(fa_dcm_ijk)
+        # Set Uppe Arm pre-dcm to the unit vectors from the anatomical lcs
+    hand_dcm_ijk = np.vstack((
+        hand_seg_trial_x_norm[frame],
+        hand_seg_trial_y_norm[frame],
+        hand_seg_trial_z_norm[frame])
+    )
+    hand_dcm_ijk_t = np.transpose(hand_dcm_ijk)
+    # dot product between the two anatomical LCS 
+    wrist_dcm = np.array( 
+        [
+        [ 
+                np.dot(hand_dcm_ijk_t[0], fa_dcm_ijk[0]),
+                np.dot(hand_dcm_ijk_t[0], fa_dcm_ijk[1]),
+                np.dot(hand_dcm_ijk_t[0], fa_dcm_ijk[2])
+            ],
+            [
+                np.dot(hand_dcm_ijk_t[1], fa_dcm_ijk[0]),
+                np.dot(hand_dcm_ijk_t[1], fa_dcm_ijk[1]),
+                np.dot(hand_dcm_ijk_t[1], fa_dcm_ijk[2]),
+            ],
+            [
+                np.dot(hand_dcm_ijk_t[2], fa_dcm_ijk[0]),
+                np.dot(hand_dcm_ijk_t[2], fa_dcm_ijk[1]),
+                np.dot(hand_dcm_ijk_t[2], fa_dcm_ijk[2]),
+            ] 
+        ]
+    )
+    #iterate through angles at each frame
+    beta_wrist[frame,:] = np.arcsin(wrist_dcm[1,2])
+    alpha_wrist[frame, :] = np.arccos((wrist_dcm[1,1])/np.cos(beta_wrist[frame]))
+    gamma_wrist[frame,:] = np.arccos((wrist_dcm[2,2])/np.cos(beta_wrist[frame]))
+    #convert angles to degrees
+    alphadeg_wrist = np.degrees(alpha_wrist)
+    betadeg_wrist = np.degrees(beta_wrist)
+    gammadeg_wrist = np.degrees(gamma_wrist)
 
 
-#   hand_seg_i = [hand_seg_trial_x_norm[frame,0], hand_seg_trial_x_norm[frame,1], hand_seg_trial_x_norm[frame,2]]
-#   hand_seg_j = [hand_seg_trial_y_norm[frame,0], hand_seg_trial_y_norm[frame,1], hand_seg_trial_y_norm[frame,2]]
-#   hand_seg_k = [hand_seg_trial_z_norm[frame,0], hand_seg_trial_z_norm[frame,1], hand_seg_trial_z_norm[frame,2]]
-#   hand_dcm_ijk = np.vstack((hand_seg_i, hand_seg_j,hand_seg_k))
-#   hand_dcm_ijk_t = np.transpose(hand_dcm_ijk) #transposed dcm
-  # print(hand_dcm_ijk)
-  fa_seg_i = [fa_seg_trial_x_norm[frame,0], fa_seg_trial_y_norm[frame,0], fa_seg_trial_z_norm[frame,0]]
-  fa_seg_j = [fa_seg_trial_x_norm[frame,1], fa_seg_trial_y_norm[frame,1], fa_seg_trial_z_norm[frame,1]]
-  fa_seg_k = [fa_seg_trial_x_norm[frame,2], fa_seg_trial_y_norm[frame,2], fa_seg_trial_z_norm[frame,2]]
-  fa_dcm_ijk = np.vstack((fa_seg_i, fa_seg_j, fa_seg_k))
-  fa_dcm_ijk_t = np.transpose(fa_dcm_ijk) #transposed dcm
-
-#   fa_seg_i = [fa_seg_trial_x_norm[frame,0], fa_seg_trial_x_norm[frame,0], fa_seg_trial_x_norm[frame,0]]
-#   fa_seg_j = [fa_seg_trial_y_norm[frame,0], fa_seg_trial_y_norm[frame,1], fa_seg_trial_z_norm[frame,1]]
-#   fa_seg_k = [fa_seg_trial_x_norm[frame,2], fa_seg_trial_y_norm[frame,2], fa_seg_trial_z_norm[frame,2]]
-#   fa_dcm_ijk = np.vstack((fa_seg_i, fa_seg_j, fa_seg_k))
-  fa_dcm_ijk_t = np.transpose(fa_dcm_ijk) #transposed dcm
-  # distal segment should be transposed
-  wrist_dcm = np.matmul(fa_dcm_ijk, hand_dcm_ijk_t)
-  #iterate through angles at each frame
-  beta_wrist[frame,:] = np.arcsin(wrist_dcm[1,2])
-  alpha_wrist[frame, :] = np.arccos((wrist_dcm[1,1])/np.cos(beta_wrist[frame]))
-  gamma_wrist[frame,:] = np.arccos((wrist_dcm[2,2])/np.cos(beta_wrist[frame]))
-#convert angles to degrees
-alphadeg_wrist = np.degrees(alpha_wrist)
-betadeg_wrist = np.degrees(beta_wrist)
-gammadeg_wrist = np.degrees(gamma_wrist)
-
-
-# x = np.linspace(0,trial_frame_count,trial_frame_count)
-# # plt.set_xlim(0.55, 0.56)
-# plt.plot(x, gammadeg_wrist)
-# plt.show()
+x = np.linspace(0,trial_frame_count,trial_frame_count)
+# plt.set_xlim(0.55, 0.56)
+plt.plot(x, alphadeg_wrist)
+plt.title('wrist angle beta (f/e) in degrees')
+plt.show()
 
 # ''' ELBOW '''
 #humerum relative to ulnar (elbow) Z-X-Y
@@ -851,17 +860,6 @@ beta_elbow = np.zeros((trial_frame_count,1))
 gamma_elbow = np.zeros((trial_frame_count,1))
 
 for frame in range(trial_frame_count):
-    # fa_seg_i = [fa_seg_trial_x_norm[frame,0], fa_seg_trial_x_norm[frame,1], fa_seg_trial_x_norm[frame,2]]
-    # fa_seg_j = [fa_seg_trial_y_norm[frame,0], fa_seg_trial_y_norm[frame,1], fa_seg_trial_y_norm[frame,2]]
-    # fa_seg_k = [fa_seg_trial_z_norm[frame,0], fa_seg_trial_z_norm[frame,1], fa_seg_trial_z_norm[frame,2]]
-
-    # ua_seg_i = [ua_seg_trial_x_norm[frame,0], ua_seg_trial_x_norm[frame,1], ua_seg_trial_x_norm[frame,2]]
-    # ua_seg_j = [ua_seg_trial_y_norm[frame,0], ua_seg_trial_y_norm[frame,1], ua_seg_trial_y_norm[frame,2]]
-    # ua_seg_k = [ua_seg_trial_z_norm[frame,0], ua_seg_trial_z_norm[frame,1], ua_seg_trial_z_norm[frame,2]]
-    # ua_dcm_ijk = np.vstack((ua_seg_i, ua_seg_j, ua_seg_k))
-    # ua_dcm_ijk_t = np.transpose(ua_dcm_ijk)
-
-    # USE THIS DCM SET UP
         # Set forearm pre-dcm to the unit vectors from the anatomical lcs
     fa_dcm_ijk = np.vstack((fa_seg_trial_x_norm[frame], fa_seg_trial_y_norm[frame], fa_seg_trial_z_norm[frame]))
     fa_dcm_ijk_t = np.transpose(fa_dcm_ijk)
@@ -893,7 +891,6 @@ for frame in range(trial_frame_count):
         ]
     )
     
-    # elbow_dcm = np.dot(ua_dcm_ijk, fa_dcm_ijk_t) # not good 
     #   #row then col
     beta_elbow[frame,:] = np.arcsin(elbow_dcm[1,2])
     alpha_elbow[frame, :] = np.arccos((elbow_dcm[1,1])/np.cos(beta_elbow[frame]))
@@ -904,17 +901,9 @@ for frame in range(trial_frame_count):
     betadeg_elbow = np.degrees(beta_elbow)
     gammadeg_elbow = np.degrees(gamma_elbow)
 
-x = np.linspace(0,trial_frame_count,trial_frame_count)
-# for deg, name in zip([alphadeg_elbow, betadeg_elbow, gammadeg_elbow], ['alpha', 'beta', 'gamma']):
-#     plt.plot(x, deg)
-#     plt.xlabel("Frame")
-#     plt.ylabel("Angle (degrees)")
-plt.plot(x, betadeg_elbow)
-plt.title('elbow angle gamma in degrees')
-plt.show()
 # x = np.linspace(0,trial_frame_count,trial_frame_count)
-# # plt.set_xlim(0.55, 0.56)
-# plt.plot(x, alphadeg_elbow)
+# plt.plot(x, betadeg_elbow)
+# plt.title('elbow angle gamma in degrees')
 # plt.show()
 
 ''' SHOULDER '''
