@@ -21,7 +21,7 @@ from numpy import typing as npt
 
 #'''IMPORT TRIAL FOLDER''' 
 #update subject number
-sub_num = "S01"
+sub_num = "S02"
 # set path for files
 trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_Kinematics/Digitized_TSV"
 
@@ -30,7 +30,7 @@ fs = 100
 
 # IMPORT CALIBRATION TRIAL INTO DATA FRAME
 # set cal file folder
-cal_file = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_KinematicS/Digitized_TSV/d_S01_CAL.tsv"
+cal_file = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_KinematicS/Digitized_TSV/d_S02_CAL.tsv"
 # reads csv into a data frame
 cal_raw = pd.read_csv(cal_file, sep='\t', header = 11)
 # sets the row for the cal trial (note: frame#-1)
@@ -199,48 +199,116 @@ cal_hand_z = np.cross(cal_hand_x, cal_hand_y) / np.linalg.norm(np.cross(cal_hand
 
 # VISUAL CHECK FOR NEUTRAL POSTURE
 # USE THIS DCM SET UP
-#     # Set forearm pre-dcm to the unit vectors from the anatomical lcs
-# fa_cal_dcm_ijk = np.vstack((cal_fa_x, cal_fa_y, cal_fa_z))
-# fa_cal_dcm_ijk_t = np.transpose(fa_cal_dcm_ijk)
-#     # Set Uppe Arm pre-dcm to the unit vectors from the anatomical lcs
-# ua_cal_dcm_ijk = np.vstack((cal_ua_x, cal_ua_y, cal_ua_z))
-# ua_cal_dcm_ijk_t = np.transpose(ua_cal_dcm_ijk)
-# # dot product between the two anatomical LCS 
-# elbow_dcm = np.array( 
-#     [
-#     [ 
-#             np.dot(fa_cal_dcm_ijk_t[0], ua_cal_dcm_ijk[0]),
-#             np.dot(fa_cal_dcm_ijk_t[0], ua_cal_dcm_ijk[1]),
-#             np.dot(fa_cal_dcm_ijk_t[0], ua_cal_dcm_ijk[2])
-#         ],
-#         [
-#             np.dot(fa_cal_dcm_ijk_t[1], ua_cal_dcm_ijk[0]),
-#             np.dot(fa_cal_dcm_ijk_t[1], ua_cal_dcm_ijk[1]),
-#             np.dot(fa_cal_dcm_ijk_t[1], ua_cal_dcm_ijk[2]),
-#         ],
-#         [
-#             np.dot(fa_cal_dcm_ijk_t[2], ua_cal_dcm_ijk[0]),
-#             np.dot(fa_cal_dcm_ijk_t[2], ua_cal_dcm_ijk[1]),
-#             np.dot(fa_cal_dcm_ijk_t[2], ua_cal_dcm_ijk[2]),
-#         ] 
-#     ]
-# )
+    # Set forearm pre-dcm to the unit vectors from the anatomical lcs
+fa_cal_dcm_ijk = np.vstack((cal_fa_x, cal_fa_y, cal_fa_z))
+fa_cal_dcm_ijk_t = np.transpose(fa_cal_dcm_ijk)
+    # Set Uppe Arm pre-dcm to the unit vectors from the anatomical lcs
+hand_cal_dcm_ijk = np.vstack((cal_hand_x, cal_hand_y, cal_hand_z))
+hand_cal_dcm_ijk_t = np.transpose(hand_cal_dcm_ijk)
 
-# # elbow_dcm = np.dot(ua_cal_dcm_ijk, fa_dcm_ijk_t) # not good 
-# #   #row then col
-# cal_beta_elbow = np.arcsin(elbow_dcm[1,2])
-# cal_alpha_elbow = np.arccos((elbow_dcm[1,1])/np.cos(cal_beta_elbow))
-# cal_gamma_elbow = np.arccos((elbow_dcm[2,2])/np.cos(cal_beta_elbow))
+ua_cal_dcm_ijk = np.vstack((cal_ua_x, cal_ua_y, cal_ua_z))
+ua_cal_dcm_ijk_t = np.transpose(ua_cal_dcm_ijk)
 
-# # print(beta_elbow)
-# cal_alphadeg_elbow = np.degrees(cal_alpha_elbow)
-# cal_betadeg_elbow = np.degrees(cal_beta_elbow)
-# cal_gammadeg_elbow = np.degrees(cal_gamma_elbow)
+thrx_cal_dcm_ijk = np.vstack((cal_chest_x, cal_chest_y, cal_chest_z))
+thrx_cal_dcm_ijk = np.transpose(thrx_cal_dcm_ijk)
+# dot product between the two anatomical LCS 
+cal_wrist_dcm = np.array( 
+    [
+    [ 
+            np.dot(hand_cal_dcm_ijk_t[0], fa_cal_dcm_ijk[0]),
+            np.dot(hand_cal_dcm_ijk_t[0], fa_cal_dcm_ijk[1]),
+            np.dot(hand_cal_dcm_ijk_t[0], fa_cal_dcm_ijk[2])
+        ],
+        [
+            np.dot(hand_cal_dcm_ijk_t[1], fa_cal_dcm_ijk[0]),
+            np.dot(hand_cal_dcm_ijk_t[1], fa_cal_dcm_ijk[1]),
+            np.dot(hand_cal_dcm_ijk_t[1], fa_cal_dcm_ijk[2]),
+        ],
+        [
+            np.dot(hand_cal_dcm_ijk_t[2], fa_cal_dcm_ijk[0]),
+            np.dot(hand_cal_dcm_ijk_t[2], fa_cal_dcm_ijk[1]),
+            np.dot(hand_cal_dcm_ijk_t[2], fa_cal_dcm_ijk[2]),
+        ] 
+    ]
+)
+cal_elbow_dcm = np.array( 
+    [
+    [ 
+            np.dot(fa_cal_dcm_ijk_t[0], ua_cal_dcm_ijk[0]),
+            np.dot(fa_cal_dcm_ijk_t[0], ua_cal_dcm_ijk[1]),
+            np.dot(fa_cal_dcm_ijk_t[0], ua_cal_dcm_ijk[2])
+        ],
+        [
+            np.dot(fa_cal_dcm_ijk_t[1], ua_cal_dcm_ijk[0]),
+            np.dot(fa_cal_dcm_ijk_t[1], ua_cal_dcm_ijk[1]),
+            np.dot(fa_cal_dcm_ijk_t[1], ua_cal_dcm_ijk[2]),
+        ],
+        [
+            np.dot(fa_cal_dcm_ijk_t[2], ua_cal_dcm_ijk[0]),
+            np.dot(fa_cal_dcm_ijk_t[2], ua_cal_dcm_ijk[1]),
+            np.dot(fa_cal_dcm_ijk_t[2], ua_cal_dcm_ijk[2]),
+        ] 
+    ]
+)
+cal_shoulder_dcm = np.array( 
+    [
+    [ 
+            np.dot(ua_cal_dcm_ijk_t[0], thrx_cal_dcm_ijk[0]),
+            np.dot(ua_cal_dcm_ijk_t[0], thrx_cal_dcm_ijk[1]),
+            np.dot(ua_cal_dcm_ijk_t[0], thrx_cal_dcm_ijk[2])
+        ],
+        [
+            np.dot(ua_cal_dcm_ijk_t[1], thrx_cal_dcm_ijk[0]),
+            np.dot(ua_cal_dcm_ijk_t[1], thrx_cal_dcm_ijk[1]),
+            np.dot(ua_cal_dcm_ijk_t[1], thrx_cal_dcm_ijk[2]),
+        ],
+        [
+            np.dot(ua_cal_dcm_ijk_t[2], thrx_cal_dcm_ijk[0]),
+            np.dot(ua_cal_dcm_ijk_t[2], thrx_cal_dcm_ijk[1]),
+            np.dot(ua_cal_dcm_ijk_t[2], thrx_cal_dcm_ijk[2]),
+        ] 
+    ]
+)
 
-# print(f'Calibration trial alpha elbow angle {cal_alphadeg_elbow}')
-# print(f'Calibration trial beta elbow angle {cal_betadeg_elbow}')
-# print(f'Calibration trial gamma elbow angle {cal_gammadeg_elbow}')
+#   #row then col
+cal_beta_wrist = np.arcsin(cal_wrist_dcm[1,2])
+cal_alpha_wrist = np.arccos((cal_wrist_dcm[1,1])/np.cos(cal_beta_wrist))
+cal_gamma_wrist = np.arccos((cal_wrist_dcm[2,2])/np.cos(cal_beta_wrist))
 
+# print(beta_wrist)
+cal_alphadeg_wrist = np.degrees(cal_alpha_wrist)
+cal_betadeg_wrist = np.degrees(cal_beta_wrist)
+cal_gammadeg_wrist = np.degrees(cal_gamma_wrist)
+
+print(f'Calibration trial alpha wrist angle {cal_alphadeg_wrist}')
+print(f'Calibration trial beta wrist angle {cal_betadeg_wrist}')
+print(f'Calibration trial gamma wrist angle {cal_gammadeg_wrist}')
+
+cal_beta_elbow = np.arcsin(cal_elbow_dcm[1,2])
+cal_alpha_elbow = np.arccos((cal_elbow_dcm[1,1])/np.cos(cal_beta_elbow))
+cal_gamma_elbow = np.arccos((cal_elbow_dcm[2,2])/np.cos(cal_beta_elbow))
+
+# print(beta_elbow)
+cal_alphadeg_elbow = np.degrees(cal_alpha_elbow)
+cal_betadeg_elbow = np.degrees(cal_beta_elbow)
+cal_gammadeg_elbow = np.degrees(cal_gamma_elbow)
+
+print(f'Calibration trial alpha elbow angle {cal_alphadeg_elbow}')
+print(f'Calibration trial beta elbow angle {cal_betadeg_elbow}')
+print(f'Calibration trial gamma elbow angle {cal_gammadeg_elbow}')
+
+cal_beta_shoulder = np.arcsin(cal_shoulder_dcm[1,2])
+cal_gamma1_shoulder = np.arccos((cal_shoulder_dcm[1,1])/np.cos(cal_beta_shoulder))
+cal_gamma2_shoulder = np.arccos((cal_shoulder_dcm[2,2])/np.cos(cal_beta_shoulder))
+
+# print(beta_shoulder)
+cal_betadeg_shoulder = np.degrees(cal_beta_shoulder)
+cal_gamma1deg_shoulder = np.degrees(cal_gamma1_shoulder)
+cal_gamma2deg_shoulder = np.degrees(cal_gamma2_shoulder)
+
+print(f'Calibration trial beta shoulder angle {cal_betadeg_shoulder}')
+print(f'Calibration trial gamma1 shoulder angle {cal_gamma1deg_shoulder}')
+print(f'Calibration trial gamma2 shoulder angle {cal_gamma2deg_shoulder}')
 
 # PLOT CAL MARKERS
 # fig = plt.figure()
@@ -363,7 +431,7 @@ le_fa = np.matmul(grl_cal_ua, (np.array(cal_le) - np.array(cal_fa1)))
 # ''' TASK TRIAL PROCESSING'''
 # reads csv into a data frame
 trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_Kinematics/Digitized_TSV" 
-trial_file = f"{trial_folder}/d_{sub_num}_EASY_LOW_7.tsv"
+trial_file = f"{trial_folder}/d_{sub_num}_EASY_LOW_5.tsv"
 trial_raw = pd.read_csv(trial_file, sep='\t', header = 11) #sets csv to df
 
 
@@ -500,7 +568,7 @@ for frame in range(trial_frame_count):
 #         # np.dot(LCS inv, point) + LCSorigin
 # for frame in range(trial_frame_count):
     #recreate upper arm from UA1 - ME, LE, R_ACR
-le_ua_trial_virtual = (np.dot(np.linalg.inv(ua_trial_lcs), le_ua) + np.array(trial_ua1))
+le_ua_trial_virtual = (np.dot(np.linalg.inv(ua_trial_lcs), le_ua) + trial_ua1)
 me_ua_trial_virtual = (np.dot(np.linalg.inv(ua_trial_lcs), me_ua) + trial_ua1)
 racr_ua_trial_virtual = (np.dot(np.linalg.inv(ua_trial_lcs), r_acr_ua) + trial_ua1)
 
@@ -510,7 +578,7 @@ xp_chest_trial_virtual = (np.dot(np.linalg.inv(chest_trial_lcs), xp_chest5) + tr
 c7_chest_trial_virtual = (np.dot(np.linalg.inv(chest_trial_lcs), c7_chest5) + trial_chest5)
 
 
-# PLOT TRIAL MARKERS, VIRTUAL MARKERS AND CLUSTER LCS
+# # PLOT TRIAL MARKERS, VIRTUAL MARKERS AND CLUSTER LCS
 fig = plt.figure()
 ax = fig.add_subplot(111, projection="3d")
 ax.set_xlabel("X")
@@ -519,64 +587,64 @@ ax.set_zlabel("Z")
 ax.set_xlim(0,2000)
 ax.set_ylim(0,2000)
 ax.set_zlim(0,2000)
-_plot_marker(ax, trial_chest5[50,:], 'blue', 'chest5')
-_plot_marker(ax, trial_chest4[50,:], 'blue', 'chest4')
-_plot_marker(ax, trial_chest3[50,:], 'blue', 'chest3')
-_plot_marker(ax, trial_chest2[50,:], 'blue', 'chest2')
-_plot_marker(ax, trial_chest1[50,:], 'blue', 'chest1')
-_plot_marker(ax, trial_r_acr[50,:], 'blue', 'r_acr')
-_plot_marker(ax, trial_ss[50,:], 'blue', 'ss')
-_plot_marker(ax, trial_c7[50,:], 'blue', 'c7')
-_plot_marker(ax, trial_xp[50,:], 'blue', 'xp')
-_plot_marker(ax, trial_ua3[50,:], 'blue', 'ua3')
-_plot_marker(ax, trial_ua2[50,:], 'blue', 'ua2')
-_plot_marker(ax, trial_ua1[50,:], 'blue', 'ua1')
-_plot_marker(ax, trial_fa3[50,:], 'blue', 'fa3')
-_plot_marker(ax, trial_fa2[50,:], 'blue', 'fa2')
-_plot_marker(ax, trial_fa1[50,:], 'blue', 'fa1')
-_plot_marker(ax, trial_rs[50,:], 'blue', 'rs')
-_plot_marker(ax, trial_us[50,:], 'blue', 'us')
-_plot_marker(ax, trial_me[50,:], 'blue', 'me')
-_plot_marker(ax, trial_le[50,:], 'blue', 'le')
-_plot_marker(ax, trial_mcp2[50,:], 'blue', 'mcp2')
-_plot_marker(ax, trial_mcp5[50,:], 'blue', 'mcp5')
-_plot_marker(ax, le_ua_trial_virtual[50,:], 'red', 'le virt')
-_plot_marker(ax, me_ua_trial_virtual[50,:], 'red', 'me virt')
-_plot_marker(ax, racr_ua_trial_virtual[50,:], 'red', 'racr virt')
-_plot_marker(ax, ss_chest_trial_virtual[50,:], 'red', 'ss virt')
-_plot_marker(ax, c7_chest_trial_virtual[50,:], 'red', 'c7 virt')
-_plot_marker(ax, xp_chest_trial_virtual[50,:], 'red', 'xp virt')
+_plot_marker(ax, trial_chest5[500,:], 'blue', 'chest5')
+_plot_marker(ax, trial_chest4[500,:], 'blue', 'chest4')
+_plot_marker(ax, trial_chest3[500,:], 'blue', 'chest3')
+_plot_marker(ax, trial_chest2[500,:], 'blue', 'chest2')
+_plot_marker(ax, trial_chest1[500,:], 'blue', 'chest1')
+_plot_marker(ax, trial_r_acr[500,:], 'blue', 'r_acr')
+_plot_marker(ax, trial_ss[500,:], 'blue', 'ss')
+_plot_marker(ax, trial_c7[500,:], 'blue', 'c7')
+_plot_marker(ax, trial_xp[500,:], 'blue', 'xp')
+_plot_marker(ax, trial_ua3[500,:], 'blue', 'ua3')
+_plot_marker(ax, trial_ua2[500,:], 'blue', 'ua2')
+_plot_marker(ax, trial_ua1[500,:], 'blue', 'ua1')
+_plot_marker(ax, trial_fa3[500,:], 'blue', 'fa3')
+_plot_marker(ax, trial_fa2[500,:], 'blue', 'fa2')
+_plot_marker(ax, trial_fa1[500,:], 'blue', 'fa1')
+_plot_marker(ax, trial_rs[500,:], 'blue', 'rs')
+_plot_marker(ax, trial_us[500,:], 'blue', 'us')
+_plot_marker(ax, trial_me[500,:], 'blue', 'me')
+_plot_marker(ax, trial_le[500,:], 'blue', 'le')
+_plot_marker(ax, trial_mcp2[500,:], 'blue', 'mcp2')
+_plot_marker(ax, trial_mcp5[500,:], 'blue', 'mcp5')
+_plot_marker(ax, le_ua_trial_virtual[500,:], 'red', 'le virt')
+_plot_marker(ax, me_ua_trial_virtual[500,:], 'red', 'me virt')
+_plot_marker(ax, racr_ua_trial_virtual[500,:], 'red', 'racr virt')
+_plot_marker(ax, ss_chest_trial_virtual[500,:], 'red', 'ss virt')
+_plot_marker(ax, c7_chest_trial_virtual[500,:], 'red', 'c7 virt')
+_plot_marker(ax, xp_chest_trial_virtual[500,:], 'red', 'xp virt')
 _plot_coordinate_system(ax, trial_chest5,chest_trial_lcs)
 _plot_coordinate_system(ax, trial_fa1, fa_trial_lcs)
 _plot_coordinate_system(ax, trial_ua1, ua_trial_lcs)
 ax.quiver(
-    trial_us[frame, 0],
-    trial_us[frame, 1],
-    trial_us[frame, 2],
-    trial_me[frame, 0] - trial_us[frame, 0],
-    trial_me[frame, 1] - trial_us[frame, 1],
-    trial_me[frame, 2] - trial_us[frame, 2],
+    trial_us[500, 0],
+    trial_us[500, 1],
+    trial_us[500, 2],
+    trial_me[500, 0] - trial_us[500, 0],
+    trial_me[500, 1] - trial_us[500, 1],
+    trial_me[500, 2] - trial_us[500, 2],
     arrow_length_ratio=0.1,
     color="purple",
 )
     # Plot vector from elbow midpoint to r_acr
 ax.quiver(
-    trial_me[frame, 0],
-    trial_me[frame, 1],
-    trial_me[frame, 2],
-    trial_r_acr[frame, 0] - trial_me[frame, 0],
-    trial_r_acr[frame, 1] - trial_me[frame, 1],
-    trial_r_acr[frame, 2] - trial_me[frame, 2],
+    trial_me[500, 0],
+    trial_me[500, 1],
+    trial_me[500, 2],
+    trial_r_acr[500, 0] - trial_me[500, 0],
+    trial_r_acr[500, 1] - trial_me[500, 1],
+    trial_r_acr[500, 2] - trial_me[500, 2],
     arrow_length_ratio=0.1,
     color="purple",
 )
 ax.quiver(
-    trial_r_acr[frame, 0],
-    trial_r_acr[frame, 1],
-    trial_r_acr[frame, 2],
-    trial_ss[frame, 0] - trial_r_acr[frame, 0],
-    trial_ss[frame, 1] - trial_r_acr[frame, 1],
-    trial_ss[frame, 2] - trial_r_acr[frame, 2],
+    trial_r_acr[500, 0],
+    trial_r_acr[500, 1],
+    trial_r_acr[500, 2],
+    trial_ss[500, 0] - trial_r_acr[500, 0],
+    trial_ss[500, 1] - trial_r_acr[500, 1],
+    trial_ss[500, 2] - trial_r_acr[500, 2],
     arrow_length_ratio=0.1,
     color="purple",
 )
@@ -625,10 +693,13 @@ for i in range(le_ua_trial_virtual.shape[1]): # iterate through frame length at 
   ss_trial_filtered[:,i] = butter_low(ss_chest_trial_virtual[:,i])
   xp_trial_filtered[:,i] = butter_low(xp_chest_trial_virtual[:,i])
   c7_trial_filtered[:,i] = butter_low(c7_chest_trial_virtual[:,i])
+#   ss_trial_filtered[:,i] = butter_low(trial_ss[:,i]) # testing non-virtual
+#   xp_trial_filtered[:,i] = butter_low(trial_xp[:,i])# testing non-virtual
+#   c7_trial_filtered[:,i] = butter_low(trial_c7[:,i])# testing non-virtual
   rs_trial_filtered[:,i] = butter_low(trial_rs[:,i])
   us_trial_filtered[:,i] = butter_low(trial_us[:,i])
   mcp2_trial_filtered[:,i] = butter_low(trial_mcp2[:,i])
-  mcp5_trial_filtered[:,i] = butter_low(trial_mcp5[:,i])\
+  mcp5_trial_filtered[:,i] = butter_low(trial_mcp5[:,i])
   
 #CALCULATE JOINT CENTERS
 sjc_adjustment = np.array([0, -60, 0]) # -60 mm in the y
@@ -690,6 +761,12 @@ hand_seg_trial_y_norm  = np.empty_like(le_trial_filtered)
 hand_seg_trial_x_norm  = np.empty_like(le_trial_filtered)
 hand_seg_trial_z_norm = np.empty_like(le_trial_filtered)
 
+hand_seg_trial_lcs = np.zeros((trial_frame_count, 3, 3))
+fa_seg_trial_lcs = np.zeros((trial_frame_count, 3, 3))
+ua_seg_trial_lcs = np.zeros((trial_frame_count, 3, 3))
+thrx_seg_trial_lcs = np.zeros((trial_frame_count, 3, 3))
+
+thrx_y = np.tile([0, 1, 0], (trial_frame_count, 1))
 for frame in range(trial_frame_count):
 #forearm
     fa_seg_trial_y[frame,:] = ((ejc[frame,:] - us_trial_filtered[frame,:])) 
@@ -700,7 +777,7 @@ for frame in range(trial_frame_count):
     fa_seg_trial_y_norm[frame,:] = fa_seg_trial_y[frame,:]/(np.linalg.norm(fa_seg_trial_y[frame,:]))
     fa_seg_trial_x_norm[frame,:] = fa_seg_trial_x[frame,:]/(np.linalg.norm(fa_seg_trial_x[frame,:]))
     fa_seg_trial_z_norm[frame,:] = fa_seg_trial_z[frame,:]/(np.linalg.norm(fa_seg_trial_z[frame,:]))
-
+    # fa_seg_trial_lcs[frame,:, :] = np.stack((fa_seg_trial_x_norm, fa_seg_trial_y_norm, fa_seg_trial_z_norm), axis=1)
     #upper arm
     ua_seg_trial_y[frame,:] = ((sjc[frame,:] - ejc[frame,:])) 
     ua_seg_trial_temp[frame,:] = (le_trial_filtered[frame,:] - ejc[frame,:]) 
@@ -710,75 +787,88 @@ for frame in range(trial_frame_count):
     ua_seg_trial_y_norm[frame,:] = ua_seg_trial_y[frame,:] / (np.linalg.norm(ua_seg_trial_y[frame,:]))
     ua_seg_trial_x_norm[frame,:] = ua_seg_trial_x[frame,:] / (np.linalg.norm(ua_seg_trial_x[frame,:]))
     ua_seg_trial_z_norm[frame,:] = ua_seg_trial_z[frame,:] / (np.linalg.norm(ua_seg_trial_z[frame,:]))
-    
+    # ua_seg_trial_lcs[frame,:, :] = np.stack((ua_seg_trial_x_norm, ua_seg_trial_y_norm, ua_seg_trial_z_norm), axis=0)
     #thorax, origin set to ss
-    thrx_y = np.tile([0, 1, 0], (trial_frame_count, 1)) #np.tile creates an array with the repeating number, rows = frames
-    
-    thrx_seg_trial_y[frame,:] = (thrx_y[frame,:] - ss_trial_filtered[frame, :])
+    # thrx_y = np.tile([0, 1, 0], (trial_frame_count, 1)) #np.tile creates an array with the repeating number, rows = frames
+    thrx_seg_trial_y[frame,:] = thrx_y[frame,:]
     thrx_seg_trial_temp[frame,:] = (c7_trial_filtered[frame, :] - ss_trial_filtered[frame, :])
     thrx_seg_trial_z[frame,:] = np.cross(thrx_seg_trial_y[frame, :], thrx_seg_trial_temp[frame, :]) 
-    thrx_seg_trial_x[frame,:] = np.cross(thrx_seg_trial_z[frame, :], thrx_seg_trial_y[frame, :])
-    # print(fa_seg_trial_x_norm.s
-    #   thorax
-    # thrx_seg_trial_y = [0,1,0] 
-    # thrx_seg_trial_temp = (c7_trial_filtered - ss_trial_filtered) / (np.linalg.norm(c7_trial_filtered - ss_trial_filtered))
-    # thrx_seg_trial_z = np.cross(thrx_seg_trial_y, thrx_seg_trial_temp) / np.linalg.norm(np.cross(thrx_seg_trial_y, thrx_seg_trial_temp))
-    # thrx_seg_trial_x = np.cross(thrx_seg_trial_z, thrx_seg_trial_y) / np.linalg.norm(np.cross(thrx_seg_trial_z, thrx_seg_trial_y))
-
+    thrx_seg_trial_x[frame,:] = np.cross(thrx_seg_trial_y[frame, :], thrx_seg_trial_z[frame, :])
+ 
     thrx_seg_trial_y_norm[frame,:] = thrx_seg_trial_y[frame,:] / (np.linalg.norm(thrx_seg_trial_y[frame,:]))
     thrx_seg_trial_x_norm[frame,:] = thrx_seg_trial_x[frame,:] / (np.linalg.norm(thrx_seg_trial_x[frame,:]))
     thrx_seg_trial_z_norm[frame,:] = thrx_seg_trial_z[frame,:] / (np.linalg.norm(thrx_seg_trial_z[frame,:]))
-    
-    # thrx_seg_trial_y_norm[frame,:] = thrx_seg_trial_y[frame,:] / (np.linalg.norm(thrx_seg_trial_y[frame,:]))
-    # thrx_seg_trial_x_norm[frame,:] = thrx_seg_trial_x[frame,:] / (np.linalg.norm(thrx_seg_trial_x[frame,:]))
-    # thrx_seg_trial_z_norm[frame,:] = thrx_seg_trial_z[frame,:] / (np.linalg.norm(thrx_seg_trial_z[frame,:]))
+    # thrx_seg_trial_lcs[frame, :, :] = np.stack((thrx_seg_trial_x_norm, thrx_seg_trial_y_norm, thrx_seg_trial_z_norm), axis=0)
 
     hand_seg_trial_y[frame,:] = (hand_origin_prox[frame,:] - hand_origin[frame,:])
     hand_seg_trial_temp[frame,:] = (mcp2_trial_filtered[frame,:] - hand_origin[frame,:])
-    hand_seg_trial_x[frame,:] = np.cross(hand_seg_trial_temp[frame,:], hand_seg_trial_y[frame,:]) 
+    hand_seg_trial_x[frame,:] = np.cross(hand_seg_trial_y[frame,:], hand_seg_trial_temp[frame,:]) 
     hand_seg_trial_z[frame,:] = np.cross(hand_seg_trial_x[frame,:], hand_seg_trial_y[frame,:]) 
 
     hand_seg_trial_y_norm[frame,:] = hand_seg_trial_y[frame,:] / (np.linalg.norm(hand_seg_trial_y[frame,:]))
     hand_seg_trial_x_norm[frame,:] = hand_seg_trial_x[frame,:] / (np.linalg.norm(hand_seg_trial_x[frame,:]))
     hand_seg_trial_z_norm[frame,:] = hand_seg_trial_z[frame,:] / (np.linalg.norm(hand_seg_trial_z[frame,:]))
-
+    # hand_seg_trial_lcs[frame, :, :] = np.stack((hand_seg_trial_x_norm, hand_seg_trial_y_norm, hand_seg_trial_z_norm), axis=0)
 
 
 # Visual checks for anatomical lcs
 
-# # Vector Plotting 
-    # forearm plot
-# origin = [0, 0 ,0]
-# ax.quiver(*origin, *fa_seg_trial_y[0], color='r', label='FA Y')
-# ax.quiver(*origin, *fa_seg_trial_x[0], color='g', label='FA X')
-# ax.quiver(*origin, *fa_seg_trial_z[0], color='b', label='FA Z')
-
-# # Set plot limits
-# ax.set_xlim([-10, 10])
-# ax.set_ylim([-10, 10])
-# ax.set_zlim([-10, 10])
-# # Set labels
-# ax.set_xlabel('X')
-# ax.set_ylabel('Y')
-# ax.set_zlabel('Z')
-
-# plt.show()
-
-    # upper arm plot
-# origin = [0, 0 ,0]
-# ax.quiver(*origin, *ua_seg_trial_y, color='r', label='UA Y')
-# ax.quiver(*origin, *ua_seg_trial_x, color='g', label='UA X')
-# ax.quiver(*origin, *ua_seg_trial_z, color='b', label='UA Z')
-#     #thorax plot
-# origin = [0, 0 ,0]
-# ax.quiver(*origin, *thrx_seg_trial_y, color='r', label='THORAX Y')
-# ax.quiver(*origin, *thrx_seg_trial_x, color='g', label='THORAX X')
-# ax.quiver(*origin, *thrx_seg_trial_z, color='b', label='THORAX Z')
-
-# origin = hand_seg_o
-# ax.quiver(*origin, *hand_seg_trial_y, color='r', label='FA Y')
-# ax.quiver(*origin, *hand_seg_trial_x, color='g', label='FA X')
-# ax.quiver(*origin, *hand_seg_trial_z, color='b', label='FA Z')
+# PLOT TRIAL MARKERS, VIRTUAL MARKERS AND CLUSTER LCS
+    # virtual-filtered markers 
+fig = plt.figure()
+ax = fig.add_subplot(111, projection="3d")
+ax.set_xlabel("X")
+ax.set_ylabel("Y")
+ax.set_zlabel("Z")
+ax.set_xlim(0,2000)
+ax.set_ylim(0,2000)
+ax.set_zlim(0,2000)
+_plot_marker(ax, mcp2_trial_filtered[50,:], 'blue', 'mcp2')
+_plot_marker(ax, mcp5_trial_filtered[50,:], 'blue', 'mcp5')
+_plot_marker(ax, racr_trial_filtered[50,:], 'blue', 'r_acr')
+_plot_marker(ax, rs_trial_filtered[50,:], 'blue', 'rs')
+_plot_marker(ax, us_trial_filtered[50,:], 'blue', 'us')
+_plot_marker(ax, me_trial_filtered[50,:], 'blue', 'me')
+_plot_marker(ax, le_trial_filtered[50,:], 'blue', 'le')
+_plot_marker(ax, c7_trial_filtered[50,:], 'blue', 'c7')
+_plot_marker(ax, ss_trial_filtered[50,:], 'blue', 'ss')
+_plot_coordinate_system(ax, trial_ss[50,:], (thrx_seg_trial_x_norm[frame],thrx_seg_trial_y_norm[frame],thrx_seg_trial_z_norm[frame]))
+# _plot_coordinate_system(ax, trial_chest5[50,:], chest_trial_lcs)
+_plot_coordinate_system(ax, trial_fa1[50,:], (fa_seg_trial_x_norm[frame],fa_seg_trial_y_norm[frame],fa_seg_trial_z_norm[frame]))
+_plot_coordinate_system(ax, trial_ua1[50,:], (ua_seg_trial_x_norm[frame],ua_seg_trial_y_norm[frame],ua_seg_trial_z_norm[frame]))
+_plot_coordinate_system(ax, hand_origin[50,:], (hand_seg_trial_x_norm[frame],hand_seg_trial_y_norm[frame],hand_seg_trial_z_norm[frame]))
+ax.quiver(
+    wjc[50, 0],
+    wjc[50, 1],
+    wjc[50, 2],
+    ejc[50, 0] - wjc[50, 0],
+    ejc[50, 1] - wjc[50, 1],
+    ejc[50, 2] - wjc[50, 2],
+    arrow_length_ratio=0.1,
+    color="purple",
+)
+    # Plot vector from elbow midpoint to r_acr
+ax.quiver(
+    ejc[50, 0],
+    ejc[50, 1],
+    ejc[50, 2],
+    sjc[50, 0] - ejc[50, 0],
+    sjc[50, 1] - ejc[50, 1],
+    sjc[50, 2] - ejc[50, 2],
+    arrow_length_ratio=0.1,
+    color="purple",
+)
+ax.quiver(
+    sjc[50, 0],
+    sjc[50, 1],
+    sjc[50, 2],
+    ss_trial_filtered[50, 0] - sjc[50, 0],
+    ss_trial_filtered[50, 1] - sjc[50, 1],
+    ss_trial_filtered[50, 2] - sjc[50, 2],
+    arrow_length_ratio=0.1,
+    color="purple",
+)
+plt.show()
 
 
 # # DEFINE SEGMENT DIRECTION COSINE MATRICES
@@ -844,16 +934,20 @@ for frame in range(trial_frame_count):
 
 x = np.linspace(0,trial_frame_count,trial_frame_count)
 # plt.set_xlim(0.55, 0.56)
-plt.plot(x, alphadeg_wrist)
-plt.title('wrist angle beta (f/e) in degrees')
-plt.show()
+
+# plt.plot(x, alphadeg_wrist, label = "alpha (p+/s-)", linestyle="-")
+# plt.plot(x, betadeg_wrist, label = "beta (rd-/ud+)", linestyle="--")
+# plt.plot(x, gammadeg_wrist, label = "gamma (f+/e-)", linestyle=":")
+# plt.legend()
+# plt.title('wrist angles')
+# plt.show()
 
 # ''' ELBOW '''
-#humerum relative to ulnar (elbow) Z-X-Y
+#ulna relative to humerus (elbow) Z-X-Y
     # alphaHF (Z) = flexion (+)/ hyperextension (-)  
     # gammaHF (Y) = axial rotation of the forearm | pronation (+) / supination (-) 
     # betaHF (X) = carrying angle, passive response to flex/ext, rarely reported
-np.set_printoptions(precision = 5)
+# np.set_printoptions(precision = 5)
 DCM_elbow = np.zeros((trial_frame_count,3,3))
 alpha_elbow = np.zeros((trial_frame_count,1))
 beta_elbow = np.zeros((trial_frame_count,1))
@@ -864,7 +958,7 @@ for frame in range(trial_frame_count):
     fa_dcm_ijk = np.vstack((fa_seg_trial_x_norm[frame], fa_seg_trial_y_norm[frame], fa_seg_trial_z_norm[frame]))
     fa_dcm_ijk_t = np.transpose(fa_dcm_ijk)
         # Set Uppe Arm pre-dcm to the unit vectors from the anatomical lcs
-    ua_dcm_ijk = ua_dcm_ijk = np.vstack((
+    ua_dcm_ijk = np.vstack((
         ua_seg_trial_x_norm[frame],
         ua_seg_trial_y_norm[frame],
         ua_seg_trial_z_norm[frame])
@@ -901,41 +995,97 @@ for frame in range(trial_frame_count):
     betadeg_elbow = np.degrees(beta_elbow)
     gammadeg_elbow = np.degrees(gamma_elbow)
 
-# x = np.linspace(0,trial_frame_count,trial_frame_count)
-# plt.plot(x, betadeg_elbow)
-# plt.title('elbow angle gamma in degrees')
+# plt.plot(x, alphadeg_elbow, label = "alpha (+f/e)", linestyle="-")
+# plt.plot(x, betadeg_elbow, label = "beta (carrying angle)", linestyle="--")
+# plt.plot(x, gammadeg_elbow, label = "gamma (p+/s-)", linestyle=":")
+# plt.legend()
+# plt.title('elbow angles')
 # plt.show()
 
 ''' SHOULDER '''
+# humerus relative to the thorax
+    # gamma1HT (Y1) = plane of elevation | 0 abduction, 90 forward flexion
+    # betaHT (X) = elevation (negative)
+    # gamma2HT (Y2) = axial rotation | internal + / external - 
 
-# DCM_ghj = np.zeros((frame_count,3,3))
-# beta_ghj = np.zeros((frame_count,1))
-# gamma1_ghj = np.zeros((frame_count,1))
-# gamma2_ghj = np.zeros((frame_count,1))
+DCM_shoulder = np.zeros((trial_frame_count,3,3))
+gamma1_shoulder = np.zeros((trial_frame_count,1))
+beta_shoulder = np.zeros((trial_frame_count,1))
+gamma2_shoulder = np.zeros((trial_frame_count,1))
+gamma_shoulder = np.zeros((trial_frame_count,1))
+alpha_shoulder =np.zeros((trial_frame_count,1))
 
+for frame in range(trial_frame_count):
+        # Set Upper Arm pre-dcm to the unit vectors from the anatomical lcs
+    ua_dcm_ijk = np.vstack((
+        ua_seg_trial_x_norm[frame],
+        ua_seg_trial_y_norm[frame],
+        ua_seg_trial_z_norm[frame])
+    )
+    ua_dcm_ijk_t = np.transpose(ua_dcm_ijk)
 
-# for frame in range(frame_count):
-#   #ua/humerus unit vectors
-#   x1_ghj = ua_seg_trial_x[frame,:]
-#   y1_ghj = ua_seg_trial_y[frame,:]
-#   z1_ghj = ua_seg_trial_z[frame,:]
+    thrx_dcm_ijk =  np.vstack((
+        thrx_seg_trial_x_norm[frame],
+        thrx_seg_trial_y_norm[frame],
+        thrx_seg_trial_z_norm[frame])
+    )
+    # dot product between the two anatomical LCS 
+    shoulder_dcm = np.array( 
+        [
+        [ 
+                np.dot(ua_dcm_ijk_t[0], thrx_dcm_ijk[0]),
+                np.dot(ua_dcm_ijk_t[0], thrx_dcm_ijk[1]),
+                np.dot(ua_dcm_ijk_t[0], thrx_dcm_ijk[2])
+            ],
+            [
+                np.dot(ua_dcm_ijk_t[1], thrx_dcm_ijk[0]),
+                np.dot(ua_dcm_ijk_t[1], thrx_dcm_ijk[1]),
+                np.dot(ua_dcm_ijk_t[1], thrx_dcm_ijk[2]),
+            ],
+            [
+                np.dot(ua_dcm_ijk_t[2], thrx_dcm_ijk[0]),
+                np.dot(ua_dcm_ijk_t[2], thrx_dcm_ijk[1]),
+                np.dot(ua_dcm_ijk_t[2], thrx_dcm_ijk[2]),
+            ] 
+        ]
+    )
 
-#   #thorax unit vectors
-#   x2_ghj = thrx_seg_trial_x[frame,:]
-#   y2_ghj = thrx_seg_trial_y[frame,:]
-#   z2_ghj = thrx_seg_trial_z[frame,:]
+    beta_shoulder[frame,:] = np.arccos((shoulder_dcm[1,1]))
+    gamma1_shoulder[frame, :] = np.arcsin((shoulder_dcm[0,1])/np.sin(beta_shoulder[frame]))
+    gamma2_shoulder[frame,:] = np.arcsin((shoulder_dcm[1,0])/np.sin(beta_shoulder[frame]))
 
+    gamma1deg_shoulder = np.degrees(gamma1_shoulder)
+    betadeg_shoulder = np.degrees(beta_shoulder)
+    gamma2deg_shoulder = np.degrees(gamma2_shoulder)
+    #Trying ZXY 
+        # Calculate Beta (β), the rotation about the Z-axis
+    beta_shoulder[frame, :] = np.arcsin(-shoulder_dcm[0, 2])
 
-#   DCM_ghj[frame,:,:] = np.array([
-#       [np.dot(x1_ghj, x2_ghj), np.dot(x1_ghj, y2_ghj), np.dot(x1_ghj, z2_ghj)],
-#       [np.dot(y1_ghj, x2_ghj), np.dot(y1_ghj, y2_ghj), np.dot(y1_ghj, z2_ghj)],
-#       [np.dot(z1_ghj, x2_ghj), np.dot(z1_ghj, y2_ghj), np.dot(z1_ghj, z2_ghj)]])
+    # Calculate Alpha (α), the rotation about the X-axis
+    alpha_shoulder[frame, :] = np.arctan2(shoulder_dcm[1, 2], shoulder_dcm[2, 2])
 
-#   #row then col
-#   beta_ghj[frame,:] = np.arccos((DCM_ghj[frame, 1,1]))
-#   gamma1_ghj[frame, :] = np.arcsin((DCM_ghj[frame, 0,1])/np.sin(beta_ghj[frame, 0]))
-#   gamma2_ghj[frame,:] = np.arcsin((DCM_ghj[frame, 1,0])/np.sin(beta_ghj[frame,0]))
+    # Calculate Gamma (γ), the rotation about the Y-axis
+    gamma_shoulder[frame, :] = np.arctan2(shoulder_dcm[0, 1], shoulder_dcm[0, 0])
 
-# betadeg_ghj = np.degrees(beta_ghj)
-# gamma1deg_ghj = np.degrees(gamma1_ghj)
-# gamma2deg_ghj = np.degrees(gamma2_ghj)
+    # Convert radians to degrees for better interpretation
+    alphadeg_shoulder = np.degrees(alpha_shoulder)
+    betadeg_shoulder = np.degrees(beta_shoulder)
+    gammadeg_shoulder = np.degrees(gamma_shoulder)
+
+plt.plot(x, alphadeg_shoulder, label="alpha (rotation about X-axis)", linestyle="-")
+plt.plot(x, betadeg_shoulder, label="beta (rotation about Z-axis)", linestyle="--")
+plt.plot(x, gammadeg_shoulder, label="gamma (rotation about Y-axis)", linestyle=":")
+plt.legend()
+plt.title('Shoulder Angles (X-Z-Y Sequence)')
+plt.xlabel('Frame')
+plt.ylabel('Angle (degrees)')
+plt.show()
+
+plt.plot(x, gamma1_shoulder, label = "gamma1 (abd/ff)", linestyle="-")
+plt.plot(x, betadeg_shoulder, label = "beta (elevation)", linestyle="--")
+plt.plot(x, gamma2deg_shoulder, label = "gamma2 (ir+/er-)", linestyle=":")
+plt.legend()
+plt.title('Shoulder Angles (Y-X-Y)')
+plt.xlabel('Frame')
+plt.ylabel('Angle (degrees)')
+plt.show()
