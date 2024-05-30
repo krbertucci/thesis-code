@@ -21,7 +21,7 @@ from numpy import typing as npt
 
 #'''IMPORT TRIAL FOLDER''' 
 #update subject number
-sub_num = "S02"
+sub_num = "S03"
 # set path for files
 trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_Kinematics/Digitized_TSV"
 
@@ -30,7 +30,7 @@ fs = 100
 
 # IMPORT CALIBRATION TRIAL INTO DATA FRAME
 # set cal file folder
-cal_file = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_KinematicS/Digitized_TSV/d_S02_CAL.tsv"
+cal_file = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_KinematicS/Digitized_TSV/d_S03_CAL_1.tsv"
 # reads csv into a data frame
 cal_raw = pd.read_csv(cal_file, sep='\t', header = 11)
 # sets the row for the cal trial (note: frame#-1)
@@ -49,7 +49,7 @@ cal_markers = {
     "ss": cal_raw[["SS X", "SS Y", "SS Z"]].values,
     "xp": cal_raw[["XP X", "XP Y", "XP Z"]].values,
     "c7": cal_raw[["C7 X", "C7 Y", "C7 Z"]].values,
-    "l_acr": cal_raw[["L_ACR X", "L_ACR Y", "L_ACR Z"]].values,
+    # "l_acr": cal_raw[["L_ACR X", "L_ACR Y", "L_ACR Z"]].values,
 }
 for marker in cal_markers:
    cal_markers[marker] = cal_markers[marker][cal_frame]
@@ -95,7 +95,7 @@ cal_r_acr = cal_markers['r_acr']
 cal_ss =  cal_markers['ss']
 cal_xp =  cal_markers['xp']
 cal_c7 =  cal_markers['c7']
-cal_l_acr = cal_markers['l_acr']
+# cal_l_acr = cal_markers['l_acr']
 
 
 # ISB definition --- lab is already in ISB orientation
@@ -431,7 +431,7 @@ le_fa = np.matmul(grl_cal_ua, (np.array(cal_le) - np.array(cal_fa1)))
 # ''' TASK TRIAL PROCESSING'''
 # reads csv into a data frame
 trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_Kinematics/Digitized_TSV" 
-trial_file = f"{trial_folder}/d_{sub_num}_EASY_LOW_5.tsv"
+trial_file = f"{trial_folder}/d_{sub_num}_EASY_LOW_6.tsv"
 trial_raw = pd.read_csv(trial_file, sep='\t', header = 11) #sets csv to df
 
 
@@ -447,7 +447,7 @@ trial_markers = {
     "ss": trial_raw[["SS X", "SS Y", "SS Z"]].values,
     "xp": trial_raw[["XP X", "XP Y", "XP Z"]].values,
     "c7": trial_raw[["C7 X", "C7 Y", "C7 Z"]].values,
-    "l_acr": trial_raw[["L_ACR X", "L_ACR Y", "L_ACR Z"]].values,
+    # "l_acr": trial_raw[["L_ACR X", "L_ACR Y", "L_ACR Z"]].values,
 }
 
     #dictionary containing trialibration individual markers
@@ -488,7 +488,7 @@ trial_r_acr = trial_markers['r_acr']
 trial_ss =  trial_markers['ss']
 trial_xp =  trial_markers['xp']
 trial_c7 =  trial_markers['c7']
-trial_l_acr = trial_markers['l_acr']
+# trial_l_acr = trial_markers['l_acr']
 
 
 # DEFINE LCS AND UNIT VECTORS FOR TASK CLUSTERS
@@ -579,76 +579,76 @@ c7_chest_trial_virtual = (np.dot(np.linalg.inv(chest_trial_lcs), c7_chest5) + tr
 
 
 # # PLOT TRIAL MARKERS, VIRTUAL MARKERS AND CLUSTER LCS
-fig = plt.figure()
-ax = fig.add_subplot(111, projection="3d")
-ax.set_xlabel("X")
-ax.set_ylabel("Y")
-ax.set_zlabel("Z")
-ax.set_xlim(0,2000)
-ax.set_ylim(0,2000)
-ax.set_zlim(0,2000)
-_plot_marker(ax, trial_chest5[500,:], 'blue', 'chest5')
-_plot_marker(ax, trial_chest4[500,:], 'blue', 'chest4')
-_plot_marker(ax, trial_chest3[500,:], 'blue', 'chest3')
-_plot_marker(ax, trial_chest2[500,:], 'blue', 'chest2')
-_plot_marker(ax, trial_chest1[500,:], 'blue', 'chest1')
-_plot_marker(ax, trial_r_acr[500,:], 'blue', 'r_acr')
-_plot_marker(ax, trial_ss[500,:], 'blue', 'ss')
-_plot_marker(ax, trial_c7[500,:], 'blue', 'c7')
-_plot_marker(ax, trial_xp[500,:], 'blue', 'xp')
-_plot_marker(ax, trial_ua3[500,:], 'blue', 'ua3')
-_plot_marker(ax, trial_ua2[500,:], 'blue', 'ua2')
-_plot_marker(ax, trial_ua1[500,:], 'blue', 'ua1')
-_plot_marker(ax, trial_fa3[500,:], 'blue', 'fa3')
-_plot_marker(ax, trial_fa2[500,:], 'blue', 'fa2')
-_plot_marker(ax, trial_fa1[500,:], 'blue', 'fa1')
-_plot_marker(ax, trial_rs[500,:], 'blue', 'rs')
-_plot_marker(ax, trial_us[500,:], 'blue', 'us')
-_plot_marker(ax, trial_me[500,:], 'blue', 'me')
-_plot_marker(ax, trial_le[500,:], 'blue', 'le')
-_plot_marker(ax, trial_mcp2[500,:], 'blue', 'mcp2')
-_plot_marker(ax, trial_mcp5[500,:], 'blue', 'mcp5')
-_plot_marker(ax, le_ua_trial_virtual[500,:], 'red', 'le virt')
-_plot_marker(ax, me_ua_trial_virtual[500,:], 'red', 'me virt')
-_plot_marker(ax, racr_ua_trial_virtual[500,:], 'red', 'racr virt')
-_plot_marker(ax, ss_chest_trial_virtual[500,:], 'red', 'ss virt')
-_plot_marker(ax, c7_chest_trial_virtual[500,:], 'red', 'c7 virt')
-_plot_marker(ax, xp_chest_trial_virtual[500,:], 'red', 'xp virt')
-_plot_coordinate_system(ax, trial_chest5,chest_trial_lcs)
-_plot_coordinate_system(ax, trial_fa1, fa_trial_lcs)
-_plot_coordinate_system(ax, trial_ua1, ua_trial_lcs)
-ax.quiver(
-    trial_us[500, 0],
-    trial_us[500, 1],
-    trial_us[500, 2],
-    trial_me[500, 0] - trial_us[500, 0],
-    trial_me[500, 1] - trial_us[500, 1],
-    trial_me[500, 2] - trial_us[500, 2],
-    arrow_length_ratio=0.1,
-    color="purple",
-)
-    # Plot vector from elbow midpoint to r_acr
-ax.quiver(
-    trial_me[500, 0],
-    trial_me[500, 1],
-    trial_me[500, 2],
-    trial_r_acr[500, 0] - trial_me[500, 0],
-    trial_r_acr[500, 1] - trial_me[500, 1],
-    trial_r_acr[500, 2] - trial_me[500, 2],
-    arrow_length_ratio=0.1,
-    color="purple",
-)
-ax.quiver(
-    trial_r_acr[500, 0],
-    trial_r_acr[500, 1],
-    trial_r_acr[500, 2],
-    trial_ss[500, 0] - trial_r_acr[500, 0],
-    trial_ss[500, 1] - trial_r_acr[500, 1],
-    trial_ss[500, 2] - trial_r_acr[500, 2],
-    arrow_length_ratio=0.1,
-    color="purple",
-)
-plt.show()
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection="3d")
+# ax.set_xlabel("X")
+# ax.set_ylabel("Y")
+# ax.set_zlabel("Z")
+# ax.set_xlim(0,2000)
+# ax.set_ylim(0,2000)
+# ax.set_zlim(0,2000)
+# _plot_marker(ax, trial_chest5[500,:], 'blue', 'chest5')
+# _plot_marker(ax, trial_chest4[500,:], 'blue', 'chest4')
+# _plot_marker(ax, trial_chest3[500,:], 'blue', 'chest3')
+# _plot_marker(ax, trial_chest2[500,:], 'blue', 'chest2')
+# _plot_marker(ax, trial_chest1[500,:], 'blue', 'chest1')
+# _plot_marker(ax, trial_r_acr[500,:], 'blue', 'r_acr')
+# _plot_marker(ax, trial_ss[500,:], 'blue', 'ss')
+# _plot_marker(ax, trial_c7[500,:], 'blue', 'c7')
+# _plot_marker(ax, trial_xp[500,:], 'blue', 'xp')
+# _plot_marker(ax, trial_ua3[500,:], 'blue', 'ua3')
+# _plot_marker(ax, trial_ua2[500,:], 'blue', 'ua2')
+# _plot_marker(ax, trial_ua1[500,:], 'blue', 'ua1')
+# _plot_marker(ax, trial_fa3[500,:], 'blue', 'fa3')
+# _plot_marker(ax, trial_fa2[500,:], 'blue', 'fa2')
+# _plot_marker(ax, trial_fa1[500,:], 'blue', 'fa1')
+# _plot_marker(ax, trial_rs[500,:], 'blue', 'rs')
+# _plot_marker(ax, trial_us[500,:], 'blue', 'us')
+# _plot_marker(ax, trial_me[500,:], 'blue', 'me')
+# _plot_marker(ax, trial_le[500,:], 'blue', 'le')
+# _plot_marker(ax, trial_mcp2[500,:], 'blue', 'mcp2')
+# _plot_marker(ax, trial_mcp5[500,:], 'blue', 'mcp5')
+# _plot_marker(ax, le_ua_trial_virtual[500,:], 'red', 'le virt')
+# _plot_marker(ax, me_ua_trial_virtual[500,:], 'red', 'me virt')
+# _plot_marker(ax, racr_ua_trial_virtual[500,:], 'red', 'racr virt')
+# _plot_marker(ax, ss_chest_trial_virtual[500,:], 'red', 'ss virt')
+# _plot_marker(ax, c7_chest_trial_virtual[500,:], 'red', 'c7 virt')
+# _plot_marker(ax, xp_chest_trial_virtual[500,:], 'red', 'xp virt')
+# _plot_coordinate_system(ax, trial_chest5,chest_trial_lcs)
+# _plot_coordinate_system(ax, trial_fa1, fa_trial_lcs)
+# _plot_coordinate_system(ax, trial_ua1, ua_trial_lcs)
+# ax.quiver(
+#     trial_us[500, 0],
+#     trial_us[500, 1],
+#     trial_us[500, 2],
+#     trial_me[500, 0] - trial_us[500, 0],
+#     trial_me[500, 1] - trial_us[500, 1],
+#     trial_me[500, 2] - trial_us[500, 2],
+#     arrow_length_ratio=0.1,
+#     color="purple",
+# )
+#     # Plot vector from elbow midpoint to r_acr
+# ax.quiver(
+#     trial_me[500, 0],
+#     trial_me[500, 1],
+#     trial_me[500, 2],
+#     trial_r_acr[500, 0] - trial_me[500, 0],
+#     trial_r_acr[500, 1] - trial_me[500, 1],
+#     trial_r_acr[500, 2] - trial_me[500, 2],
+#     arrow_length_ratio=0.1,
+#     color="purple",
+# )
+# ax.quiver(
+#     trial_r_acr[500, 0],
+#     trial_r_acr[500, 1],
+#     trial_r_acr[500, 2],
+#     trial_ss[500, 0] - trial_r_acr[500, 0],
+#     trial_ss[500, 1] - trial_r_acr[500, 1],
+#     trial_ss[500, 2] - trial_r_acr[500, 2],
+#     arrow_length_ratio=0.1,
+#     color="purple",
+# )
+# plt.show()
 
 
 
@@ -815,60 +815,60 @@ for frame in range(trial_frame_count):
 
 # PLOT TRIAL MARKERS, VIRTUAL MARKERS AND CLUSTER LCS
     # virtual-filtered markers 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection="3d")
-ax.set_xlabel("X")
-ax.set_ylabel("Y")
-ax.set_zlabel("Z")
-ax.set_xlim(0,2000)
-ax.set_ylim(0,2000)
-ax.set_zlim(0,2000)
-_plot_marker(ax, mcp2_trial_filtered[50,:], 'blue', 'mcp2')
-_plot_marker(ax, mcp5_trial_filtered[50,:], 'blue', 'mcp5')
-_plot_marker(ax, racr_trial_filtered[50,:], 'blue', 'r_acr')
-_plot_marker(ax, rs_trial_filtered[50,:], 'blue', 'rs')
-_plot_marker(ax, us_trial_filtered[50,:], 'blue', 'us')
-_plot_marker(ax, me_trial_filtered[50,:], 'blue', 'me')
-_plot_marker(ax, le_trial_filtered[50,:], 'blue', 'le')
-_plot_marker(ax, c7_trial_filtered[50,:], 'blue', 'c7')
-_plot_marker(ax, ss_trial_filtered[50,:], 'blue', 'ss')
-_plot_coordinate_system(ax, trial_ss[50,:], (thrx_seg_trial_x_norm[frame],thrx_seg_trial_y_norm[frame],thrx_seg_trial_z_norm[frame]))
-# _plot_coordinate_system(ax, trial_chest5[50,:], chest_trial_lcs)
-_plot_coordinate_system(ax, trial_fa1[50,:], (fa_seg_trial_x_norm[frame],fa_seg_trial_y_norm[frame],fa_seg_trial_z_norm[frame]))
-_plot_coordinate_system(ax, trial_ua1[50,:], (ua_seg_trial_x_norm[frame],ua_seg_trial_y_norm[frame],ua_seg_trial_z_norm[frame]))
-_plot_coordinate_system(ax, hand_origin[50,:], (hand_seg_trial_x_norm[frame],hand_seg_trial_y_norm[frame],hand_seg_trial_z_norm[frame]))
-ax.quiver(
-    wjc[50, 0],
-    wjc[50, 1],
-    wjc[50, 2],
-    ejc[50, 0] - wjc[50, 0],
-    ejc[50, 1] - wjc[50, 1],
-    ejc[50, 2] - wjc[50, 2],
-    arrow_length_ratio=0.1,
-    color="purple",
-)
-    # Plot vector from elbow midpoint to r_acr
-ax.quiver(
-    ejc[50, 0],
-    ejc[50, 1],
-    ejc[50, 2],
-    sjc[50, 0] - ejc[50, 0],
-    sjc[50, 1] - ejc[50, 1],
-    sjc[50, 2] - ejc[50, 2],
-    arrow_length_ratio=0.1,
-    color="purple",
-)
-ax.quiver(
-    sjc[50, 0],
-    sjc[50, 1],
-    sjc[50, 2],
-    ss_trial_filtered[50, 0] - sjc[50, 0],
-    ss_trial_filtered[50, 1] - sjc[50, 1],
-    ss_trial_filtered[50, 2] - sjc[50, 2],
-    arrow_length_ratio=0.1,
-    color="purple",
-)
-plt.show()
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection="3d")
+# ax.set_xlabel("X")
+# ax.set_ylabel("Y")
+# ax.set_zlabel("Z")
+# ax.set_xlim(0,2000)
+# ax.set_ylim(0,2000)
+# ax.set_zlim(0,2000)
+# _plot_marker(ax, mcp2_trial_filtered[50,:], 'blue', 'mcp2')
+# _plot_marker(ax, mcp5_trial_filtered[50,:], 'blue', 'mcp5')
+# _plot_marker(ax, racr_trial_filtered[50,:], 'blue', 'r_acr')
+# _plot_marker(ax, rs_trial_filtered[50,:], 'blue', 'rs')
+# _plot_marker(ax, us_trial_filtered[50,:], 'blue', 'us')
+# _plot_marker(ax, me_trial_filtered[50,:], 'blue', 'me')
+# _plot_marker(ax, le_trial_filtered[50,:], 'blue', 'le')
+# _plot_marker(ax, c7_trial_filtered[50,:], 'blue', 'c7')
+# _plot_marker(ax, ss_trial_filtered[50,:], 'blue', 'ss')
+# _plot_coordinate_system(ax, trial_ss[50,:], (thrx_seg_trial_x_norm[frame],thrx_seg_trial_y_norm[frame],thrx_seg_trial_z_norm[frame]))
+# # _plot_coordinate_system(ax, trial_chest5[50,:], chest_trial_lcs)
+# _plot_coordinate_system(ax, trial_fa1[50,:], (fa_seg_trial_x_norm[frame],fa_seg_trial_y_norm[frame],fa_seg_trial_z_norm[frame]))
+# _plot_coordinate_system(ax, trial_ua1[50,:], (ua_seg_trial_x_norm[frame],ua_seg_trial_y_norm[frame],ua_seg_trial_z_norm[frame]))
+# _plot_coordinate_system(ax, hand_origin[50,:], (hand_seg_trial_x_norm[frame],hand_seg_trial_y_norm[frame],hand_seg_trial_z_norm[frame]))
+# ax.quiver(
+#     wjc[50, 0],
+#     wjc[50, 1],
+#     wjc[50, 2],
+#     ejc[50, 0] - wjc[50, 0],
+#     ejc[50, 1] - wjc[50, 1],
+#     ejc[50, 2] - wjc[50, 2],
+#     arrow_length_ratio=0.1,
+#     color="purple",
+# )
+#     # Plot vector from elbow midpoint to r_acr
+# ax.quiver(
+#     ejc[50, 0],
+#     ejc[50, 1],
+#     ejc[50, 2],
+#     sjc[50, 0] - ejc[50, 0],
+#     sjc[50, 1] - ejc[50, 1],
+#     sjc[50, 2] - ejc[50, 2],
+#     arrow_length_ratio=0.1,
+#     color="purple",
+# )
+# ax.quiver(
+#     sjc[50, 0],
+#     sjc[50, 1],
+#     sjc[50, 2],
+#     ss_trial_filtered[50, 0] - sjc[50, 0],
+#     ss_trial_filtered[50, 1] - sjc[50, 1],
+#     ss_trial_filtered[50, 2] - sjc[50, 2],
+#     arrow_length_ratio=0.1,
+#     color="purple",
+# )
+# plt.show()
 
 
 # # DEFINE SEGMENT DIRECTION COSINE MATRICES
@@ -935,11 +935,11 @@ for frame in range(trial_frame_count):
 x = np.linspace(0,trial_frame_count,trial_frame_count)
 # plt.set_xlim(0.55, 0.56)
 
-plt.plot(x, alphadeg_wrist, label = "alpha (p+/s-)", linestyle="-")
-plt.plot(x, betadeg_wrist, label = "beta (rd-/ud+)", linestyle="--")
-plt.plot(x, gammadeg_wrist, label = "gamma (f+/e-)", linestyle=":")
+plt.plot(x, alphadeg_wrist, label = "alpha (p+/s-)", color = 'blue')
+plt.plot(x, betadeg_wrist, label = "beta (rd-/ud+)", color = 'green')
+plt.plot(x, gammadeg_wrist, label = "gamma (f+/e-)", color ='red')
 plt.legend()
-plt.title('wrist angles')
+plt.title('Wrist Angles (LOW SENS)')
 plt.show()
 
 # ''' ELBOW '''
@@ -995,11 +995,11 @@ for frame in range(trial_frame_count):
     betadeg_elbow = np.degrees(beta_elbow)
     gammadeg_elbow = np.degrees(gamma_elbow)
 
-plt.plot(x, alphadeg_elbow, label = "alpha (+f/e)", linestyle="-")
-plt.plot(x, betadeg_elbow, label = "beta (carrying angle)", linestyle="--")
-plt.plot(x, gammadeg_elbow, label = "gamma (p+/s-)", linestyle=":")
+plt.plot(x, alphadeg_elbow, label = "alpha (+f/e)", color = 'blue')
+plt.plot(x, betadeg_elbow, label = "beta (carrying angle)",color = 'green')
+plt.plot(x, gammadeg_elbow, label = "gamma (p+/s-)", color ='red')
 plt.legend()
-plt.title('elbow angles')
+plt.title('Elbow Angles (LOW) SENS)')
 plt.show()
 
 ''' SHOULDER '''
@@ -1049,7 +1049,7 @@ for frame in range(trial_frame_count):
             ] 
         ]
     )
-
+    
     beta_shoulder[frame,:] = np.arccos((shoulder_dcm[1,1]))
     gamma1_shoulder[frame, :] = np.arcsin((shoulder_dcm[0,1])/np.sin(beta_shoulder[frame]))
     gamma2_shoulder[frame,:] = np.arcsin((shoulder_dcm[1,0])/np.sin(beta_shoulder[frame]))
@@ -1057,13 +1057,11 @@ for frame in range(trial_frame_count):
     gamma1deg_shoulder = np.degrees(gamma1_shoulder)
     betadeg_shoulder = np.degrees(beta_shoulder)
     gamma2deg_shoulder = np.degrees(gamma2_shoulder)
-    #Trying ZXY 
+    #Trying XY 
         # Calculate Beta (β), the rotation about the Z-axis
     beta_shoulder[frame, :] = np.arcsin(-shoulder_dcm[0, 2])
-
     # Calculate Alpha (α), the rotation about the X-axis
     alpha_shoulder[frame, :] = np.arctan2(shoulder_dcm[1, 2], shoulder_dcm[2, 2])
-
     # Calculate Gamma (γ), the rotation about the Y-axis
     gamma_shoulder[frame, :] = np.arctan2(shoulder_dcm[0, 1], shoulder_dcm[0, 0])
 
@@ -1072,95 +1070,157 @@ for frame in range(trial_frame_count):
     betadeg_shoulder = np.degrees(beta_shoulder)
     gammadeg_shoulder = np.degrees(gamma_shoulder)
 
-plt.plot(x, alphadeg_shoulder, label="alpha (rotation about X-axis)", linestyle="-")
-plt.plot(x, betadeg_shoulder, label="beta (rotation about Z-axis)", linestyle="--")
-plt.plot(x, gammadeg_shoulder, label="gamma (rotation about Y-axis)", linestyle=":")
+# print(f'shoulder dcm matrix {shoulder_dcm}')
+# print(f'humerus lcs  {ua_dcm_ijk}')
+# print(f'torso lcs {thrx_dcm_ijk}')
+plt.plot(x, alphadeg_shoulder, label="alpha (rotation about X-axis)", color = 'blue')
+plt.plot(x, betadeg_shoulder, label="beta (rotation about Z-axis)", color = 'green')
+plt.plot(x, gammadeg_shoulder, label="gamma (rotation about Y-axis)", color ='red')
 plt.legend()
-plt.title('Shoulder Angles (X-Z-Y Sequence)')
+plt.title('Shoulder Angles (X-Z-Y Sequence)(LOW SENS)')
 plt.xlabel('Frame')
 plt.ylabel('Angle (degrees)')
 plt.show()
 
-plt.plot(x, gamma1_shoulder, label = "gamma1 (abd/ff)", linestyle="-")
-plt.plot(x, betadeg_shoulder, label = "beta (elevation)", linestyle="--")
-plt.plot(x, gamma2deg_shoulder, label = "gamma2 (ir+/er-)", linestyle=":")
+plt.plot(x, gamma1_shoulder, label = "gamma1 (abd/ff)", color = 'blue' )
+# plt.plot(x, betadeg_shoulder, label = "beta (elevation)",color = 'green' )
+# plt.plot(x, gamma2deg_shoulder, label = "gamma2 (ir+/er-)", color ='red')
 plt.legend()
-plt.title('Shoulder Angles (Y-X-Y)')
+plt.title('Shoulder Angles (Y-X-Y) (LOW SENS)')
 plt.xlabel('Frame')
 plt.ylabel('Angle (degrees)')
 plt.show()
 
 #calculate min, max and mean at each joint
 
-alpha_shoulder_min = np.min(alphadeg_shoulder)
-alpha_shoulder_max = np.max(alphadeg_shoulder)
-alpha_shoulder_mean = np.mean(alphadeg_shoulder)
+# alpha_shoulder_min = []
+# alpha_shoulder_max = []
+# alpha_shoulder_mean = []
 
-beta_shoulder_min = np.min(betadeg_shoulder)
-beta_shoulder_max = np.max(betadeg_shoulder)
-beta_shoulder_mean = np.mean(betadeg_shoulder)
+# beta_shoulder_min = []
+# beta_shoulder_max = []
+# beta_shoulder_mean = []
 
-gamma_shoulder_min = np.min(gammadeg_shoulder)
-gamma_shoulder_max = np.max(gammadeg_shoulder)
-gamma_shoulder_mean = np.mean(gammadeg_shoulder)
+# gamma_shoulder_min = []
+# gamma_shoulder_max = []
+# gamma_shoulder_mean = []
 
-alpha_elbow_min = np.min(alphadeg_elbow)
-alpha_elbow_max = np.max(alphadeg_elbow)
-alpha_elbow_mean = np.mean(alphadeg_elbow)
+# alpha_elbow_min = []
+# alpha_elbow_max = []
+# alpha_elbow_mean =[]
 
-beta_elbow_min = np.min(betadeg_elbow)
-beta_elbow_max = np.max(betadeg_elbow)
-beta_elbow_mean = np.mean(betadeg_elbow)
+# beta_elbow_min = np.min(betadeg_elbow)
+# beta_elbow_max = np.max(betadeg_elbow)
+# beta_elbow_mean = np.mean(betadeg_elbow)
 
-gamma_elbow_min = np.min(gammadeg_elbow)
-gamma_elbow_max = np.max(gammadeg_elbow)
-gamma_elbow_mean = np.mean(gammadeg_elbow)
+# gamma_elbow_min = np.min(gammadeg_elbow)
+# gamma_elbow_max = np.max(gammadeg_elbow)
+# gamma_elbow_mean = np.mean(gammadeg_elbow)
 
-alpha_wrist_min = np.min(alphadeg_wrist)
-alpha_wrist_max = np.max(alphadeg_wrist)
-alpha_wrist_mean = np.mean(alphadeg_wrist)
+# alpha_wrist_min = np.min(alphadeg_wrist)
+# alpha_wrist_max = np.max(alphadeg_wrist)
+# alpha_wrist_mean = np.mean(alphadeg_wrist)
 
-beta_wrist_min = np.min(betadeg_wrist)
-beta_wrist_max = np.max(betadeg_wrist)
-beta_wrist_mean = np.mean(betadeg_wrist)
+# beta_wrist_min = np.min(betadeg_wrist)
+# beta_wrist_max = np.max(betadeg_wrist)
+# beta_wrist_mean = np.mean(betadeg_wrist)
 
-gamma_wrist_min = np.min(gammadeg_wrist)
-gamma_wrist_max = np.max(gammadeg_wrist)
-gamma_wrist_mean = np.mean(gammadeg_wrist)
+# gamma_wrist_min = np.min(gammadeg_wrist)
+# gamma_wrist_max = np.max(gammadeg_wrist)
+# gamma_wrist_mean = np.mean(gammadeg_wrist)
+
+# # Calculate angles for stats
+# alpha_shoulder_min = np.min(alphadeg_shoulder)
+# alpha_shoulder_max = np.max(alphadeg_shoulder)
+# alpha_shoulder_mean = np.mean(alphadeg_shoulder)
+
+# beta_shoulder_min = np.min(betadeg_shoulder)
+# beta_shoulder_max = np.max(betadeg_shoulder)
+# beta_shoulder_mean = np.mean(betadeg_shoulder)
+
+# gamma_shoulder_min = np.min(gammadeg_shoulder)
+# gamma_shoulder_max = np.max(gammadeg_shoulder)
+# gamma_shoulder_mean = np.mean(gammadeg_shoulder)
+
+# alpha_elbow_min = np.min(alphadeg_elbow)
+# alpha_elbow_max = np.max(alphadeg_elbow)
+# alpha_elbow_mean = np.mean(alphadeg_elbow)
+
+# beta_elbow_min = np.min(betadeg_elbow)
+# beta_elbow_max = np.max(betadeg_elbow)
+# beta_elbow_mean = np.mean(betadeg_elbow)
+
+# gamma_elbow_min = np.min(gammadeg_elbow)
+# gamma_elbow_max = np.max(gammadeg_elbow)
+# gamma_elbow_mean = np.mean(gammadeg_elbow)
+
+# alpha_wrist_min = np.min(alphadeg_wrist)
+# alpha_wrist_max = np.max(alphadeg_wrist)
+# alpha_wrist_mean = np.mean(alphadeg_wrist)
+
+# beta_wrist_min = np.min(betadeg_wrist)
+# beta_wrist_max = np.max(betadeg_wrist)
+# beta_wrist_mean = np.mean(betadeg_wrist)
+
+# gamma_wrist_min = np.min(gammadeg_wrist)
+# gamma_wrist_max = np.max(gammadeg_wrist)
+# gamma_wrist_mean = np.mean(gammadeg_wrist)
 
 
-# make pd df
-# set columns for all outputs
-# paths to conditions
-# insert row with all the data
+# # make pd df
+# # set columns for all outputs
+# # paths to conditions
+# # insert row with all the data
 
-# list of outputs 
-    # shoulder: min max of alpha, beta, gamma ; total (6)
-    # elbow: min max of alpha, beta, gamma ; total (6)   
-    # wrist: min max of alpha, beta, gamma ; total (6)
 
-import glob
+# import glob
+# import os
 
-angleoutputs_df = pd.DataFrame(columns=['Subject' ,'Difficulty' , 'Sensitivity',
-                                        'Shoulder Alpha Min', 'Shoulder Alpha Max','Shoulder Beta Min',
-                                        'Shoulder Beta Max','Shoulder Gamma Min','Shoulder Gamma Max',
-                                        'Elbow Alpha Min','Elbow Alpha Max','Elbow Beta Min','Elbow Beta Max',
-                                        'Elbow Gamma Min','Elbow Gamma Max','Wrist Alpha Min','Wrist Alpha Max',
-                                        'Wrist Beta Min','Wrist Beta Max','Wrist Gamma Min','Wrist Gamma Max'])
-difficulties = ['EASY', 'HARD']
-sensitivities = ['PREF', 'LOW', 'HIGH']
+# angleoutputs_df = pd.DataFrame(columns=['Subject' ,'Difficulty' , 'Sensitivity',
+#                                         'Shoulder Alpha Min', 'Shoulder Alpha Max','Shoulder Beta Min',
+#                                         'Shoulder Beta Max','Shoulder Gamma Min','Shoulder Gamma Max',
+#                                         'Elbow Alpha Min','Elbow Alpha Max','Elbow Beta Min','Elbow Beta Max',
+#                                         'Elbow Gamma Min','Elbow Gamma Max','Wrist Alpha Min','Wrist Alpha Max',
+#                                         'Wrist Beta Min','Wrist Beta Max','Wrist Gamma Min','Wrist Gamma Max'])
+# difficulties = ['EASY', 'HARD']
+# sensitivities = ['PREF', 'LOW', 'HIGH']
 
-print(angleoutputs_df)
-sub_num = 'S05'
-trial_folder = 'path'
-# create nested loops to generate data for diff and sens and append to df
-for difficulty in difficulties:
-    condition_max = []
-    condition_min = []
-    for sensitivity in sensitivities:
-        folder_prefix = f'd_{sub_num}_{difficulty}_{sensitivity}*.tsv'
-        condition_trial_paths = glob.glob(f'{trial_folder}/{folder_prefix}')
-        if len(condition_trial_paths) == 0: continue
+# print(angleoutputs_df)
+# sub_num = 'S05'
+# trial_folder = 'path'
+# # create nested loops to generate data for diff and sens and append to df
+# for difficulty in difficulties:
+#     condition_max = []
+#     condition_min = []
+#     for sensitivity in sensitivities:
+#         folder_prefix = f'd_{sub_num}_{difficulty}_{sensitivity}*.tsv'
+#         condition_trial_paths = glob.glob(f'{trial_folder}/{folder_prefix}')
+#         if len(condition_trial_paths) == 0: continue
+#         for condition_trial in condition_trial_paths:
+#             #pulls original file name to be used for plot output
+#             condition_trial_basename = os.path.basename(condition_trial).strip('.tsv')
+#             # creates a data frame from csv containing trial data
+#             condition_df = pd.read_csv(condition_trial, sep='\t', header=13)
+#             # converts condition_df csv to a numpy file
+#             condition_signal = condition_df[f"EMG {col}"].to_numpy()
+#             # process trial signal using signal processing function (bandpass, fwr)
+        
+        
+#         # input data processing per trial
+#         pd.df.loc() = 
 
-        # input data processing per trial
-        pd.df.insertrow = 
+
+# def jmp_sort(dictionary: dict, file_path: str):
+#     for key, value in dictionary.items():
+#         difficulty, sensitivity = key.split("_")
+#         dictionary[key] = [sub_num, difficulty, sensitivity] + value
+#     result_df = pd.DataFrame.from_dict(dictionary, orient='index', columns=(['Subject', 'Difficulty', 'Sensitivity'] + list(muscles.keys())))
+#     result_df.reset_index(drop=True)
+#     result_df.to_csv(file_path)
+
+# jmp_sort(normalized_maxs, f'{trial_folder}/{sub_num}_sorted_normalized_condition_maxs.csv')
+# print(f"subject max emg values have been written to {trial_folder}/{sub_num}_sorted_normalized_condition_maxs.csv")
+# jmp_sort(condition_means, f'{trial_folder}/{sub_num}_sorted_normalized_condition_means.csv')
+# print(f"subject mean emg values have been written to {trial_folder}/{sub_num}_sorted_normalized_condition_means.csv")
+# jmp_sort(condition_maxs, f'{trial_folder}/{sub_num}_sorted_condition_maxs.csv')
+# print(f"subject max emg values have been written to {trial_folder}/{sub_num}_sorted_condition_maxs.csv")
