@@ -935,12 +935,12 @@ for frame in range(trial_frame_count):
 x = np.linspace(0,trial_frame_count,trial_frame_count)
 # plt.set_xlim(0.55, 0.56)
 
-# plt.plot(x, alphadeg_wrist, label = "alpha (p+/s-)", linestyle="-")
-# plt.plot(x, betadeg_wrist, label = "beta (rd-/ud+)", linestyle="--")
-# plt.plot(x, gammadeg_wrist, label = "gamma (f+/e-)", linestyle=":")
-# plt.legend()
-# plt.title('wrist angles')
-# plt.show()
+plt.plot(x, alphadeg_wrist, label = "alpha (p+/s-)", linestyle="-")
+plt.plot(x, betadeg_wrist, label = "beta (rd-/ud+)", linestyle="--")
+plt.plot(x, gammadeg_wrist, label = "gamma (f+/e-)", linestyle=":")
+plt.legend()
+plt.title('wrist angles')
+plt.show()
 
 # ''' ELBOW '''
 #ulna relative to humerus (elbow) Z-X-Y
@@ -995,12 +995,12 @@ for frame in range(trial_frame_count):
     betadeg_elbow = np.degrees(beta_elbow)
     gammadeg_elbow = np.degrees(gamma_elbow)
 
-# plt.plot(x, alphadeg_elbow, label = "alpha (+f/e)", linestyle="-")
-# plt.plot(x, betadeg_elbow, label = "beta (carrying angle)", linestyle="--")
-# plt.plot(x, gammadeg_elbow, label = "gamma (p+/s-)", linestyle=":")
-# plt.legend()
-# plt.title('elbow angles')
-# plt.show()
+plt.plot(x, alphadeg_elbow, label = "alpha (+f/e)", linestyle="-")
+plt.plot(x, betadeg_elbow, label = "beta (carrying angle)", linestyle="--")
+plt.plot(x, gammadeg_elbow, label = "gamma (p+/s-)", linestyle=":")
+plt.legend()
+plt.title('elbow angles')
+plt.show()
 
 ''' SHOULDER '''
 # humerus relative to the thorax
@@ -1089,3 +1089,78 @@ plt.title('Shoulder Angles (Y-X-Y)')
 plt.xlabel('Frame')
 plt.ylabel('Angle (degrees)')
 plt.show()
+
+#calculate min, max and mean at each joint
+
+alpha_shoulder_min = np.min(alphadeg_shoulder)
+alpha_shoulder_max = np.max(alphadeg_shoulder)
+alpha_shoulder_mean = np.mean(alphadeg_shoulder)
+
+beta_shoulder_min = np.min(betadeg_shoulder)
+beta_shoulder_max = np.max(betadeg_shoulder)
+beta_shoulder_mean = np.mean(betadeg_shoulder)
+
+gamma_shoulder_min = np.min(gammadeg_shoulder)
+gamma_shoulder_max = np.max(gammadeg_shoulder)
+gamma_shoulder_mean = np.mean(gammadeg_shoulder)
+
+alpha_elbow_min = np.min(alphadeg_elbow)
+alpha_elbow_max = np.max(alphadeg_elbow)
+alpha_elbow_mean = np.mean(alphadeg_elbow)
+
+beta_elbow_min = np.min(betadeg_elbow)
+beta_elbow_max = np.max(betadeg_elbow)
+beta_elbow_mean = np.mean(betadeg_elbow)
+
+gamma_elbow_min = np.min(gammadeg_elbow)
+gamma_elbow_max = np.max(gammadeg_elbow)
+gamma_elbow_mean = np.mean(gammadeg_elbow)
+
+alpha_wrist_min = np.min(alphadeg_wrist)
+alpha_wrist_max = np.max(alphadeg_wrist)
+alpha_wrist_mean = np.mean(alphadeg_wrist)
+
+beta_wrist_min = np.min(betadeg_wrist)
+beta_wrist_max = np.max(betadeg_wrist)
+beta_wrist_mean = np.mean(betadeg_wrist)
+
+gamma_wrist_min = np.min(gammadeg_wrist)
+gamma_wrist_max = np.max(gammadeg_wrist)
+gamma_wrist_mean = np.mean(gammadeg_wrist)
+
+
+# make pd df
+# set columns for all outputs
+# paths to conditions
+# insert row with all the data
+
+# list of outputs 
+    # shoulder: min max of alpha, beta, gamma ; total (6)
+    # elbow: min max of alpha, beta, gamma ; total (6)   
+    # wrist: min max of alpha, beta, gamma ; total (6)
+
+import glob
+
+angleoutputs_df = pd.DataFrame(columns=['Subject' ,'Difficulty' , 'Sensitivity',
+                                        'Shoulder Alpha Min', 'Shoulder Alpha Max','Shoulder Beta Min',
+                                        'Shoulder Beta Max','Shoulder Gamma Min','Shoulder Gamma Max',
+                                        'Elbow Alpha Min','Elbow Alpha Max','Elbow Beta Min','Elbow Beta Max',
+                                        'Elbow Gamma Min','Elbow Gamma Max','Wrist Alpha Min','Wrist Alpha Max',
+                                        'Wrist Beta Min','Wrist Beta Max','Wrist Gamma Min','Wrist Gamma Max'])
+difficulties = ['EASY', 'HARD']
+sensitivities = ['PREF', 'LOW', 'HIGH']
+
+print(angleoutputs_df)
+sub_num = 'S05'
+trial_folder = 'path'
+# create nested loops to generate data for diff and sens and append to df
+for difficulty in difficulties:
+    condition_max = []
+    condition_min = []
+    for sensitivity in sensitivities:
+        folder_prefix = f'd_{sub_num}_{difficulty}_{sensitivity}*.tsv'
+        condition_trial_paths = glob.glob(f'{trial_folder}/{folder_prefix}')
+        if len(condition_trial_paths) == 0: continue
+
+        # input data processing per trial
+        pd.df.insertrow = 
