@@ -1092,6 +1092,27 @@ plt.ylabel('Angle (degrees)')
 plt.show()
 
 #calculate min, max and mean at each joint
+'''PROCESS TO ADD TO CODE'''
+#AFTER CAL
+
+# set trial folder 
+
+# set difficulty and sensitivity lists to iterate throuhg
+
+
+# for difficulty in diffs
+# 	for sensitivity in sens
+# 		set empty arrays for each value i need to output
+# 		glob to make a list of each of the 6 conditions
+# 		sub_condition_trial_# for loop through globs 
+# 			perform all trial processing
+# 			calculate the values for the output and append them to the empty array
+# 		from appended values, obtain max, mean and min
+# 		save appended values to results data frame
+
+# export results data frame
+
+
 
 # alpha_shoulder_min = []
 # alpha_shoulder_max = []
