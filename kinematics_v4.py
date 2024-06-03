@@ -433,17 +433,21 @@ le_fa = np.matmul(grl_cal_ua, (np.array(cal_le) - np.array(cal_fa1)))
 # ''' TASK TRIAL PROCESSING'''
 # reads csv into a data frame
 trial_folder = f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/{sub_num}/Data_Raw/Trial_Kinematics/Digitized_TSV" 
-trial_file = f"{trial_folder}/d_{sub_num}_EASY_LOW_6.tsv"
-trial_raw = pd.read_csv(trial_file, sep='\t', header = 11) #sets csv to df
+# trial_file = f"{trial_folder}/d_{sub_num}_EASY_LOW_6.tsv"
+# trial_raw = pd.read_csv(trial_file, sep='\t', header = 11) #sets csv to df
 
 
 
-angleoutputs_df = pd.DataFrame(columns=['Subject' ,'Difficulty' , 'Sensitivity',
-                                        'Shoulder Alpha Min', 'Shoulder Alpha Max','Shoulder Beta Min',
-                                        'Shoulder Beta Max','Shoulder Gamma Min','Shoulder Gamma Max',
-                                        'Elbow Alpha Min','Elbow Alpha Max','Elbow Beta Min','Elbow Beta Max',
-                                        'Elbow Gamma Min','Elbow Gamma Max','Wrist Alpha Min','Wrist Alpha Max',
-                                        'Wrist Beta Min','Wrist Beta Max','Wrist Gamma Min','Wrist Gamma Max'])
+angle_outputs_df = pd.DataFrame(columns=['Subject' ,'Difficulty' , 'Sensitivity',
+                                        'Shoulder Alpha Min', 'Shoulder Alpha Mean','Shoulder Alpha Max',
+                                        'Shoulder Beta Min','Shoulder Beta Mean','Shoulder Beta Max',
+                                        'Shoulder Gamma Min','Shoulder Gamma Mean','Shoulder Gamma Max',
+                                        'Elbow Alpha Min', 'Elbow Alpha Mean', 'Elbow Alpha Max',
+                                        'Elbow Beta Min','Elbow Beta Mean', 'Elbow Beta Max',
+                                        'Elbow Gamma Min','Elbow Gamma Max','Elbow Gamma Max',
+                                        'Wrist Alpha Min','Wrist Alpha Mean','Wrist Alpha Max',
+                                        'Wrist Beta Min','Wrist Beta Mean','Wrist Beta Max',
+                                        'Wrist Gamma Min','Wrist Gamma Mean','Wrist Gamma Max'])
 difficulties = ['EASY', 'HARD']
 sensitivities = ['PREF', 'LOW', 'HIGH']
 
@@ -463,22 +467,32 @@ def append_angles (angle_arr, angle_data,value):
     
     angle_arr.append(angle_value)
 
-def output_angles (angle_output_df, angle_arr, value):
+def output_angles (output_list, angle_arr, value):
     ''' Args:
     angle_arr = contains appended values from append_angles
     value =  indicate 'min', 'max', 'mean' for final output '''
+
+    if len(angle_arr) == 0:
+        angle_output = np.nan
+
     if value == 'min':
         angle_output = np.min(angle_arr)
     elif value == 'mean':
         angle_output = np.mean(angle_arr)
     elif value == 'max':
-        angle_outout = np.max(angle_arr)
-
-    angle_output_df.append(angle_output)
+        angle_output = np.max(angle_arr)
+    else:
+        raise ValueError("Unsupported value type. Use 'min', 'mean', or 'max'.")
+    #append to list to be put into the final df
+    output_list.append(angle_output)
 
 
 for difficulty in difficulties:
+ 
     for sensitivity in sensitivities:
+        # list for angles to be stored in for exporting (ends with a total of 6)
+        angle_outputs_list = [] 
+
         alpha_shoulder_min = []
         alpha_shoulder_max = []
         alpha_shoulder_mean = []
@@ -514,15 +528,16 @@ for difficulty in difficulties:
         gamma_wrist_min = []
         gamma_wrist_max = []
         gamma_wrist_mean = []
-
+        
         folder_prefix = f'd_{sub_num}_{difficulty}_{sensitivity}*.tsv'
         condition_trial_paths = glob.glob(f'{trial_folder}/{folder_prefix}')
         # print(condition_trial_paths)
         for condition_trial in condition_trial_paths:
             condition_trial_basename = os.path.basename(condition_trial).strip('.tsv')
             print(f'basenames: {condition_trial_basename}')
+            
             trial_raw = pd.read_csv(condition_trial, sep='\t', header = 11)
-
+            if len(condition_trial_paths) == 0: continue
             trial_markers = {
                 "mcp2": trial_raw[["MCP2 X", "MCP2 Y", "MCP2 Z"]].values,
                 "mcp5": trial_raw[["MCP5 X", "MCP5 Y", "MCP5 Z"]].values,
@@ -1088,9 +1103,9 @@ for difficulty in difficulties:
                 # gamma2HT (Y2) = axial rotation | internal + / external - 
 
             DCM_shoulder = np.zeros((trial_frame_count,3,3))
-            gamma1_shoulder = np.zeros((trial_frame_count,1))
+            # gamma1_shoulder = np.zeros((trial_frame_count,1))
             beta_shoulder = np.zeros((trial_frame_count,1))
-            gamma2_shoulder = np.zeros((trial_frame_count,1))
+            # gamma2_shoulder = np.zeros((trial_frame_count,1))
             gamma_shoulder = np.zeros((trial_frame_count,1))
             alpha_shoulder =np.zeros((trial_frame_count,1))
 
@@ -1129,13 +1144,13 @@ for difficulty in difficulties:
                     ]
                 )
                 
-                beta_shoulder[frame,:] = np.arccos((shoulder_dcm[1,1]))
-                gamma1_shoulder[frame, :] = np.arcsin((shoulder_dcm[0,1])/np.sin(beta_shoulder[frame]))
-                gamma2_shoulder[frame,:] = np.arcsin((shoulder_dcm[1,0])/np.sin(beta_shoulder[frame]))
+                # beta_shoulder[frame,:] = np.arccos((shoulder_dcm[1,1]))
+                # gamma1_shoulder[frame, :] = np.arcsin((shoulder_dcm[0,1])/np.sin(beta_shoulder[frame]))
+                # gamma2_shoulder[frame,:] = np.arcsin((shoulder_dcm[1,0])/np.sin(beta_shoulder[frame]))
 
-                gamma1deg_shoulder = np.degrees(gamma1_shoulder)
-                betadeg_shoulder = np.degrees(beta_shoulder)
-                gamma2deg_shoulder = np.degrees(gamma2_shoulder)
+                # gamma1deg_shoulder = np.degrees(gamma1_shoulder)
+                # betadeg_shoulder = np.degrees(beta_shoulder)
+                # gamma2deg_shoulder = np.degrees(gamma2_shoulder)
                 #Trying XY 
                     # Calculate Beta (β), the rotation about the Z-axis
                 beta_shoulder[frame, :] = np.arcsin(-shoulder_dcm[0, 2])
@@ -1161,190 +1176,99 @@ for difficulty in difficulties:
             plt.ylabel('Angle (degrees)')
             # plt.show()
 
-            plt.plot(x, gamma1_shoulder, label = "gamma1 (abd/ff)", color = 'blue' )
-            # plt.plot(x, betadeg_shoulder, label = "beta (elevation)",color = 'green' )
-            # plt.plot(x, gamma2deg_shoulder, label = "gamma2 (ir+/er-)", color ='red')
-            plt.legend()
-            plt.title('Shoulder Angles (Y-X-Y) (LOW SENS)')
-            plt.xlabel('Frame')
-            plt.ylabel('Angle (degrees)')
-            # plt.show()
+            # plt.plot(x, gamma1_shoulder, label = "gamma1 (abd/ff)", color = 'blue' )
+            # # plt.plot(x, betadeg_shoulder, label = "beta (elevation)",color = 'green' )
+            # # plt.plot(x, gamma2deg_shoulder, label = "gamma2 (ir+/er-)", color ='red')
+            # plt.legend()
+            # plt.title('Shoulder Angles (Y-X-Y) (LOW SENS)')
+            # plt.xlabel('Frame')
+            # plt.ylabel('Angle (degrees)')
+            # # plt.show()
 
-            #WRIST
-            append_angles(alpha_wrist_min, alphadeg_wrist, 'min')
-            append_angles(alpha_wrist_mean, alphadeg_wrist, 'mean')
-            append_angles(alpha_wrist_max, alphadeg_wrist, 'max')
+        #WRIST
+        append_angles(alpha_wrist_min, alphadeg_wrist, 'min')
+        append_angles(alpha_wrist_mean, alphadeg_wrist, 'mean')
+        append_angles(alpha_wrist_max, alphadeg_wrist, 'max')
 
-            append_angles(beta_wrist_min, betadeg_wrist, 'min')
-            append_angles(beta_wrist_mean, betadeg_wrist, 'mean')
-            append_angles(beta_wrist_max, betadeg_wrist, 'max')
+        append_angles(beta_wrist_min, betadeg_wrist, 'min')
+        append_angles(beta_wrist_mean, betadeg_wrist, 'mean')
+        append_angles(beta_wrist_max, betadeg_wrist, 'max')
 
-            append_angles(gamma_wrist_min, gammadeg_wrist, 'min')
-            append_angles(gamma_wrist_mean, gammadeg_wrist, 'mean')
-            append_angles(gamma_wrist_max, gammadeg_wrist, 'max')
-            #ELBOW
-            append_angles(alpha_elbow_min, alphadeg_elbow, 'min')
-            append_angles(alpha_elbow_mean, alphadeg_elbow, 'mean')
-            append_angles(alpha_elbow_max, alphadeg_elbow, 'max')
+        append_angles(gamma_wrist_min, gammadeg_wrist, 'min')
+        append_angles(gamma_wrist_mean, gammadeg_wrist, 'mean')
+        append_angles(gamma_wrist_max, gammadeg_wrist, 'max')
+        #ELBOW
+        append_angles(alpha_elbow_min, alphadeg_elbow, 'min')
+        append_angles(alpha_elbow_mean, alphadeg_elbow, 'mean')
+        append_angles(alpha_elbow_max, alphadeg_elbow, 'max')
 
-            append_angles(beta_elbow_min, betadeg_elbow, 'min')
-            append_angles(beta_elbow_mean, betadeg_elbow, 'mean')
-            append_angles(beta_elbow_max, betadeg_elbow, 'max')
+        append_angles(beta_elbow_min, betadeg_elbow, 'min')
+        append_angles(beta_elbow_mean, betadeg_elbow, 'mean')
+        append_angles(beta_elbow_max, betadeg_elbow, 'max')
 
-            append_angles(gamma_elbow_min, gammadeg_elbow, 'min')
-            append_angles(gamma_elbow_mean, gammadeg_elbow, 'mean')
-            append_angles(gamma_elbow_max, gammadeg_elbow, 'max')
-            #SHOULDER
-            append_angles(alpha_shoulder_min, alphadeg_shoulder, 'min')
-            append_angles(alpha_shoulder_mean, alphadeg_shoulder, 'mean')
-            append_angles(alpha_shoulder_max, alphadeg_shoulder, 'max')
+        append_angles(gamma_elbow_min, gammadeg_elbow, 'min')
+        append_angles(gamma_elbow_mean, gammadeg_elbow, 'mean')
+        append_angles(gamma_elbow_max, gammadeg_elbow, 'max')
+        #SHOULDER
+        append_angles(alpha_shoulder_min, alphadeg_shoulder, 'min')
+        append_angles(alpha_shoulder_mean, alphadeg_shoulder, 'mean')
+        append_angles(alpha_shoulder_max, alphadeg_shoulder, 'max')
 
-            append_angles(beta_shoulder_min, betadeg_shoulder, 'min')
-            append_angles(beta_shoulder_mean, betadeg_shoulder, 'mean')
-            append_angles(beta_shoulder_max, betadeg_shoulder, 'max')
+        append_angles(beta_shoulder_min, betadeg_shoulder, 'min')
+        append_angles(beta_shoulder_mean, betadeg_shoulder, 'mean')
+        append_angles(beta_shoulder_max, betadeg_shoulder, 'max')
 
-            append_angles(gamma_elbow_min, gammadeg_elbow, 'min')
-            append_angles(gamma_elbow_mean, gammadeg_elbow, 'mean')
-            append_angles(gamma_elbow_max, gammadeg_elbow, 'max')
-        
+        append_angles(gamma_shoulder_min, gammadeg_shoulder, 'min')
+        append_angles(gamma_shoulder_mean, gammadeg_shoulder, 'mean')
+        append_angles(gamma_shoulder_max, gammadeg_shoulder, 'max')
+    
         #calculate the min, mean and max from the appended values
-        
+        #empty array for angle outputs. will be put into the dataframe at the end
             
+        angle_outputs_list.append(sub_num)
+        angle_outputs_list.append(difficulty)
+        angle_outputs_list.append(sensitivity)
+        output_angles(angle_outputs_list, alpha_shoulder_min, 'min')
+        output_angles(angle_outputs_list, alpha_shoulder_mean, 'mean')
+        output_angles(angle_outputs_list, alpha_shoulder_max, 'max')
 
-#calculate min, max and mean at each joint
-'''PROCESS TO ADD TO CODE'''
-#AFTER CAL
-
-# set trial folder 
-
-# set difficulty and sensitivity lists to iterate throuhg
-
-
-# for difficulty in diffs
-# 	for sensitivity in sens
-# 		set empty arrays for each value i need to output
-# 		glob to make a list of each of the 6 conditions
-# 		sub_condition_trial_# for loop through globs 
-# 			perform all trial processing
-# 			calculate the values for the output and append them to the empty array
-# 		from appended values, obtain max, mean and min
-# 		save appended values to results data frame
-
-# export results data frame
-
-
-# beta_elbow_min = np.min(betadeg_elbow)
-# beta_elbow_max = np.max(betadeg_elbow)
-# beta_elbow_mean = np.mean(betadeg_elbow)
-
-# gamma_elbow_min = np.min(gammadeg_elbow)
-# gamma_elbow_max = np.max(gammadeg_elbow)
-# gamma_elbow_mean = np.mean(gammadeg_elbow)
-
-# alpha_wrist_min = np.min(alphadeg_wrist)
-# alpha_wrist_max = np.max(alphadeg_wrist)
-# alpha_wrist_mean = np.mean(alphadeg_wrist)
-
-# beta_wrist_min = np.min(betadeg_wrist)
-# beta_wrist_max = np.max(betadeg_wrist)
-# beta_wrist_mean = np.mean(betadeg_wrist)
-
-# gamma_wrist_min = np.min(gammadeg_wrist)
-# gamma_wrist_max = np.max(gammadeg_wrist)
-# gamma_wrist_mean = np.mean(gammadeg_wrist)
-
-# # Calculate angles for stats
-# alpha_shoulder_min = np.min(alphadeg_shoulder)
-# alpha_shoulder_max = np.max(alphadeg_shoulder)
-# alpha_shoulder_mean = np.mean(alphadeg_shoulder)
-
-# beta_shoulder_min = np.min(betadeg_shoulder)
-# beta_shoulder_max = np.max(betadeg_shoulder)
-# beta_shoulder_mean = np.mean(betadeg_shoulder)
-
-# gamma_shoulder_min = np.min(gammadeg_shoulder)
-# gamma_shoulder_max = np.max(gammadeg_shoulder)
-# gamma_shoulder_mean = np.mean(gammadeg_shoulder)
-
-# alpha_elbow_min = np.min(alphadeg_elbow)
-# alpha_elbow_max = np.max(alphadeg_elbow)
-# alpha_elbow_mean = np.mean(alphadeg_elbow)
-
-# beta_elbow_min = np.min(betadeg_elbow)
-# beta_elbow_max = np.max(betadeg_elbow)
-# beta_elbow_mean = np.mean(betadeg_elbow)
-
-# gamma_elbow_min = np.min(gammadeg_elbow)
-# gamma_elbow_max = np.max(gammadeg_elbow)
-# gamma_elbow_mean = np.mean(gammadeg_elbow)
-
-# alpha_wrist_min = np.min(alphadeg_wrist)
-# alpha_wrist_max = np.max(alphadeg_wrist)
-# alpha_wrist_mean = np.mean(alphadeg_wrist)
-
-# beta_wrist_min = np.min(betadeg_wrist)
-# beta_wrist_max = np.max(betadeg_wrist)
-# beta_wrist_mean = np.mean(betadeg_wrist)
-
-# gamma_wrist_min = np.min(gammadeg_wrist)
-# gamma_wrist_max = np.max(gammadeg_wrist)
-# gamma_wrist_mean = np.mean(gammadeg_wrist)
-
-
-# # make pd df
-# # set columns for all outputs
-# # paths to conditions
-# # insert row with all the data
-
-
-# import glob
-# import os
-
-# angleoutputs_df = pd.DataFrame(columns=['Subject' ,'Difficulty' , 'Sensitivity',
-#                                         'Shoulder Alpha Min', 'Shoulder Alpha Max','Shoulder Beta Min',
-#                                         'Shoulder Beta Max','Shoulder Gamma Min','Shoulder Gamma Max',
-#                                         'Elbow Alpha Min','Elbow Alpha Max','Elbow Beta Min','Elbow Beta Max',
-#                                         'Elbow Gamma Min','Elbow Gamma Max','Wrist Alpha Min','Wrist Alpha Max',
-#                                         'Wrist Beta Min','Wrist Beta Max','Wrist Gamma Min','Wrist Gamma Max'])
-# difficulties = ['EASY', 'HARD']
-# sensitivities = ['PREF', 'LOW', 'HIGH']
-
-# print(angleoutputs_df)
-# sub_num = 'S05'
-# trial_folder = 'path'
-# # create nested loops to generate data for diff and sens and append to df
-# for difficulty in difficulties:
-#     condition_max = []
-#     condition_min = []
-#     for sensitivity in sensitivities:
-#         folder_prefix = f'd_{sub_num}_{difficulty}_{sensitivity}*.tsv'
-#         condition_trial_paths = glob.glob(f'{trial_folder}/{folder_prefix}')
-#         if len(condition_trial_paths) == 0: continue
-#         for condition_trial in condition_trial_paths:
-#             #pulls original file name to be used for plot output
-#             condition_trial_basename = os.path.basename(condition_trial).strip('.tsv')
-#             # creates a data frame from csv containing trial data
-#             condition_df = pd.read_csv(condition_trial, sep='\t', header=13)
-#             # converts condition_df csv to a numpy file
-#             condition_signal = condition_df[f"EMG {col}"].to_numpy()
-#             # process trial signal using signal processing function (bandpass, fwr)
+        output_angles(angle_outputs_list, beta_shoulder_min, 'min')
+        output_angles(angle_outputs_list, beta_shoulder_mean, 'mean')
+        output_angles(angle_outputs_list, beta_shoulder_max, 'max')
         
+        output_angles(angle_outputs_list, gamma_shoulder_min, 'min')
+        output_angles(angle_outputs_list, gamma_shoulder_mean, 'mean')
+        output_angles(angle_outputs_list, gamma_shoulder_max, 'max')
+
+        output_angles(angle_outputs_list, alpha_elbow_min, 'min')
+        output_angles(angle_outputs_list, alpha_elbow_mean, 'mean')
+        output_angles(angle_outputs_list, alpha_elbow_max, 'max')
         
-#         # input data processing per trial
-#         pd.df.loc() = 
+        output_angles(angle_outputs_list, beta_elbow_min, 'min')
+        output_angles(angle_outputs_list, beta_elbow_mean, 'mean')
+        output_angles(angle_outputs_list, beta_elbow_max, 'max')
+        
+        output_angles(angle_outputs_list, gamma_elbow_min, 'min')
+        output_angles(angle_outputs_list, gamma_elbow_mean, 'mean')
+        output_angles(angle_outputs_list, gamma_elbow_max, 'max')
 
+        output_angles(angle_outputs_list, alpha_wrist_min, 'min')
+        output_angles(angle_outputs_list, alpha_wrist_mean, 'mean')
+        output_angles(angle_outputs_list, alpha_wrist_max, 'max')
 
-# def jmp_sort(dictionary: dict, file_path: str):
-#     for key, value in dictionary.items():
-#         difficulty, sensitivity = key.split("_")
-#         dictionary[key] = [sub_num, difficulty, sensitivity] + value
-#     result_df = pd.DataFrame.from_dict(dictionary, orient='index', columns=(['Subject', 'Difficulty', 'Sensitivity'] + list(muscles.keys())))
-#     result_df.reset_index(drop=True)
-#     result_df.to_csv(file_path)
+        output_angles(angle_outputs_list, beta_wrist_min, 'min')
+        output_angles(angle_outputs_list, beta_wrist_mean, 'mean')
+        output_angles(angle_outputs_list, beta_wrist_max, 'max')
+        
+        output_angles(angle_outputs_list, gamma_wrist_min, 'min')
+        output_angles(angle_outputs_list, gamma_wrist_mean, 'mean')
+        output_angles(angle_outputs_list, gamma_wrist_max, 'max')
+        
+        if len(angle_outputs_list) != len(angle_outputs_df.columns):
+            # Add the completed row to the DataFrame
+            print(f"Skipping row due to mismatch in length:list {len(angle_outputs_list)} vs df {len(angle_outputs_df.columns)}")
+        angle_outputs_df.loc[len(angle_outputs_df)] = angle_outputs_list
+        
 
-# jmp_sort(normalized_maxs, f'{trial_folder}/{sub_num}_sorted_normalized_condition_maxs.csv')
-# print(f"subject max emg values have been written to {trial_folder}/{sub_num}_sorted_normalized_condition_maxs.csv")
-# jmp_sort(condition_means, f'{trial_folder}/{sub_num}_sorted_normalized_condition_means.csv')
-# print(f"subject mean emg values have been written to {trial_folder}/{sub_num}_sorted_normalized_condition_means.csv")
-# jmp_sort(condition_maxs, f'{trial_folder}/{sub_num}_sorted_condition_maxs.csv')
-# print(f"subject max emg values have been written to {trial_folder}/{sub_num}_sorted_condition_maxs.csv")
+#export to csv
+angle_outputs_df.to_csv(f"C:/Users/kruss/OneDrive - University of Waterloo/Documents/OSU/Data/S03/Data_Raw/Trial_Kinematics/{sub_num}_kinematic_angles_outputs.csv")
